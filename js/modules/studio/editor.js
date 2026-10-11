@@ -27,12 +27,37 @@ const temaEditor = EditorView.theme({
     "&.cm-focused": { outline: "2px solid #b99af8", outlineOffset: "-2px" }
 }, { dark: true });
 
-// Editor — Configuração - inicia vazio e comunica somente mudanças no documento
-export function criarEditorHTML(parent, aoAlterarCodigo) {
+// Projeto — Estrutura inicial - trata o título como texto dentro do HTML
+export function criarEstruturaInicialHTML(titulo) {
+    const tituloSeguro = titulo.replace(/[&<>"']/g, (caractere) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    })[caractere]);
+
+    return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${tituloSeguro}</title>
+</head>
+<body>
+
+</body>
+</html>`;
+}
+
+// Editor — Configuração - prepara projetos novos sem substituir conteúdo recebido
+export function criarEditorHTML(parent, aoAlterarCodigo, { novoProjeto = false, titulo = "", codigoInicial, posicaoCursor = 0 } = {}) {
+    const inserirEstrutura = novoProjeto && codigoInicial === undefined;
+    const codigo = inserirEstrutura ? criarEstruturaInicialHTML(titulo) : (codigoInicial ?? "");
+    const cursor = inserirEstrutura ? codigo.indexOf("<body>\n") + "<body>\n".length :
+        Math.max(0, Math.min(posicaoCursor, codigo.length));
+
     return new EditorView({
         parent,
         state: EditorState.create({
-            doc: "",
+            doc: codigo,
+            selection: { anchor: cursor },
             extensions: [
                 lineNumbers(),
                 highlightActiveLine(),

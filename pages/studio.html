@@ -45,6 +45,8 @@
   </header>
 
   <main class="studio-conteudo">
+    <p id="studio-projetos-aviso" class="studio-projetos-aviso" role="status" hidden></p>
+    <div id="studio-gerenciamento">
     <!-- Projeto — Criação - solicita o título antes de apresentar o ambiente -->
     <section id="studio-inicio" class="studio-inicio" aria-labelledby="titulo-inicio">
       <span class="studio-etiqueta">HTML / NOVO PROJETO</span>
@@ -54,11 +56,18 @@
         <label for="studio-titulo">Título do projeto</label>
         <input id="studio-titulo" name="titulo" type="text" required maxlength="120"
           placeholder="Ex.: Minha primeira página" aria-describedby="studio-aviso">
-        <p id="studio-aviso" class="studio-ajuda" role="status">Seu título será mantido ao atualizar esta aba.</p>
-        <button class="studio-criar" type="submit">Criar projeto</button>
+        <p id="studio-aviso" class="studio-ajuda" role="status">Os projetos são salvos neste navegador e neste dispositivo.</p>
+        <button id="studio-criar-projeto" class="studio-criar" type="submit" disabled>Criar projeto</button>
       </form>
       <noscript>Ative o JavaScript no navegador para criar o projeto.</noscript>
     </section>
+    <section class="studio-biblioteca" aria-labelledby="titulo-projetos">
+      <h2 id="titulo-projetos" tabindex="-1">Meus projetos</h2>
+      <ul id="studio-lista-projetos" class="studio-lista-projetos">
+        <li>Carregando projetos…</li>
+      </ul>
+    </section>
+    </div>
 
     <!-- Ambiente — Estrutura - reserva os painéis para as próximas fases -->
     <section id="studio-ambiente" hidden aria-labelledby="titulo-ambiente">
@@ -67,7 +76,12 @@
           <span class="studio-etiqueta">SEU ESPAÇO DE CRIAÇÃO</span>
           <h1 id="titulo-ambiente" tabindex="-1">Ambiente do projeto</h1>
         </div>
-        <span class="studio-linguagem">HTML</span>
+        <div class="studio-projeto-acoes">
+          <span class="studio-linguagem">HTML</span>
+          <button id="studio-meus-projetos" class="studio-retorno" type="button">Meus projetos</button>
+          <button id="studio-salvar-projeto" class="studio-retorno" type="button" disabled>Salvar projeto</button>
+          <span id="studio-salvamento" role="status" aria-live="polite"></span>
+        </div>
       </div>
       <div class="studio-paineis">
         <section class="studio-painel studio-editor" aria-labelledby="titulo-editor">
@@ -91,7 +105,7 @@
             <button id="studio-editor-repetir" class="studio-retorno" type="button" hidden>Tentar novamente</button>
           </div>
           <div id="studio-editor" aria-busy="true"></div>
-          <p id="studio-editor-ajuda" class="studio-editor-ajuda">O código não é salvo nesta fase. Use Esc e depois Tab para sair do editor se a tecla Tab estiver indentando.</p>
+          <p id="studio-editor-ajuda" class="studio-editor-ajuda">Seu código é salvo automaticamente neste navegador. Use Esc e depois Tab para sair do editor se a tecla Tab estiver indentando.</p>
         </section>
         <section class="studio-painel" aria-labelledby="titulo-previa">
           <header class="studio-painel-cabecalho">

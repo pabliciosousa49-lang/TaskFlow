@@ -94,6 +94,23 @@ button, a, input { -webkit-tap-highlight-color: transparent; }
     cursor: pointer;
 }
 .studio-criar:hover { background: #8b5cf6; }
+.studio-criar:disabled { opacity: .5; cursor: default; }
+
+/* Projetos — Gerenciamento - apresenta registros e ações sem modificar os painéis */
+.studio-biblioteca { max-width: 800px; margin: 24px auto; }
+.studio-biblioteca h2 { font-size: 22px; margin-bottom: 16px; }
+.studio-lista-projetos { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.studio-lista-projetos li { min-width: 0; padding: 16px; border: 1px solid var(--studio-borda); border-radius: 10px; background: var(--studio-superficie); }
+.studio-lista-projetos strong { display: block; overflow-wrap: anywhere; }
+.studio-lista-projetos time { display: block; margin-top: 4px; color: var(--studio-secundario); font-size: 12px; }
+.studio-lista-acoes, .studio-projeto-acoes { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.studio-lista-acoes { margin-top: 12px; }
+.studio-lista-acoes button, .studio-projeto-acoes button { min-width: 0; background: var(--studio-card); color: var(--studio-texto); cursor: pointer; }
+.studio-projeto-acoes button:disabled { opacity: .5; cursor: default; }
+.studio-projetos-aviso { margin-bottom: 20px; padding: 12px 16px; border: 1px solid var(--studio-borda); border-radius: 6px; color: #f59e0b; overflow-wrap: anywhere; }
+#studio-salvamento { color: var(--studio-secundario); font-size: 12px; }
+#studio-salvamento[data-estado="erro"] { color: #ef4444; }
+#studio-salvamento[data-estado="salvo"] { color: #22c55e; }
 
 /* Ambiente — Painéis - reserva editor, prévia e mentor sem controles fictícios */
 .studio-abertura { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
@@ -150,4 +167,7 @@ button, a, input { -webkit-tap-highlight-color: transparent; }
     #studio-editor .cm-scroller { font-size: 16px; }
     #studio-previa-iframe { height: 320px; height: clamp(240px, 50dvh, 420px); }
     .studio-editor-controles button { flex: 1 1 160px; justify-content: center; }
+    .studio-abertura { align-items: flex-start; flex-direction: column; }
+    .studio-projeto-acoes { width: 100%; }
+    .studio-lista-acoes button { flex: 1 1 100px; justify-content: center; }
 }
