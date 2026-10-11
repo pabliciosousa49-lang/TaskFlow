@@ -26,8 +26,8 @@ const temaEditor = EditorView.theme({
     "&.cm-focused": { outline: "2px solid #b99af8", outlineOffset: "-2px" }
 }, { dark: true });
 
-// Editor — Configuração - inicia vazio, com edição nativa e sem prévia ou persistência
-export function criarEditorHTML(parent) {
+// Editor — Configuração - inicia vazio e comunica somente mudanças no documento
+export function criarEditorHTML(parent, aoAlterarCodigo) {
     return new EditorView({
         parent,
         state: EditorState.create({
@@ -44,6 +44,11 @@ export function criarEditorHTML(parent) {
                 keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
                 syntaxHighlighting(coresHTML),
                 temaEditor,
+                EditorView.updateListener.of((atualizacao) => {
+                    if (atualizacao.docChanged) {
+                        aoAlterarCodigo(atualizacao.state.doc.toString());
+                    }
+                }),
                 EditorView.contentAttributes.of({
                     "aria-label": "Editor de código HTML — index.html",
                     "aria-describedby": "studio-editor-ajuda",

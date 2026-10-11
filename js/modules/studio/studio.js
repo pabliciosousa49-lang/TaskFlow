@@ -19,8 +19,15 @@ async function iniciarEditorStudio() {
     container.setAttribute("aria-busy", "true");
 
     try {
-        const { criarEditorHTML } = await import("./editor.js");
-        editorStudio = criarEditorHTML(container);
+        const [{ criarEditorHTML }, { criarPreviaHTML }] = await Promise.all([
+            import("./editor.js"),
+            import("./previa.js")
+        ]);
+        const previa = criarPreviaHTML(
+            document.querySelector("#studio-previa-iframe"),
+            document.querySelector("#studio-previa-vazia")
+        );
+        editorStudio = criarEditorHTML(container, previa.agendar);
         status.hidden = true;
     } catch {
         status.textContent = "Não foi possível carregar o editor. Confira sua conexão e tente novamente.";

@@ -86,9 +86,13 @@
           <header class="studio-painel-cabecalho">
             <h2 id="titulo-previa">Pré-visualização</h2>
           </header>
-          <div class="studio-reserva" id="studio-previa">
-            <h3>Uma janela para suas ideias</h3>
-            <p>O resultado do seu projeto aparecerá neste espaço.</p>
+          <div id="studio-previa">
+            <div class="studio-reserva" id="studio-previa-vazia">
+              <h3>Uma janela para suas ideias</h3>
+              <p>Escreva HTML no editor para visualizar o resultado neste espaço.</p>
+            </div>
+            <iframe id="studio-previa-iframe" title="Resultado do código HTML"
+              sandbox="" referrerpolicy="no-referrer" hidden></iframe>
           </div>
         </section>
       </div>
