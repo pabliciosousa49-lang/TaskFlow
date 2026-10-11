@@ -19,15 +19,25 @@ async function iniciarEditorStudio() {
     container.setAttribute("aria-busy", "true");
 
     try {
-        const [{ criarEditorHTML }, { criarPreviaHTML }] = await Promise.all([
+        const [{ criarEditorHTML }, { criarPreviaHTML }, { iniciarReferenciaHTML }, { mostrarProblemasHTML }] = await Promise.all([
             import("./editor.js"),
-            import("./previa.js")
+            import("./previa.js"),
+            import("./referencia.js"),
+            import("./validacao.js")
         ]);
         const previa = criarPreviaHTML(
             document.querySelector("#studio-previa-iframe"),
             document.querySelector("#studio-previa-vazia")
         );
         editorStudio = criarEditorHTML(container, previa.agendar);
+        iniciarReferenciaHTML(
+            document.querySelector("#studio-mostrar-referencia"),
+            document.querySelector("#studio-referencia"),
+            document.querySelector("#studio-referencia-codigo")
+        );
+        const botaoProblemas = document.querySelector("#studio-ver-problemas");
+        botaoProblemas.disabled = false;
+        botaoProblemas.addEventListener("click", () => mostrarProblemasHTML(editorStudio));
         status.hidden = true;
     } catch {
         status.textContent = "Não foi possível carregar o editor. Confira sua conexão e tente novamente.";

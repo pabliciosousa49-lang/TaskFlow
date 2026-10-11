@@ -4,6 +4,7 @@ import { history, historyKeymap, defaultKeymap, indentWithTab } from "@codemirro
 import { indentOnInput, indentUnit, syntaxHighlighting, HighlightStyle } from "@codemirror/language";
 import { html } from "@codemirror/lang-html";
 import { tags } from "@lezer/highlight";
+import { criarValidacaoHTML } from "./validacao.js";
 
 // Editor — Aparência - distingue tags, atributos e valores no tema escuro
 const coresHTML = HighlightStyle.define([
@@ -44,6 +45,7 @@ export function criarEditorHTML(parent, aoAlterarCodigo) {
                 keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
                 syntaxHighlighting(coresHTML),
                 temaEditor,
+                criarValidacaoHTML(),
                 EditorView.updateListener.of((atualizacao) => {
                     if (atualizacao.docChanged) {
                         aoAlterarCodigo(atualizacao.state.doc.toString());

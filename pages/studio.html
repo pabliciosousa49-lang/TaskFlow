@@ -75,6 +75,17 @@
             <h2 id="titulo-editor">Editor</h2>
             <span class="studio-arquivo">index.html</span>
           </header>
+          <!-- Editor — Orientação - oferece diagnósticos e referência sem inserir código -->
+          <div class="studio-editor-controles">
+            <button id="studio-ver-problemas" class="studio-retorno" type="button" disabled>Ver problemas</button>
+            <button id="studio-mostrar-referencia" class="studio-retorno" type="button"
+              aria-controls="studio-referencia" aria-expanded="false" aria-pressed="false" disabled>Mostrar código de referência</button>
+          </div>
+          <section id="studio-referencia" class="studio-referencia" aria-labelledby="titulo-referencia" hidden>
+            <h3 id="titulo-referencia">Código de referência</h3>
+            <p>Orientação visual: escreva manualmente no editor. Esta referência não altera seu código.</p>
+            <pre><code id="studio-referencia-codigo"></code></pre>
+          </section>
           <div class="studio-editor-carregamento">
             <p id="studio-editor-status" role="status">Carregando o editor HTML…</p>
             <button id="studio-editor-repetir" class="studio-retorno" type="button" hidden>Tentar novamente</button>
