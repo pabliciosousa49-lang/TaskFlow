@@ -3,6 +3,35 @@ const formularioStudio = document.querySelector("#studio-formulario");
 const campoTituloStudio = document.querySelector("#studio-titulo");
 const tituloProjetoStudio = document.querySelector("#studio-projeto");
 const chaveProjetoStudio = "taskflow.studio.titulo.v1";
+let editorStudio;
+let carregandoEditorStudio = false;
+
+// Editor — Integração - carrega uma única instância sem bloquear o fluxo do projeto
+async function iniciarEditorStudio() {
+    if (editorStudio || carregandoEditorStudio) return;
+    carregandoEditorStudio = true;
+    const status = document.querySelector("#studio-editor-status");
+    const repetir = document.querySelector("#studio-editor-repetir");
+    const container = document.querySelector("#studio-editor");
+    status.hidden = false;
+    status.textContent = "Carregando o editor HTML…";
+    repetir.hidden = true;
+    container.setAttribute("aria-busy", "true");
+
+    try {
+        const { criarEditorHTML } = await import("./editor.js");
+        editorStudio = criarEditorHTML(container);
+        status.hidden = true;
+    } catch {
+        status.textContent = "Não foi possível carregar o editor. Confira sua conexão e tente novamente.";
+        repetir.hidden = false;
+    } finally {
+        container.setAttribute("aria-busy", "false");
+        carregandoEditorStudio = false;
+    }
+}
+
+document.querySelector("#studio-editor-repetir").addEventListener("click", iniciarEditorStudio);
 
 function abrirAmbienteStudio(titulo) {
     tituloProjetoStudio.textContent = titulo;
@@ -10,6 +39,7 @@ function abrirAmbienteStudio(titulo) {
     document.querySelector("#studio-inicio").hidden = true;
     document.querySelector("#studio-ambiente").hidden = false;
     document.querySelector("#titulo-ambiente").focus();
+    iniciarEditorStudio();
 }
 
 try {
