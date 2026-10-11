@@ -563,20 +563,20 @@ a {
     }
 }
 
-/* Recepção compacta — Responsividade - adapta o conteúdo sem depender da largura do desktop */
 /* Agenda — Identidade - complementa o roxo da marca com verdes suaves */
-.agenda-painel, .proximos-eventos, .agenda-acesso {
+.agenda-painel,
+.proximos-eventos,
+.agenda-acesso {
     --agenda-fundo: #15181a;
     --agenda-superficie: #1c2123;
     --agenda-borda: #343c3f;
     --agenda-verde: var(--cor-sucesso);
     --agenda-verde-fundo: #243127;
-    --agenda-verde-borda: var(--cor-principal);
-    --agenda-roxo-claro: var(--cor-principal);
-    --agenda-roxo-borda: var(--cor-principal);
+    --agenda-verde-borda: var(--cor-sucesso);
     --agenda-texto-secundario: #bdc5c2;
     --agenda-excluir: #f1a9ad;
 }
+
 /* Agenda — Layout - organiza o painel e separa calendário de compromissos */
 .agenda-painel {
     width: min(980px, calc(100% - 32px));
@@ -591,23 +591,127 @@ a {
     box-shadow: 0 18px 60px rgba(0, 0, 0, .4);
     overflow: auto;
 }
-.agenda-painel::backdrop { background: rgba(0, 0, 0, .75); }
-.agenda-painel[open], .eventos-conteudo:not([hidden]) { animation: agenda-entrada .18s ease both; }
-.agenda-painel.agenda-fechando, .eventos-conteudo.eventos-fechando { animation: agenda-saida .15s ease both; }
-.agenda-barra { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.agenda-barra > div { min-width: 0; }
-.agenda-painel > .agenda-barra { padding-bottom: 16px; border-bottom: 1px solid var(--cor-sucesso); }
-.agenda-painel .taskflow-identificador { font-size: 12px; color:  var(--cor-principal); letter-spacing: 2px; }
-#titulo-agenda { margin-top: 4px; font-size: 26px; line-height: 1.3; }
-.agenda-layout { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 20px; align-items: start; margin-top: 20px; }
-.agenda-calendario, .agenda-registros, .agenda-formulario { min-width: 0; padding: 20px; border: 1px solid var(--cor-sucesso); border-radius: var(--raio-medio); background: var(--agenda-superficie); }
-.agenda-registros > h3, .agenda-formulario > h3 { font-size: 17px; line-height: 1.4; }
+
+.agenda-painel::backdrop {
+    background: rgba(52, 17, 134, 0.158);
+}
+
+.agenda-painel[open],
+.eventos-conteudo:not([hidden]) {
+    animation: agenda-entrada .18s ease both;
+}
+
+.agenda-painel.agenda-fechando,
+.eventos-conteudo.eventos-fechando {
+    animation: agenda-saida .15s ease both;
+}
+
+.agenda-barra {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.agenda-barra>div {
+    min-width: 0;
+}
+
+/* Logo da agenda — Apresentação - mantém a imagem original pequena e proporcional */
+.agenda-painel>.agenda-barra>div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 1;
+    gap: 12px;
+}
+
+.agenda-logo {
+    display: block;
+    width: 104px;
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.agenda-painel>.agenda-barra {
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--cor-sucesso);
+}
+
+.agenda-painel .taskflow-identificador {
+    font-size: 26px;
+    color: var(--cor-principal);
+    letter-spacing: 2px;
+}
+
+#titulo-agenda {
+    margin-top: 4px;
+    font-size: 26px;
+    line-height: 1.3;
+}
+
+.agenda-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+    margin-top: 20px;
+}
+
+.agenda-calendario,
+.agenda-registros,
+.agenda-formulario {
+    min-width: 0;
+    padding: 20px;
+    border: 1px solid var(--cor-sucesso);
+    border-radius: var(--raio-medio);
+    background: var(--agenda-superficie);
+}
+
+.agenda-registros>h3,
+.agenda-formulario>h3 {
+    font-size: 17px;
+    line-height: 1.4;
+}
+
 /* Calendário — Estilização - diferencia hoje, seleção e dias com compromissos */
-.agenda-calendario h3 { font-size: 16px; line-height: 1.4; }
-#agenda-mes { text-align: center; font-weight: 700; }
-#mes-anterior, #mes-seguinte, #fechar-agenda, #fechar-eventos { flex-shrink: 0; width: 44px; padding: 6px; font-size: 24px; line-height: 1; }
-.agenda-semana, .agenda-dias { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; }
-.agenda-semana { margin: 20px 0 10px; text-align: center; font-size: 12px; color: var(--cor-sucesso); }
+.agenda-calendario h3 {
+    font-size: 16px;
+    line-height: 1.4;
+}
+
+#agenda-mes {
+    text-align: center;
+    font-weight: 700;
+}
+
+#mes-anterior,
+#mes-seguinte,
+#fechar-agenda,
+#fechar-eventos {
+    flex-shrink: 0;
+    width: 44px;
+    padding: 6px;
+    font-size: 24px;
+    line-height: 1;
+}
+
+.agenda-semana,
+.agenda-dias {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 5px;
+}
+
+.agenda-semana {
+    margin: 20px 0 10px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--cor-sucesso);
+}
+
 .agenda-dia {
     position: relative;
     min-width: 0;
@@ -615,52 +719,272 @@ a {
     padding: 6px 0 12px;
     border: 1px solid var(--agenda-borda);
     border-radius: var(--raio-pequeno);
-    background: var(--agenda-fundo);
-    color: var(--cor-texto);
+    background: white;
+    color: black;
     font-size: 14px;
     font-variant-numeric: tabular-nums;
     transition: background-color .15s, border-color .15s, transform .15s;
 }
-.agenda-dia[aria-current="date"] { border-color: var(--agenda-verde); box-shadow: inset 0 0 0 1px var(--agenda-verde); }
-.agenda-dia[aria-pressed="true"] { background: var(--cor-principal); font-weight: 700; }
-.agenda-dia.com-compromisso::after { content: ''; position: absolute; width: 5px; height: 5px; border-radius: 50%; background: var(--agenda-verde); bottom: 4px; left: calc(50% - 2.5px); }
-.agenda-legenda { margin: 14px 0 18px; color: var(--agenda-texto-secundario); font-size: 12px; line-height: 1.6; }
-#agenda-data-selecionada { padding-top: 14px; border-top: 1px solid var(--agenda-borda); color: white; }
-/* Compromissos — Estilização - apresenta eventos como cards com identificação verde */
-.agenda-lista { display: grid; gap: 12px; list-style: none; margin: 14px 0 0; }
-.agenda-lista > li:not(.agenda-compromisso) { color: var(--agenda-texto-secundario); line-height: 1.6; font-size: 14px; }
-.agenda-compromisso { padding: 16px; border: 1px solid var(--agenda-borda); border-left: 3px solid var(--agenda-verde-borda); border-radius: var(--raio-medio); background: var(--agenda-fundo); overflow-wrap: anywhere; transition: border-color .18s, box-shadow .18s; }
-.agenda-compromisso strong { display: block; font-size: 15px; line-height: 1.5; color: var(--cor-texto); }
-.agenda-compromisso p { margin-top: 10px; white-space: pre-wrap; line-height: 1.6; font-size: 13px; color: var(--agenda-texto-secundario); }
-.agenda-compromisso time { display: block; margin-top: 8px; font-size: 13px; line-height: 1.5; font-variant-numeric: tabular-nums; color: var(--agenda-verde); }
-.agenda-acoes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
-.agenda-botao[data-acao="editar"] { color: white; border-color: var(--agenda-roxo-borda); }
-.agenda-botao[data-acao="excluir"] { color: white; }
-/* Formulário — Estilização - mantém campos legíveis e destaca a ação de salvar */
-.agenda-formulario { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 10px; }
-.agenda-formulario[hidden] { display: none; }
-.agenda-formulario label { font-size: 13px; font-weight: 600; margin-top: 8px; color: var(--agenda-texto-secundario); }
-.agenda-formulario input, .agenda-formulario textarea { width: 100%; min-width: 0; padding: 12px; min-height: 44px; border: 1px solid var(--agenda-borda); border-radius: var(--raio-pequeno); background: var(--agenda-fundo); color: var(--cor-texto); color-scheme: dark; transition: border-color .15s, box-shadow .15s; }
-.agenda-formulario textarea { resize: vertical; line-height: 1.5; }
-.agenda-formulario input:focus, .agenda-formulario textarea:focus { border-color: var(--agenda-verde); box-shadow: 0 0 0 2px var(--agenda-verde-fundo); }
-/* Ações da agenda — Interação - oferece contraste, foco e feedback discreto */
-.agenda-botao { min-height: 44px; padding: 10px 14px; max-width: 100%; border: 1px solid var(--agenda-borda); border-radius: var(--raio-medio); color: var(--cor-texto); background: var(--agenda-superficie); font-size: 14px; line-height: 1.4; transition: background-color .15s, border-color .15s, transform .15s; touch-action: manipulation; }
-.agenda-acesso { margin: 16px 0 0 8px; border-color: var(--agenda-verde-borda); }
-.agenda-primario, #agenda-completa { background: var(--cor-principal); border-color: var(--cor-principal-hover); font-weight: 700; }
-.agenda-botao:active, .agenda-dia:active { transform: scale(.97); }
-.agenda-botao:focus-visible, .agenda-dia:focus-visible, .agenda-formulario input:focus-visible, .agenda-formulario textarea:focus-visible { outline: 2px solid var(--agenda-roxo-claro); outline-offset: 3px; }
-.agenda-botao:disabled { opacity: .5; cursor: not-allowed; }
-.agenda-aviso { color: var(--cor-alerta); line-height: 1.5; font-size: 13px; margin-top: 12px; overflow-wrap: anywhere; }
-/* Próximos eventos — Estilização - integra a janela à identidade da agenda */
-.proximos-eventos { position: fixed; right: 20px; bottom: 20px; width: min(320px, calc(100% - 32px)); z-index: 5; }
-.proximos-eventos > button { display: block; margin-left: auto; border-color: var(--agenda-verde-borda); box-shadow: 0 4px 20px rgba(0, 0, 0, .3); }
-.eventos-conteudo { margin-top: 8px; padding: 16px; border: 1px solid var(--agenda-roxo-borda); border-top: 2px solid var(--agenda-verde-borda); border-radius: var(--raio-grande); background: var(--agenda-fundo); color: var(--cor-texto); max-height: min(420px, 65dvh); overflow: auto; box-shadow: 0 8px 32px rgba(0, 0, 0, .4); }
-.eventos-conteudo h2 { font-size: 16px; line-height: 1.4; }
-.eventos-conteudo .agenda-compromisso { background: var(--agenda-superficie); padding: 12px; }
-#agenda-completa { width: 100%; margin-top: 16px; }
-@keyframes agenda-entrada { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes agenda-saida { to { opacity: 0; transform: translateY(8px); } }
 
+.agenda-dia[aria-current="date"] {
+    border-color: var(--agenda-verde);
+    box-shadow: inset 0 0 0 1px var(--agenda-verde);
+}
+
+.agenda-dia[aria-pressed="true"] {
+    background: var(--cor-principal);
+    font-weight: 700;
+}
+
+.agenda-dia.com-compromisso::after {
+    content: '';
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--agenda-verde);
+    bottom: 4px;
+    left: calc(50% - 2.5px);
+}
+
+.agenda-legenda {
+    margin: 14px 0 18px;
+    color: var(--agenda-texto-secundario);
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+#agenda-data-selecionada {
+    padding-top: 14px;
+    border-top: 1px solid var(--agenda-borda);
+    color: white;
+}
+
+/* Compromissos — Estilização - apresenta eventos como cards com identificação verde */
+.agenda-lista {
+    display: grid;
+    gap: 12px;
+    list-style: none;
+    margin: 14px 0 0;
+}
+
+.agenda-lista>li:not(.agenda-compromisso) {
+    color: var(--agenda-texto-secundario);
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+.agenda-compromisso {
+    padding: 16px;
+    border: 1px solid var(--agenda-borda);
+    border-left: 3px solid var(--agenda-verde-borda);
+    border-radius: var(--raio-medio);
+    background: var(--agenda-fundo);
+    overflow-wrap: anywhere;
+    transition: border-color .18s, box-shadow .18s;
+}
+
+.agenda-compromisso strong {
+    display: block;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--cor-texto);
+}
+
+.agenda-compromisso p {
+    margin-top: 10px;
+    white-space: pre-wrap;
+    line-height: 1.6;
+    font-size: 13px;
+    color: var(--agenda-texto-secundario);
+}
+
+.agenda-compromisso time {
+    display: block;
+    margin-top: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+    font-variant-numeric: tabular-nums;
+    color: var(--agenda-verde);
+}
+
+.agenda-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.agenda-botao[data-acao="editar"] {
+    color: white;
+    border-color: var(--agenda-roxo-borda);
+}
+
+.agenda-botao[data-acao="excluir"] {
+    color: white;
+}
+
+/* Formulário — Estilização - mantém campos legíveis e destaca a ação de salvar */
+.agenda-formulario {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.agenda-formulario[hidden] {
+    display: none;
+}
+
+.agenda-formulario label {
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 8px;
+    color: var(--agenda-texto-secundario);
+}
+
+.agenda-formulario input,
+.agenda-formulario textarea {
+    width: 100%;
+    min-width: 0;
+    padding: 12px;
+    min-height: 44px;
+    border: 1px solid var(--agenda-borda);
+    border-radius: var(--raio-pequeno);
+    background: var(--agenda-fundo);
+    color: var(--cor-texto);
+    color-scheme: dark;
+    transition: border-color .15s, box-shadow .15s;
+}
+
+.agenda-formulario textarea {
+    resize: vertical;
+    line-height: 1.5;
+}
+
+.agenda-formulario input:focus,
+.agenda-formulario textarea:focus {
+    border-color: var(--agenda-verde);
+    box-shadow: 0 0 0 2px var(--agenda-verde-fundo);
+}
+
+/* Ações da agenda — Interação - oferece contraste, foco e feedback discreto */
+.agenda-botao {
+    min-height: 44px;
+    padding: 10px 14px;
+    max-width: 100%;
+    border: 1px solid var(--agenda-borda);
+    border-radius: var(--raio-medio);
+    color: var(--cor-texto);
+    background: var(--agenda-superficie);
+    font-size: 14px;
+    line-height: 1.4;
+    transition: background-color .15s, border-color .15s, transform .15s;
+    touch-action: manipulation;
+}
+
+.agenda-acesso {
+    margin: 16px 0 0 8px;
+    border-color: var(--agenda-verde-borda);
+}
+
+.agenda-primario,
+#agenda-completa {
+    background: var(--cor-principal);
+    border-color: var(--cor-principal-hover);
+    font-weight: 700;
+}
+
+.agenda-botao:active,
+.agenda-dia:active {
+    transform: scale(.97);
+}
+
+.agenda-botao:focus-visible,
+.agenda-dia:focus-visible,
+.agenda-formulario input:focus-visible,
+.agenda-formulario textarea:focus-visible {
+    outline: 2px solid var(--agenda-roxo-claro);
+    outline-offset: 3px;
+}
+
+.agenda-botao:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+.agenda-aviso {
+    color: var(--cor-alerta);
+    line-height: 1.5;
+    font-size: 13px;
+    margin-top: 12px;
+    overflow-wrap: anywhere;
+}
+
+/* Próximos eventos — Estilização - integra a janela à identidade da agenda */
+.proximos-eventos {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    width: min(320px, calc(100% - 32px));
+    z-index: 5;
+}
+
+.proximos-eventos>button {
+    display: block;
+    margin-left: auto;
+    border-color: var(--agenda-verde-borda);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, .3);
+}
+
+.eventos-conteudo {
+    margin-top: 8px;
+    padding: 16px;
+    border: 1px solid var(--agenda-roxo-borda);
+    border-top: 2px solid var(--agenda-verde-borda);
+    border-radius: var(--raio-grande);
+    background: var(--agenda-fundo);
+    color: var(--cor-texto);
+    max-height: min(420px, 65dvh);
+    overflow: auto;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, .4);
+}
+
+.eventos-conteudo h2 {
+    font-size: 16px;
+    line-height: 1.4;
+}
+
+.eventos-conteudo .agenda-compromisso {
+    background: var(--agenda-superficie);
+    padding: 12px;
+}
+
+#agenda-completa {
+    width: 100%;
+    margin-top: 16px;
+}
+
+@keyframes agenda-entrada {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes agenda-saida {
+    to {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+}
+
+/* Recepção compacta — Responsividade - adapta o conteúdo sem depender da largura do desktop */
 @media (max-width: 1100px) {
     .taskflow-apresentacao {
         gap: 16px;
@@ -708,7 +1032,7 @@ a {
 
     .taskflow-identidade {
         position: absolute;
-        right: -15px;
+        right: 0px;
         bottom: 10px;
         width: 100px;
         min-height: 0;
@@ -885,30 +1209,120 @@ a {
 
 
 }
+
 /* Agenda compacta — Responsividade - mantém o calendário e o formulário acessíveis no celular */
 @media (max-width: 768px) {
-    .agenda-painel { padding: 16px; width: calc(100% - 16px); max-height: calc(100dvh - 16px); }
-    .agenda-layout { grid-template-columns: minmax(0, 1fr); gap: 16px; }
-    .agenda-calendario, .agenda-registros, .agenda-formulario { padding: 12px; }
-    .agenda-semana, .agenda-dias { gap: 3px; }
-    #titulo-agenda { font-size: 22px; }
-    .agenda-acesso { margin-left: 0; }
-    .agenda-formulario input, .agenda-formulario textarea { font-size: 16px; }
-    .proximos-eventos { position: relative; width: 100%; right: auto; bottom: auto; margin-top: 24px; }
-    .proximos-eventos > button { margin-left: 0; }
-    .eventos-conteudo { max-height: none; }
+    .agenda-logo {
+        width: 80px;
+    }
+
+    .agenda-painel {
+        padding: 16px;
+        width: calc(100% - 16px);
+        max-height: calc(100dvh - 16px);
+    }
+
+    .agenda-layout {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 16px;
+    }
+
+    .agenda-calendario,
+    .agenda-registros,
+    .agenda-formulario {
+        padding: 12px;
+    }
+
+    .agenda-semana,
+    .agenda-dias {
+        gap: 3px;
+    }
+
+    #titulo-agenda {
+        font-size: 22px;
+    }
+
+    .agenda-acesso {
+        margin-left: 0;
+    }
+
+    .agenda-formulario input,
+    .agenda-formulario textarea {
+        font-size: 16px;
+    }
+
+    .proximos-eventos {
+        position: relative;
+        width: 100%;
+        right: auto;
+        bottom: auto;
+        margin-top: 24px;
+    }
+
+    .proximos-eventos>button {
+        margin-left: 0;
+    }
+
+    .eventos-conteudo {
+        max-height: none;
+    }
 }
+
 @media (hover: hover) and (pointer: fine) {
-    .agenda-botao:not(:disabled):hover { background: var(--agenda-verde-fundo); border-color: var(--agenda-verde-borda); }
-    .agenda-primario:not(:disabled):hover, #agenda-completa:hover { background: var(--cor-principal-hover); border-color: var(--cor-principal-hover); }
-    .agenda-botao[data-acao="excluir"]:hover { border-color: var(--agenda-excluir); }
-    .agenda-dia:hover { background: var(--agenda-verde-fundo); border-color: var(--agenda-verde-borda); }
-    .agenda-dia[aria-pressed="true"]:hover { background: var(--cor-principal-hover); }
-    .agenda-dia[aria-current="date"]:hover { border-color: var(--agenda-verde); }
-    .agenda-compromisso:hover, .agenda-compromisso:focus-within { border-color: var(--agenda-verde-borda); box-shadow: 0 3px 10px rgba(0, 0, 0, .15); }
+    .agenda-botao:not(:disabled):hover {
+        background: var(--agenda-verde-fundo);
+        border-color: var(--agenda-verde-borda);
+    }
+
+    .agenda-primario:not(:disabled):hover,
+    #agenda-completa:hover {
+        background: var(--cor-principal-hover);
+        border-color: var(--cor-principal-hover);
+    }
+
+    .agenda-botao[data-acao="excluir"]:hover {
+        border-color: var(--agenda-excluir);
+    }
+
+    .agenda-dia:hover {
+        background: var(--agenda-verde-fundo);
+        border-color: var(--agenda-verde-borda);
+    }
+
+    .agenda-dia[aria-pressed="true"]:hover {
+        background: var(--cor-principal-hover);
+    }
+
+    .agenda-dia[aria-current="date"]:hover {
+        border-color: var(--agenda-verde);
+    }
+
+    .agenda-compromisso:hover,
+    .agenda-compromisso:focus-within {
+        border-color: var(--agenda-verde-borda);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, .15);
+    }
 }
+
 @media (prefers-reduced-motion: reduce) {
-    .agenda-painel[open], .agenda-painel.agenda-fechando, .eventos-conteudo:not([hidden]), .eventos-conteudo.eventos-fechando { animation: none; }
-    .agenda-botao, .agenda-dia, .agenda-compromisso, .agenda-formulario input, .agenda-formulario textarea { transition: none; }
-    .agenda-botao:active, .agenda-dia:active { transform: none; }
+
+    .agenda-painel[open],
+    .agenda-painel.agenda-fechando,
+    .eventos-conteudo:not([hidden]),
+    .eventos-conteudo.eventos-fechando {
+        animation: none;
+    }
+
+    .agenda-botao,
+    .agenda-dia,
+    .agenda-compromisso,
+    .agenda-formulario input,
+    .agenda-formulario textarea {
+        transition: none;
+    }
+
+    .agenda-botao:active,
+    .agenda-dia:active {
+        transform: none;
+    }
 }

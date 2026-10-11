@@ -138,7 +138,8 @@
               <p class="taskflow-descricao">Um ponto de encontro para seus estudos, suas ideias e seu futuro. Explore os
                 assuntos que fazem parte da sua jornada como dev.</p>
               <a class="taskflow-explorar" href="#taskflow-areas">Explore as áreas <span aria-hidden="true">↓</span></a>
-              <button id="abrir-agenda" class="agenda-botao agenda-acesso" type="button" aria-haspopup="dialog">Minha Agenda</button>
+              <button id="abrir-agenda" class="agenda-botao agenda-acesso" type="button" aria-haspopup="dialog">Minha
+                Agenda</button>
             </div>
             <div class="taskflow-identidade" aria-hidden="true">
               <div class="taskflow-anel"></div>
@@ -313,11 +314,16 @@
           </section>
           <!-- Próximos eventos — Estrutura - apresenta até três compromissos futuros -->
           <aside class="proximos-eventos" aria-label="Próximos eventos">
-            <button id="alternar-eventos" class="agenda-botao" type="button" aria-expanded="false" aria-controls="painel-eventos">Próximos eventos</button>
+            <button id="alternar-eventos" class="agenda-botao" type="button" aria-expanded="false"
+              aria-controls="painel-eventos">Próximos eventos</button>
             <div id="painel-eventos" class="eventos-conteudo" hidden>
-              <div class="agenda-barra"><h2>Próximos eventos</h2><button id="fechar-eventos" class="agenda-botao" type="button" aria-label="Fechar próximos eventos">×</button></div>
+              <div class="agenda-barra">
+                <h2>Próximos eventos</h2><button id="fechar-eventos" class="agenda-botao" type="button"
+                  aria-label="Fechar próximos eventos">×</button>
+              </div>
               <ul id="lista-eventos" class="agenda-lista"></ul>
-              <button id="agenda-completa" class="agenda-botao" type="button" aria-haspopup="dialog">Abrir agenda completa</button>
+              <button id="agenda-completa" class="agenda-botao" type="button" aria-haspopup="dialog">Abrir agenda
+                completa</button>
             </div>
           </aside>
         </div>
@@ -330,7 +336,10 @@
   <!-- Agenda pessoal — Estrutura - reúne calendário, consulta e edição em um painel -->
   <dialog id="painel-agenda" class="agenda-painel" aria-labelledby="titulo-agenda">
     <div class="agenda-barra">
-      <div><span class="taskflow-identificador">TASKFLOW</span><h2 id="titulo-agenda">Minha Agenda</h2></div>
+      <div>
+        <h2 id="titulo-agenda">Minha Agenda</h2>
+        <img class="agenda-logo" src="./assets/images/TaskCentro.png" alt="TaskFlow">
+      </div>
       <button id="fechar-agenda" class="agenda-botao" type="button" aria-label="Fechar agenda">×</button>
     </div>
     <p id="agenda-aviso" class="agenda-aviso" role="status" aria-live="polite"></p>
@@ -341,7 +350,9 @@
           <h3 id="agenda-mes" aria-live="polite"></h3>
           <button id="mes-seguinte" class="agenda-botao" type="button" aria-label="Mês seguinte">›</button>
         </div>
-        <div class="agenda-semana" aria-hidden="true"><span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span></div>
+        <div class="agenda-semana" aria-hidden="true">
+          <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
+        </div>
         <div id="agenda-dias" class="agenda-dias"></div>
         <p class="agenda-legenda">● Dia com compromisso · Borda verde: hoje</p>
         <h3 id="agenda-data-selecionada"></h3>
@@ -362,7 +373,9 @@
         <input id="compromisso-data" name="data" type="date" min="0001-01-01" max="9999-12-31" required>
         <label for="compromisso-hora">Hora (obrigatória)</label>
         <input id="compromisso-hora" name="hora" type="time" required>
-        <div class="agenda-acoes"><button id="salvar-compromisso" class="agenda-botao agenda-primario" type="submit">Salvar</button><button id="cancelar-compromisso" class="agenda-botao" type="button">Cancelar</button></div>
+        <div class="agenda-acoes"><button id="salvar-compromisso" class="agenda-botao agenda-primario"
+            type="submit">Salvar</button><button id="cancelar-compromisso" class="agenda-botao"
+            type="button">Cancelar</button></div>
       </form>
     </div>
   </dialog>
