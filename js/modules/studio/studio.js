@@ -20,6 +20,7 @@ let abrindoProjeto = false;
 let criandoProjeto = false;
 let referenciaInicializada = false;
 let pedidoAbertura;
+let mentorStudio;
 
 function mostrarAviso(mensagem = "") {
     avisoProjetosStudio.textContent = mensagem;
@@ -29,6 +30,15 @@ function mostrarAviso(mensagem = "") {
 function indicarSalvamento(estado) {
     estadoSalvamentoStudio.dataset.estado = estado;
     estadoSalvamentoStudio.textContent = { salvando: "Salvando...", salvo: "Salvo", erro: "Erro ao salvar" }[estado];
+    if (estado === "erro") mentorStudio?.erro();
+}
+
+// Interface — Painéis - alterna a apresentação no mobile sem recriar o documento
+function selecionarPainel(nome) {
+    document.querySelector("#studio-paineis").dataset.painel = nome;
+    document.querySelector("#studio-abrir-editor").setAttribute("aria-pressed", String(nome === "editor"));
+    document.querySelector("#studio-abrir-previa").setAttribute("aria-pressed", String(nome === "previa"));
+    if (nome === "editor") editorStudio?.requestMeasure();
 }
 
 function registrarProjetoAtivo(id) {
@@ -159,6 +169,8 @@ async function abrirProjeto(id, novo = false) {
         document.querySelector("#studio-ambiente").hidden = false;
         tituloProjetoStudio.textContent = projeto.titulo;
         tituloProjetoStudio.hidden = false;
+        document.querySelector("#studio-acoes-projeto").hidden = false;
+        selecionarPainel("editor");
         previaStudio.agendar(projeto.codigo);
         if (!referenciaInicializada) {
             componentesStudio.iniciarReferenciaHTML(
@@ -173,6 +185,8 @@ async function abrirProjeto(id, novo = false) {
         registrarProjetoAtivo(projeto.id);
         mostrarAviso();
         status.hidden = true;
+        mentorStudio?.ativar(true);
+        mentorStudio?.saudacao();
         editorStudio.focus();
     } catch (erro) {
         mostrarAviso(`Não foi possível abrir o projeto. ${erro.message} Seus projetos salvos foram preservados.`);
@@ -190,6 +204,8 @@ function mostrarGerenciamento() {
     document.querySelector("#studio-gerenciamento").hidden = false;
     document.querySelector("#studio-ambiente").hidden = true;
     tituloProjetoStudio.hidden = true;
+    document.querySelector("#studio-acoes-projeto").hidden = true;
+    mentorStudio?.ativar(false);
     atualizarListaProjetos();
     document.querySelector("#titulo-projetos").focus();
 }
@@ -245,11 +261,22 @@ listaProjetosStudio.addEventListener("click", async (event) => {
     }
 });
 
-botaoSalvarStudio.addEventListener("click", salvarProjetoAtual);
+// Navegação — Retorno - sai do editor somente depois de confirmar o salvamento
+botaoSalvarStudio.addEventListener("click", mostrarGerenciamento);
 document.querySelector("#studio-meus-projetos").addEventListener("click", mostrarGerenciamento);
+document.querySelector("#studio-voltar").addEventListener("click", () => {
+    if (abrindoProjeto || criandoProjeto) return;
+    if (!document.querySelector("#studio-ambiente").hidden) {
+        mostrarGerenciamento();
+    } else {
+        window.location.assign("../index.html");
+    }
+});
 document.querySelector("#studio-ver-problemas").addEventListener("click", () => {
     if (editorStudio && componentesStudio) componentesStudio.mostrarProblemasHTML(editorStudio);
 });
+document.querySelector("#studio-abrir-editor").addEventListener("click", () => selecionarPainel("editor"));
+document.querySelector("#studio-abrir-previa").addEventListener("click", () => selecionarPainel("previa"));
 document.querySelector("#studio-editor-repetir").addEventListener("click", () => {
     if (pedidoAbertura) abrirProjeto(pedidoAbertura.id, pedidoAbertura.novo);
 });
@@ -267,6 +294,12 @@ window.addEventListener("beforeunload", (event) => {
 
 // Studio — Inicialização - carrega registros sem criar projetos durante uma recarga
 async function iniciarStudio() {
+    try {
+        const { criarMentorStudio } = await import("./mentor.js");
+        mentorStudio = criarMentorStudio(document.querySelector("#studio-mentor"));
+    } catch {
+        document.querySelector("#studio-mentor-estado").textContent = "Mentor indisponível";
+    }
     try {
         servicoProjetos = await import("../../services/projetos-studio.js");
         if (!atualizarListaProjetos()) {

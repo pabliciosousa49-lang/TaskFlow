@@ -18,13 +18,13 @@ const coresHTML = HighlightStyle.define([
 ]);
 
 const temaEditor = EditorView.theme({
-    "&": { backgroundColor: "#1e1e1e", color: "#d4d4d4" },
+    "&": { backgroundColor: "var(--studio-editor-fundo)", color: "var(--studio-editor-texto)" },
     ".cm-content": { caretColor: "#f5f5f5", padding: "12px 0" },
     ".cm-cursor, .cm-dropCursor": { borderLeftColor: "#f5f5f5" },
-    ".cm-gutters": { backgroundColor: "#1e1e1e", color: "#858585", border: "none" },
+    ".cm-gutters": { backgroundColor: "var(--studio-editor-fundo)", color: "var(--studio-secundario)", border: "none" },
     ".cm-activeLine, .cm-activeLineGutter": { backgroundColor: "#ffffff08" },
-    "&.cm-focused .cm-selectionBackground, .cm-selectionBackground, ::selection": { backgroundColor: "#264f78" },
-    "&.cm-focused": { outline: "2px solid #b99af8", outlineOffset: "-2px" }
+    "&.cm-focused .cm-selectionBackground, .cm-selectionBackground, ::selection": { backgroundColor: "#563385" },
+    "&.cm-focused": { outline: "2px solid var(--studio-foco)", outlineOffset: "-2px" }
 }, { dark: true });
 
 // Projeto — Estrutura inicial - trata o título como texto dentro do HTML

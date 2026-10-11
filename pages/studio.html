@@ -38,10 +38,21 @@
   <!-- Studio — Cabeçalho - identifica o ambiente e permite retornar à página principal -->
   <header class="studio-cabecalho">
     <div class="studio-identidade">
-      <span class="studio-marca">TaskFlow <span>Studio</span></span>
-      <p id="studio-projeto" hidden></p>
+      <img src="../assets/images/devLogo.png" width="40" height="40" alt="">
+      <div>
+        <span class="studio-marca">TaskFlow <span>Studio</span></span>
+        <p id="studio-projeto" hidden></p>
+      </div>
     </div>
-    <a class="studio-retorno" href="../index.html">← Voltar ao TaskFlow</a>
+    <div id="studio-acoes-projeto" class="studio-projeto-acoes" hidden>
+      <span id="studio-salvamento" role="status" aria-live="polite"></span>
+      <button id="studio-meus-projetos" class="studio-retorno" type="button">Meus projetos</button>
+      <button id="studio-salvar-projeto" class="studio-retorno studio-acao-principal" type="button" disabled>Salvar projeto</button>
+    </div>
+    <nav class="studio-navegacao" aria-label="Retorno do Studio">
+      <button id="studio-voltar" class="studio-retorno" type="button">← Voltar</button>
+      <a class="studio-retorno" href="../index.html">Voltar ao TaskFlow</a>
+    </nav>
   </header>
 
   <main class="studio-conteudo">
@@ -49,9 +60,9 @@
     <div id="studio-gerenciamento">
     <!-- Projeto — Criação - solicita o título antes de apresentar o ambiente -->
     <section id="studio-inicio" class="studio-inicio" aria-labelledby="titulo-inicio">
-      <span class="studio-etiqueta">HTML / NOVO PROJETO</span>
-      <h1 id="titulo-inicio">Toda ideia começa com um primeiro passo.</h1>
-      <p>Dê um nome ao seu projeto para entrar no TaskFlow Studio.</p>
+      <span class="studio-etiqueta">SEU LABORATÓRIO DE HTML</span>
+      <h1 id="titulo-inicio">Uma ideia.<br>Seu próximo projeto.</h1>
+      <p>Escreva, experimente e veja sua página ganhar forma. Comece dando um nome à sua ideia.</p>
       <form id="studio-formulario">
         <label for="studio-titulo">Título do projeto</label>
         <input id="studio-titulo" name="titulo" type="text" required maxlength="120"
@@ -62,7 +73,11 @@
       <noscript>Ative o JavaScript no navegador para criar o projeto.</noscript>
     </section>
     <section class="studio-biblioteca" aria-labelledby="titulo-projetos">
-      <h2 id="titulo-projetos" tabindex="-1">Meus projetos</h2>
+      <div class="studio-biblioteca-cabecalho">
+        <span class="studio-etiqueta">CONTINUE DE ONDE PAROU</span>
+        <h2 id="titulo-projetos" tabindex="-1">Meus projetos</h2>
+        <p>Seus projetos ficam neste navegador, prontos para o próximo passo.</p>
+      </div>
       <ul id="studio-lista-projetos" class="studio-lista-projetos">
         <li>Carregando projetos…</li>
       </ul>
@@ -71,23 +86,41 @@
 
     <!-- Ambiente — Estrutura - reserva os painéis para as próximas fases -->
     <section id="studio-ambiente" hidden aria-labelledby="titulo-ambiente">
-      <div class="studio-abertura">
+      <div class="studio-contexto">
+        <!-- Mentor — Componente - mantém o personagem e a mensagem no topo esquerdo -->
+        <aside id="studio-mentor" class="studio-mentor" aria-labelledby="titulo-mentor">
+          <div id="studio-mascote" class="mascote-viewport" aria-hidden="true"></div>
+          <div class="studio-mentor-conteudo">
+            <div class="studio-mentor-cabecalho">
+              <div>
+                <span class="studio-etiqueta">MENTOR TASKFLOW</span>
+                <h2 id="titulo-mentor">Flow</h2>
+              </div>
+              <button id="studio-mentor-recolher" type="button" aria-controls="studio-mentor-mensagem" aria-expanded="true">Recolher mensagem</button>
+            </div>
+            <span id="studio-mentor-estado" class="studio-mentor-estado">Disponível</span>
+            <div id="studio-mentor-mensagem" class="studio-mentor-mensagem" aria-live="polite">
+              <p id="studio-mentor-texto">Seu espaço para escrever, experimentar e aprender no seu ritmo.</p>
+            </div>
+          </div>
+        </aside>
+        <div class="studio-abertura">
         <div>
-          <span class="studio-etiqueta">SEU ESPAÇO DE CRIAÇÃO</span>
-          <h1 id="titulo-ambiente" tabindex="-1">Ambiente do projeto</h1>
+          <span class="studio-etiqueta">ESCREVA. EXPERIMENTE. EVOLUA.</span>
+          <h1 id="titulo-ambiente" tabindex="-1">Seu código ganha vida aqui.</h1>
+          <p>Edite à esquerda. Acompanhe o resultado à direita.</p>
         </div>
-        <div class="studio-projeto-acoes">
-          <span class="studio-linguagem">HTML</span>
-          <button id="studio-meus-projetos" class="studio-retorno" type="button">Meus projetos</button>
-          <button id="studio-salvar-projeto" class="studio-retorno" type="button" disabled>Salvar projeto</button>
-          <span id="studio-salvamento" role="status" aria-live="polite"></span>
         </div>
       </div>
-      <div class="studio-paineis">
-        <section class="studio-painel studio-editor" aria-labelledby="titulo-editor">
+      <div class="studio-alternar-paineis" role="group" aria-label="Painel visível no smartphone">
+        <button id="studio-abrir-editor" type="button" aria-controls="studio-editor-painel" aria-pressed="true">Editor</button>
+        <button id="studio-abrir-previa" type="button" aria-controls="studio-previa-painel" aria-pressed="false">Pré-visualização</button>
+      </div>
+      <div id="studio-paineis" class="studio-paineis" data-painel="editor">
+        <section id="studio-editor-painel" class="studio-painel studio-editor" aria-labelledby="titulo-editor">
           <header class="studio-painel-cabecalho">
-            <h2 id="titulo-editor">Editor</h2>
-            <span class="studio-arquivo">index.html</span>
+            <h2 id="titulo-editor">Editor HTML</h2>
+            <span class="studio-arquivo"><span aria-hidden="true">&lt;/&gt;</span> index.html</span>
           </header>
           <!-- Editor — Orientação - oferece diagnósticos e referência sem inserir código -->
           <div class="studio-editor-controles">
@@ -107,9 +140,11 @@
           <div id="studio-editor" aria-busy="true"></div>
           <p id="studio-editor-ajuda" class="studio-editor-ajuda">Seu código é salvo automaticamente neste navegador. Use Esc e depois Tab para sair do editor se a tecla Tab estiver indentando.</p>
         </section>
-        <section class="studio-painel" aria-labelledby="titulo-previa">
-          <header class="studio-painel-cabecalho">
+        <section id="studio-previa-painel" class="studio-painel studio-previa-painel" aria-labelledby="titulo-previa">
+          <header class="studio-painel-cabecalho studio-browser-cabecalho">
+            <span class="studio-browser-pontos" aria-hidden="true"><span></span><span></span><span></span></span>
             <h2 id="titulo-previa">Pré-visualização</h2>
+            <span class="studio-browser-endereco" aria-hidden="true">index.html</span>
           </header>
           <div id="studio-previa">
             <div class="studio-reserva" id="studio-previa-vazia">
@@ -121,13 +156,6 @@
           </div>
         </section>
       </div>
-      <aside class="studio-mentor" aria-labelledby="titulo-mentor">
-        <span class="studio-mentor-marca" aria-hidden="true">✦</span>
-        <div>
-          <h2 id="titulo-mentor">Mentor</h2>
-          <p>Espaço reservado para seu futuro companheiro de aprendizado.</p>
-        </div>
-      </aside>
     </section>
   </main>
 </body>
