@@ -578,6 +578,17 @@ a {
 }
 
 /* Agenda — Layout - organiza o painel e separa calendário de compromissos */
+/* Página principal — Rolagem - imobiliza o fundo enquanto o modal está aberto */
+html.agenda-aberta {
+    overflow: hidden;
+    scroll-behavior: auto;
+}
+html.agenda-aberta body {
+    position: fixed;
+    top: var(--agenda-posicao-pagina);
+    left: 0;
+    width: 100%;
+}
 .agenda-painel {
     width: min(980px, calc(100% - 32px));
     max-height: calc(100dvh - 32px);
@@ -590,6 +601,7 @@ a {
     color: var(--cor-texto);
     box-shadow: 0 18px 60px rgba(0, 0, 0, .4);
     overflow: auto;
+    overscroll-behavior: contain;
 }
 
 .agenda-painel::backdrop {
@@ -685,6 +697,9 @@ a {
 #agenda-mes {
     text-align: center;
     font-weight: 700;
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
 }
 
 #mes-anterior,
@@ -847,6 +862,10 @@ a {
 .agenda-formulario textarea {
     width: 100%;
     min-width: 0;
+    max-width: 100%;
+    min-inline-size: 0;
+    box-sizing: border-box;
+    align-self: stretch;
     padding: 12px;
     min-height: 44px;
     border: 1px solid var(--agenda-borda);
@@ -855,6 +874,16 @@ a {
     color: var(--cor-texto);
     color-scheme: dark;
     transition: border-color .15s, box-shadow .15s;
+}
+
+/* Campos nativos — Dimensionamento - permite encolher sem ultrapassar o formulário */
+.agenda-formulario input[type="date"],
+.agenda-formulario input[type="time"] {
+    inline-size: 100%;
+}
+.agenda-formulario input::-webkit-date-and-time-value {
+    min-width: 0;
+    text-align: left;
 }
 
 .agenda-formulario textarea {
@@ -1024,23 +1053,39 @@ a {
         font-size: 14px;
     }
 
-    /* Identidade TaskFlow — Layout - posiciona a logo no canto direito no mobile */
-    .taskflow-apresentacao {
-        position: relative;
-        padding-bottom: 120px;
-    }
-
+    /* Recepção — Responsividade - mantém botões e logo no fluxo sem sobreposição */
     .taskflow-identidade {
-        position: absolute;
-        right: 0px;
-        bottom: 10px;
+        position: relative;
+        justify-self: end;
         width: 100px;
+        max-width: 100%;
         min-height: 0;
     }
 
     .taskflow-identidade img {
         width: 130px;
         max-width: 100%;
+    }
+
+    .taskflow-boas-vindas,
+    .taskflow-areas-cabecalho > div,
+    .taskflow-areas-cabecalho > p,
+    .area-cabecalho > div {
+        min-width: 0;
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
+
+    .taskflow-explorar,
+    .taskflow-boas-vindas .agenda-acesso {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        margin: 16px 0 0;
+        overflow-wrap: anywhere;
     }
 
     .area-tecnologia {
@@ -1217,7 +1262,7 @@ a {
     }
 
     .agenda-painel {
-        padding: 16px;
+        padding: 12px;
         width: calc(100% - 16px);
         max-height: calc(100dvh - 16px);
     }
@@ -1236,6 +1281,41 @@ a {
     .agenda-semana,
     .agenda-dias {
         gap: 3px;
+        width: 100%;
+        min-width: 0;
+    }
+
+    /* Calendário — Responsividade - reserva espaço para o mês e as sete colunas */
+    .agenda-calendario > .agenda-barra {
+        display: grid;
+        grid-template-columns: 44px minmax(0, 1fr) 44px;
+        gap: 8px;
+    }
+
+    .agenda-dia {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .agenda-painel > .agenda-barra {
+        gap: 8px;
+    }
+
+    .agenda-painel > .agenda-barra > div {
+        gap: 8px;
+    }
+
+    #titulo-agenda,
+    #agenda-data-selecionada,
+    .eventos-conteudo h2 {
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    /* Formulário — Responsividade - mantém campos e ações dentro da área útil */
+    .agenda-acoes > .agenda-botao {
+        flex: 1 1 96px;
+        min-width: 0;
     }
 
     #titulo-agenda {

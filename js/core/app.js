@@ -56,6 +56,7 @@ let mesExibido = dataSelecionada.slice(0, 7);
 let idEmEdicao = null;
 let acessoAgenda = null;
 let fechamentoAgenda = null;
+let posicaoPaginaAgenda = 0;
 let fechamentoEventos = null;
 
 // Datas e horários — Condição - valida valores reais sem conversão de fuso por UTC
@@ -238,7 +239,11 @@ function abrirAgenda(evento) {
     avisoAgenda.textContent = avisoArmazenamento;
     cancelarEdicao();
     atualizarAgenda();
+    posicaoPaginaAgenda = window.scrollY;
     painelAgenda.showModal();
+    // Página principal — Atualização - fixa o fundo na posição atual durante o uso da agenda
+    document.documentElement.style.setProperty("--agenda-posicao-pagina", `${-posicaoPaginaAgenda}px`);
+    document.documentElement.classList.add("agenda-aberta");
     document.querySelector("#fechar-agenda").focus();
 }
 function fecharAgenda() {
@@ -259,7 +264,11 @@ painelAgenda.addEventListener("close", () => {
     clearTimeout(fechamentoAgenda);
     fechamentoAgenda = null;
     painelAgenda.classList.remove("agenda-fechando");
-    if (acessoAgenda) acessoAgenda.focus();
+    // Página principal — Atualização - libera o fundo e restaura a rolagem sem deslocar o foco
+    document.documentElement.classList.remove("agenda-aberta");
+    document.documentElement.style.removeProperty("--agenda-posicao-pagina");
+    window.scrollTo({ top: posicaoPaginaAgenda, behavior: "instant" });
+    if (acessoAgenda) acessoAgenda.focus({ preventScroll: true });
 });
 document.querySelector("#cancelar-compromisso").addEventListener("click", () => {
     cancelarEdicao();
