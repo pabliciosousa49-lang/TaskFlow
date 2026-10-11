@@ -306,12 +306,50 @@ a {
 .taskflow-apresentacao {
     max-width: 1200px;
     margin: 0 auto;
-    display: grid;
-    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-    gap: 32px;
-    align-items: center;
+    display: block;
     padding: 24px 0 56px;
 }
+
+/* Acessos superiores — Visual - alinha os botões com a identidade atual do TaskFlow */
+.taskflow-acessos {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+    max-width: 1200px;
+    margin: 0 auto 24px;
+    padding: 12px;
+    border: 1px solid var(--cor-borda);
+    border-bottom-color: color-mix(in srgb, var(--cor-principal-hover) 35%, var(--cor-borda));
+    border-radius: var(--raio-medio);
+    background: var(--cor-superficie);
+}
+.taskflow-acesso {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 0;
+    min-height: 72px;
+    padding: 10px 6px;
+    border: 1px solid transparent;
+    border-radius: var(--raio-pequeno);
+    background: transparent;
+    color: var(--cor-texto-secundario);
+    font-size: 14px;
+    line-height: 1.4;
+    text-align: center;
+    transition: background-color .18s, border-color .18s, color .18s;
+}
+.taskflow-acesso i { font-size: 21px; }
+.taskflow-acesso:hover, .taskflow-acesso:active {
+    background: var(--cor-card);
+    border-color: var(--cor-principal);
+    color: var(--cor-texto);
+}
+.taskflow-acesso:focus-visible { outline: 2px solid var(--cor-principal-hover); outline-offset: 2px; }
 
 .taskflow-identificador {
     display: block;
@@ -366,11 +404,18 @@ a {
     background: var(--cor-principal-hover);
 }
 
-/* Identidade TaskFlow — Visual - reaproveita a imagem central como destaque de recepção */
+/* Logo TaskFlow — Layout - alinha a identidade à direita do título no fluxo da apresentação */
+.taskflow-titulo-logo {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 32px;
+}
+.taskflow-titulo-logo h1 { min-width: 0; }
 .taskflow-identidade {
     position: relative;
     min-width: 0;
-    min-height: 300px;
+    min-height: 0;
     display: grid;
     place-items: center;
 }
@@ -524,6 +569,8 @@ a {
 }
 
 .taskflow-entrada .taskflow-identidade {
+    /* Logo TaskFlow — Animação - apresenta a imagem em 700ms sem movimento contínuo */
+    animation-duration: .7s;
     animation-delay: .1s;
 }
 
@@ -1015,7 +1062,7 @@ html.agenda-aberta body {
 
 /* Recepção compacta — Responsividade - adapta o conteúdo sem depender da largura do desktop */
 @media (max-width: 1100px) {
-    .taskflow-apresentacao {
+    .taskflow-titulo-logo {
         gap: 16px;
     }
 
@@ -1031,14 +1078,28 @@ html.agenda-aberta body {
 }
 
 @media (max-width: 768px) {
+    /* Navegação — Responsividade - mantém cinco acessos em uma linha sem abreviar os nomes */
+    .taskflow-acessos {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 0;
+        padding: 4px 0;
+        margin-bottom: 20px;
+    }
+    .taskflow-acesso {
+        padding: 8px 0;
+        min-height: 60px;
+        gap: 6px;
+        font-size: clamp(10px, 2.8vw, 12px);
+        white-space: nowrap;
+    }
+    .taskflow-acesso span { letter-spacing: -.35px; }
+    .taskflow-acesso i { font-size: 18px; }
     .taskflow-recepcao {
         padding: 28px 20px;
     }
 
     .taskflow-apresentacao {
-        grid-template-columns: minmax(0, 1fr);
         padding: 0 0 28px;
-        gap: 20px;
     }
 
     .taskflow-saudacao {
@@ -1053,18 +1114,17 @@ html.agenda-aberta body {
         font-size: 14px;
     }
 
-    /* Recepção — Responsividade - mantém botões e logo no fluxo sem sobreposição */
+    /* Logo TaskFlow — Responsividade - reserva espaço ao lado do título mesmo em 320px */
+    .taskflow-titulo-logo {
+        grid-template-columns: minmax(0, 1fr) clamp(80px, 24vw, 120px);
+        gap: 12px;
+    }
     .taskflow-identidade {
-        position: relative;
-        justify-self: end;
-        width: 100px;
-        max-width: 100%;
-        min-height: 0;
+        width: 100%;
     }
 
     .taskflow-identidade img {
-        width: 130px;
-        max-width: 100%;
+        width: 100%;
     }
 
     .taskflow-boas-vindas,
@@ -1093,7 +1153,6 @@ html.agenda-aberta body {
     }
 
     .taskflow-entrada .taskflow-boas-vindas,
-    .taskflow-entrada .taskflow-identidade,
     .taskflow-entrada .taskflow-areas-cabecalho,
     .taskflow-entrada .area-tecnologia,
     .taskflow-entrada .taskflow-nota {
@@ -1104,6 +1163,7 @@ html.agenda-aberta body {
 
 /* Movimento reduzido — Acessibilidade - respeita a preferência do dispositivo */
 @media (prefers-reduced-motion: reduce) {
+    .taskflow-acesso { transition: none; }
     html {
         scroll-behavior: auto;
     }

@@ -129,22 +129,33 @@
       <!-- Recepção TaskFlow — Estrutura - apresenta o ambiente e suas áreas de estudo -->
       <section id="view-taskflow" class="view" aria-labelledby="titulo-taskflow">
         <div class="taskflow-recepcao">
+          <!-- Acessos superiores — Estrutura - apresenta os botões sem ações nesta etapa -->
+          <div class="taskflow-acessos" role="group" aria-label="Acessos do TaskFlow">
+            <button class="taskflow-acesso" type="button"><i class="fa-solid fa-house" aria-hidden="true"></i><span>Home</span></button>
+            <button class="taskflow-acesso" type="button"><i class="fa-solid fa-video" aria-hidden="true"></i><span>Aulas</span></button>
+            <button class="taskflow-acesso" type="button"><i class="fa-solid fa-user-group" aria-hidden="true"></i><span>Comunidade</span></button>
+            <button class="taskflow-acesso" type="button"><i class="fa-solid fa-briefcase" aria-hidden="true"></i><span>Vagas</span></button>
+            <button class="taskflow-acesso" type="button"><i class="fa-regular fa-life-ring" aria-hidden="true"></i><span>Suporte</span></button>
+          </div>
           <!-- Apresentação — Estrutura - acolhe o aluno e explica o propósito do ambiente -->
           <header class="taskflow-apresentacao">
             <div class="taskflow-boas-vindas">
               <span class="taskflow-identificador">DEVCLUB / TASKFLOW</span>
               <p class="taskflow-saudacao">Boas-vindas ao seu espaço de evolução.</p>
-              <h1 id="titulo-taskflow">Seu próximo passo<br>começa <span>aqui.</span></h1>
+              <!-- Título e logo — Layout - mantém a identidade à direita antes da descrição -->
+              <div class="taskflow-titulo-logo">
+                <h1 id="titulo-taskflow">Seu próximo passo<br>começa <span>aqui.</span></h1>
+                <div class="taskflow-identidade" aria-hidden="true">
+                  <div class="taskflow-anel"></div>
+                  <img src="./assets/images/TaskCentro.png" alt="">
+                  <span class="taskflow-legenda">APRENDA. EXPERIMENTE. EVOLUA.</span>
+                </div>
+              </div>
               <p class="taskflow-descricao">Um ponto de encontro para seus estudos, suas ideias e seu futuro. Explore os
                 assuntos que fazem parte da sua jornada como dev.</p>
               <a class="taskflow-explorar" href="#taskflow-areas">Explore as áreas <span aria-hidden="true">↓</span></a>
               <button id="abrir-agenda" class="agenda-botao agenda-acesso" type="button" aria-haspopup="dialog">Minha
                 Agenda</button>
-            </div>
-            <div class="taskflow-identidade" aria-hidden="true">
-              <div class="taskflow-anel"></div>
-              <img src="./assets/images/TaskCentro.png" alt="">
-              <span class="taskflow-legenda">APRENDA. EXPERIMENTE. EVOLUA.</span>
             </div>
           </header>
           <!-- Áreas de estudo — Estrutura - apresenta os tópicos sem antecipar páginas individuais -->
