@@ -323,7 +323,7 @@ a {
     border: 1px solid var(--cor-borda);
     border-bottom-color: color-mix(in srgb, var(--cor-principal-hover) 35%, var(--cor-borda));
     border-radius: var(--raio-medio);
-    background: var(--cor-superficie);
+   
 }
 .taskflow-acesso {
     display: flex;

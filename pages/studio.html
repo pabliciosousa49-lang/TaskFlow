@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaskFlow Studio</title>
+  <link rel="stylesheet" href="../css/pages/studio.css">
+  <script src="../js/modules/studio/studio.js" defer></script>
+</head>
+<body>
+  <!-- Studio — Cabeçalho - identifica o ambiente e permite retornar à página principal -->
+  <header class="studio-cabecalho">
+    <div class="studio-identidade">
+      <span class="studio-marca">TaskFlow <span>Studio</span></span>
+      <p id="studio-projeto" hidden></p>
+    </div>
+    <a class="studio-retorno" href="../index.html">← Voltar ao TaskFlow</a>
+  </header>
+
+  <main class="studio-conteudo">
+    <!-- Projeto — Criação - solicita o título antes de apresentar o ambiente -->
+    <section id="studio-inicio" class="studio-inicio" aria-labelledby="titulo-inicio">
+      <span class="studio-etiqueta">HTML / NOVO PROJETO</span>
+      <h1 id="titulo-inicio">Toda ideia começa com um primeiro passo.</h1>
+      <p>Dê um nome ao seu projeto para entrar no TaskFlow Studio.</p>
+      <form id="studio-formulario">
+        <label for="studio-titulo">Título do projeto</label>
+        <input id="studio-titulo" name="titulo" type="text" required maxlength="120"
+          placeholder="Ex.: Minha primeira página" aria-describedby="studio-aviso">
+        <p id="studio-aviso" class="studio-ajuda" role="status">Seu título será mantido ao atualizar esta aba.</p>
+        <button class="studio-criar" type="submit">Criar projeto</button>
+      </form>
+      <noscript>Ative o JavaScript no navegador para criar o projeto.</noscript>
+    </section>
+
+    <!-- Ambiente — Estrutura - reserva os painéis para as próximas fases -->
+    <section id="studio-ambiente" hidden aria-labelledby="titulo-ambiente">
+      <div class="studio-abertura">
+        <div>
+          <span class="studio-etiqueta">SEU ESPAÇO DE CRIAÇÃO</span>
+          <h1 id="titulo-ambiente" tabindex="-1">Ambiente do projeto</h1>
+        </div>
+        <span class="studio-linguagem">HTML</span>
+      </div>
+      <div class="studio-paineis">
+        <section class="studio-painel studio-editor" aria-labelledby="titulo-editor">
+          <header class="studio-painel-cabecalho">
+            <h2 id="titulo-editor">Editor</h2>
+            <span class="studio-arquivo">index.html</span>
+          </header>
+          <div class="studio-reserva" id="studio-editor">
+            <span class="studio-simbolo" aria-hidden="true">&lt;/&gt;</span>
+            <h3>Seu código começa aqui</h3>
+            <p>Espaço reservado para o editor de código, disponível em uma próxima etapa.</p>
+          </div>
+        </section>
+        <section class="studio-painel" aria-labelledby="titulo-previa">
+          <header class="studio-painel-cabecalho">
+            <h2 id="titulo-previa">Pré-visualização</h2>
+          </header>
+          <div class="studio-reserva" id="studio-previa">
+            <h3>Uma janela para suas ideias</h3>
+            <p>O resultado do seu projeto aparecerá neste espaço.</p>
+          </div>
+        </section>
+      </div>
+      <aside class="studio-mentor" aria-labelledby="titulo-mentor">
+        <span class="studio-mentor-marca" aria-hidden="true">✦</span>
+        <div>
+          <h2 id="titulo-mentor">Mentor</h2>
+          <p>Espaço reservado para seu futuro companheiro de aprendizado.</p>
+        </div>
+      </aside>
+    </section>
+  </main>
+</body>
+</html>
