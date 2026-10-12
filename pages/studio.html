@@ -116,12 +116,32 @@
         <button id="studio-abrir-editor" type="button" aria-controls="studio-editor-painel" aria-pressed="true">Editor</button>
         <button id="studio-abrir-previa" type="button" aria-controls="studio-previa-painel" aria-pressed="false">Pré-visualização</button>
       </div>
+      <div class="studio-area-trabalho">
+        <details id="studio-explorador" class="studio-explorador" open>
+          <summary>Explorador</summary>
+          <div class="explorador-conteudo">
+            <button id="explorador-raiz" type="button" aria-pressed="true">Projeto</button>
+            <div class="explorador-acoes">
+              <button id="explorador-novo-arquivo" type="button" disabled>Novo arquivo</button>
+              <button id="explorador-nova-pasta" type="button" disabled>Nova pasta</button>
+              <button id="explorador-renomear" type="button" disabled>Renomear</button>
+              <button id="explorador-excluir" type="button" disabled>Excluir</button>
+            </div>
+            <p id="explorador-local">Criar em: raiz do projeto</p>
+            <ul id="explorador-arvore" aria-label="Arquivos e pastas do projeto"></ul>
+          </div>
+        </details>
       <div id="studio-paineis" class="studio-paineis" data-painel="editor">
         <section id="studio-editor-painel" class="studio-painel studio-editor" aria-labelledby="titulo-editor">
           <header class="studio-painel-cabecalho">
             <h2 id="titulo-editor">Editor HTML</h2>
-            <span class="studio-arquivo"><span aria-hidden="true">&lt;/&gt;</span> index.html</span>
+            <span class="studio-arquivo"><span aria-hidden="true">&lt;/&gt;</span> <span id="studio-nome-arquivo">Nenhum arquivo</span></span>
           </header>
+          <div id="studio-arquivo-aviso" class="studio-reserva">
+            <h3 id="studio-arquivo-titulo">Seu projeto começa vazio</h3>
+            <p id="studio-arquivo-mensagem">Crie index.html no explorador para iniciar a edição HTML.</p>
+          </div>
+          <div id="studio-editor-conteudo" hidden>
           <!-- Editor — Orientação - oferece diagnósticos e referência sem inserir código -->
           <div class="studio-editor-controles">
             <button id="studio-ver-problemas" class="studio-retorno" type="button" disabled>Ver problemas</button>
@@ -139,6 +159,7 @@
           </div>
           <div id="studio-editor" aria-busy="true"></div>
           <p id="studio-editor-ajuda" class="studio-editor-ajuda">Seu código é salvo automaticamente neste navegador. Use Esc e depois Tab para sair do editor se a tecla Tab estiver indentando.</p>
+          </div>
         </section>
         <section id="studio-previa-painel" class="studio-painel studio-previa-painel" aria-labelledby="titulo-previa">
           <header class="studio-painel-cabecalho studio-browser-cabecalho">
@@ -155,6 +176,7 @@
               sandbox="" referrerpolicy="no-referrer" hidden></iframe>
           </div>
         </section>
+      </div>
       </div>
     </section>
   </main>

@@ -21,6 +21,11 @@ let criandoProjeto = false;
 let referenciaInicializada = false;
 let pedidoAbertura;
 let mentorStudio;
+let exploradorStudio;
+let arquivoSelecionadoId = null;
+let arquivoEditorAbertoId = null;
+let projetoEditorAbertoId = null;
+let trocandoDocumento = false;
 
 function mostrarAviso(mensagem = "") {
     avisoProjetosStudio.textContent = mensagem;
@@ -92,7 +97,7 @@ function atualizarListaProjetos() {
 // Projetos — Salvamento - confirma a escrita antes de atualizar o estado visual
 function salvarProjetoAtual() {
     clearTimeout(temporizadorSalvamento);
-    if (!projetoAtivo || !editorStudio) return true;
+    if (!projetoAtivo || !editorStudio || !arquivoEditorAbertoId) return true;
     const codigo = editorStudio.state.doc.toString();
     if (!alteracoesPendentes || codigo === codigoSalvo) {
         alteracoesPendentes = false;
@@ -101,13 +106,14 @@ function salvarProjetoAtual() {
     }
     indicarSalvamento("salvando");
     try {
-        projetoAtivo = servicoProjetos.atualizarProjeto(
-            projetoAtivo.id, { codigo }, projetoAtivo.atualizadoEm
+        projetoAtivo = servicoProjetos.atualizarConteudoArquivo(
+            projetoAtivo.id, arquivoEditorAbertoId, codigo, projetoAtivo.atualizadoEm
         );
         codigoSalvo = codigo;
         alteracoesPendentes = false;
         indicarSalvamento("salvo");
         mostrarAviso();
+        exploradorStudio?.atualizar(projetoAtivo, arquivoSelecionadoId);
         return true;
     } catch (erro) {
         indicarSalvamento("erro");
@@ -117,9 +123,9 @@ function salvarProjetoAtual() {
 }
 
 function aoAlterarCodigo(codigo) {
+    if (trocandoDocumento || !projetoAtivo || !arquivoEditorAbertoId) return;
     previaStudio.agendar(codigo);
     clearTimeout(temporizadorSalvamento);
-    if (!projetoAtivo) return;
     alteracoesPendentes = codigo !== codigoSalvo;
     indicarSalvamento(alteracoesPendentes ? "salvando" : "salvo");
     if (alteracoesPendentes) temporizadorSalvamento = setTimeout(salvarProjetoAtual, 800);
@@ -129,11 +135,105 @@ async function carregarComponentes() {
     if (!carregamentoComponentes) {
         carregamentoComponentes = Promise.all([
             import("./editor.js"), import("./previa.js"),
-            import("./referencia.js"), import("./validacao.js")
-        ]).then(([editor, previa, referencia, validacao]) => ({ ...editor, ...previa, ...referencia, ...validacao }))
+            import("./referencia.js"), import("./validacao.js"), import("./explorador.js")
+        ]).then(([editor, previa, referencia, validacao, explorador]) => ({ ...editor, ...previa, ...referencia, ...validacao, ...explorador }))
             .catch((erro) => { carregamentoComponentes = null; throw erro; });
     }
     return carregamentoComponentes;
+}
+
+function arquivoEditavel(item) {
+    return item?.tipo === "arquivo" && item.id === projetoAtivo?.arquivoEditorId && /\.html?$/i.test(item.nome);
+}
+
+function carregarArquivoNoEditor(codigo, opcoes = {}) {
+    trocandoDocumento = true;
+    try { componentesStudio.carregarDocumentoHTML(editorStudio, codigo, aoAlterarCodigo, opcoes); }
+    finally { trocandoDocumento = false; }
+}
+
+function atualizarApresentacaoArquivo(item) {
+    const editavel = arquivoEditavel(item);
+    const principal = projetoAtivo?.arquivos.find((entrada) => entrada.id === projetoAtivo.arquivoEditorId);
+    document.querySelector("#studio-nome-arquivo").textContent = item?.caminho || "Nenhum arquivo";
+    document.querySelector("#studio-editor-conteudo").hidden = !editavel;
+    document.querySelector("#studio-arquivo-aviso").hidden = editavel;
+    document.querySelector("#studio-arquivo-titulo").textContent = item ? "Arquivo selecionado" : "Seu projeto começa vazio";
+    document.querySelector("#studio-arquivo-mensagem").textContent = item
+        ? `Arquivo selecionado para organização. A edição dos arquivos adicionais ainda não está disponível.${principal ? ` O HTML principal do projeto é ${principal.caminho}.` : " Crie index.html para iniciar a edição HTML."}`
+        : "Crie index.html no explorador para iniciar a edição HTML. Nenhum arquivo é gerado automaticamente.";
+    document.querySelector("#studio-ver-problemas").disabled = !editavel;
+    document.querySelector("#studio-mostrar-referencia").disabled = !editavel;
+}
+
+// Arquivos — Seleção - guarda o HTML anterior antes de mudar a seleção visual
+function selecionarArquivo(item, primeiraAbertura = false) {
+    if (!projetoAtivo || !salvarProjetoAtual()) return false;
+    const atual = projetoAtivo.arquivos.find((entrada) => entrada.id === item.id);
+    if (!atual || atual.tipo !== "arquivo") return false;
+    if (arquivoEditavel(atual)) {
+        if (arquivoEditorAbertoId !== atual.id || projetoEditorAbertoId !== projetoAtivo.id) {
+            carregarArquivoNoEditor(atual.conteudo, {
+                posicaoCursor: primeiraAbertura && atual.nome === "index.html"
+                    ? atual.conteudo.indexOf("<body>\n") + "<body>\n".length : 0
+            });
+            arquivoEditorAbertoId = atual.id;
+            projetoEditorAbertoId = projetoAtivo.id;
+            codigoSalvo = atual.conteudo;
+            alteracoesPendentes = false;
+        }
+        previaStudio.agendar(atual.conteudo);
+    }
+    arquivoSelecionadoId = atual.id;
+    atualizarApresentacaoArquivo(atual);
+    exploradorStudio?.atualizar(projetoAtivo, arquivoSelecionadoId);
+    if (arquivoEditavel(atual)) editorStudio.requestMeasure();
+    return true;
+}
+
+// Explorador — Operações - mantém a persistência e o documento aberto coerentes
+function operarEstrutura(acao, item, nome, parentId) {
+    if (!projetoAtivo || abrindoProjeto || !salvarProjetoAtual()) return;
+    try {
+        let selecao;
+        let criado;
+        if (acao === "arquivo" || acao === "pasta") {
+            const criar = acao === "arquivo" ? servicoProjetos.criarArquivo : servicoProjetos.criarPasta;
+            const resultado = criar(projetoAtivo.id, nome, parentId, projetoAtivo.atualizadoEm);
+            projetoAtivo = resultado.projeto;
+            criado = resultado.item;
+            selecao = criado.id;
+        } else if (acao === "renomear") {
+            projetoAtivo = servicoProjetos.renomearItem(projetoAtivo.id, item.id, nome, projetoAtivo.atualizadoEm);
+            selecao = item.id;
+        } else if (acao === "excluir") {
+            projetoAtivo = servicoProjetos.excluirItem(projetoAtivo.id, item.id, projetoAtivo.atualizadoEm);
+            selecao = item.parentId;
+        }
+        if (arquivoEditorAbertoId && !projetoAtivo.arquivos.some((entrada) => entrada.id === arquivoEditorAbertoId)) {
+            carregarArquivoNoEditor("", { somenteLeitura: true });
+            arquivoEditorAbertoId = projetoEditorAbertoId = null;
+            codigoSalvo = "";
+            previaStudio.agendar("");
+        }
+        if (criado?.tipo === "arquivo") selecionarArquivo(criado, true);
+        else {
+            const selecionado = projetoAtivo.arquivos.find((entrada) => entrada.id === arquivoSelecionadoId);
+            if (!selecionado) arquivoSelecionadoId = null;
+            if (selecionado && arquivoEditavel(selecionado)) selecionarArquivo(selecionado);
+            else atualizarApresentacaoArquivo(selecionado);
+        }
+        exploradorStudio.atualizar(projetoAtivo, arquivoSelecionadoId, selecao);
+        if (criado && arquivoEditavel(criado)) {
+            selecionarPainel("editor");
+            editorStudio.focus();
+        } else exploradorStudio.focarSelecionado();
+        indicarSalvamento("salvo");
+        mostrarAviso();
+    } catch (erro) {
+        indicarSalvamento("erro");
+        mostrarAviso(erro.message);
+    }
 }
 
 // Projetos — Abertura - restaura o código exato e substitui somente a instância anterior
@@ -156,14 +256,11 @@ async function abrirProjeto(id, novo = false) {
         previaStudio ||= componentesStudio.criarPreviaHTML(
             document.querySelector("#studio-previa-iframe"), document.querySelector("#studio-previa-vazia")
         );
-        const novoEditor = componentesStudio.criarEditorHTML(container, aoAlterarCodigo, {
-            codigoInicial: projeto.codigo,
-            posicaoCursor: novo ? projeto.codigo.indexOf("<body>\n") + "<body>\n".length : 0
-        });
-        editorStudio?.destroy();
-        editorStudio = novoEditor;
+        if (!editorStudio) editorStudio = componentesStudio.criarEditorHTML(container, aoAlterarCodigo, { somenteLeitura: true });
+        else carregarArquivoNoEditor("", { somenteLeitura: true });
         projetoAtivo = projeto;
-        codigoSalvo = projeto.codigo;
+        arquivoSelecionadoId = arquivoEditorAbertoId = projetoEditorAbertoId = null;
+        codigoSalvo = "";
         alteracoesPendentes = false;
         document.querySelector("#studio-gerenciamento").hidden = true;
         document.querySelector("#studio-ambiente").hidden = false;
@@ -171,7 +268,17 @@ async function abrirProjeto(id, novo = false) {
         tituloProjetoStudio.hidden = false;
         document.querySelector("#studio-acoes-projeto").hidden = false;
         selecionarPainel("editor");
-        previaStudio.agendar(projeto.codigo);
+        previaStudio.agendar("");
+        if (!exploradorStudio) exploradorStudio = componentesStudio.criarExplorador(document.querySelector("#studio-explorador"), {
+            selecionar: selecionarArquivo,
+            criar: (tipo, nome, parentId) => operarEstrutura(tipo, null, nome, parentId),
+            renomear: (item, nome) => operarEstrutura("renomear", item, nome),
+            excluir: (item) => operarEstrutura("excluir", item)
+        });
+        const principal = projeto.arquivos.find((item) => item.id === projeto.arquivoEditorId);
+        if (principal) selecionarArquivo(principal);
+        else atualizarApresentacaoArquivo(null);
+        exploradorStudio.atualizar(projetoAtivo, arquivoSelecionadoId);
         if (!referenciaInicializada) {
             componentesStudio.iniciarReferenciaHTML(
                 document.querySelector("#studio-mostrar-referencia"),
@@ -179,7 +286,7 @@ async function abrirProjeto(id, novo = false) {
             );
             referenciaInicializada = true;
         }
-        document.querySelector("#studio-ver-problemas").disabled = false;
+        atualizarApresentacaoArquivo(principal);
         botaoSalvarStudio.disabled = false;
         indicarSalvamento("salvo");
         registrarProjetoAtivo(projeto.id);
@@ -187,7 +294,8 @@ async function abrirProjeto(id, novo = false) {
         status.hidden = true;
         mentorStudio?.ativar(true);
         mentorStudio?.saudacao();
-        editorStudio.focus();
+        if (arquivoEditavel(principal)) editorStudio.focus();
+        else document.querySelector("#explorador-novo-arquivo").focus();
     } catch (erro) {
         mostrarAviso(`Não foi possível abrir o projeto. ${erro.message} Seus projetos salvos foram preservados.`);
         repetir.hidden = false;
@@ -221,8 +329,7 @@ formularioStudio.addEventListener("submit", async (event) => {
     criandoProjeto = true;
     botaoCriarStudio.disabled = true;
     try {
-        const { criarEstruturaInicialHTML } = await carregarComponentes();
-        const projeto = servicoProjetos.criarProjeto(titulo, criarEstruturaInicialHTML(titulo));
+        const projeto = servicoProjetos.criarProjeto(titulo);
         campoTituloStudio.value = "";
         atualizarListaProjetos();
         await abrirProjeto(projeto.id, true);
