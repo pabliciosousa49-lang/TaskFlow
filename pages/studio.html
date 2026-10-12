@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -34,6 +35,7 @@
   </script>
   <script src="../js/modules/studio/studio.js" defer></script>
 </head>
+
 <body>
   <!-- Studio — Cabeçalho - identifica o ambiente e permite retornar à página principal -->
   <header class="studio-cabecalho">
@@ -47,7 +49,8 @@
     <div id="studio-acoes-projeto" class="studio-projeto-acoes" hidden>
       <span id="studio-salvamento" role="status" aria-live="polite"></span>
       <button id="studio-meus-projetos" class="studio-retorno" type="button">Meus projetos</button>
-      <button id="studio-salvar-projeto" class="studio-retorno studio-acao-principal" type="button" disabled>Salvar projeto</button>
+      <button id="studio-salvar-projeto" class="studio-retorno studio-acao-principal" type="button" disabled>Salvar
+        projeto</button>
     </div>
     <nav class="studio-navegacao" aria-label="Retorno do Studio">
       <button id="studio-voltar" class="studio-retorno" type="button">← Voltar</button>
@@ -58,30 +61,31 @@
   <main class="studio-conteudo">
     <p id="studio-projetos-aviso" class="studio-projetos-aviso" role="status" hidden></p>
     <div id="studio-gerenciamento">
-    <!-- Projeto — Criação - solicita o título antes de apresentar o ambiente -->
-    <section id="studio-inicio" class="studio-inicio" aria-labelledby="titulo-inicio">
-      <span class="studio-etiqueta">SEU LABORATÓRIO DE HTML</span>
-      <h1 id="titulo-inicio">Uma ideia.<br>Seu próximo projeto.</h1>
-      <p>Escreva, experimente e veja sua página ganhar forma. Comece dando um nome à sua ideia.</p>
-      <form id="studio-formulario">
-        <label for="studio-titulo">Título do projeto</label>
-        <input id="studio-titulo" name="titulo" type="text" required maxlength="120"
-          placeholder="Ex.: Minha primeira página" aria-describedby="studio-aviso">
-        <p id="studio-aviso" class="studio-ajuda" role="status">Os projetos são salvos neste navegador e neste dispositivo.</p>
-        <button id="studio-criar-projeto" class="studio-criar" type="submit" disabled>Criar projeto</button>
-      </form>
-      <noscript>Ative o JavaScript no navegador para criar o projeto.</noscript>
-    </section>
-    <section class="studio-biblioteca" aria-labelledby="titulo-projetos">
-      <div class="studio-biblioteca-cabecalho">
-        <span class="studio-etiqueta">CONTINUE DE ONDE PAROU</span>
-        <h2 id="titulo-projetos" tabindex="-1">Meus projetos</h2>
-        <p>Seus projetos ficam neste navegador, prontos para o próximo passo.</p>
-      </div>
-      <ul id="studio-lista-projetos" class="studio-lista-projetos">
-        <li>Carregando projetos…</li>
-      </ul>
-    </section>
+      <!-- Projeto — Criação - solicita o título antes de apresentar o ambiente -->
+      <section id="studio-inicio" class="studio-inicio" aria-labelledby="titulo-inicio">
+        <span class="studio-etiqueta">SEU LABORATÓRIO DE HTML</span>
+        <h1 id="titulo-inicio">Uma ideia.<br>Seu próximo projeto.</h1>
+        <p>Escreva, experimente e veja sua página ganhar forma. Comece dando um nome à sua ideia.</p>
+        <form id="studio-formulario">
+          <label for="studio-titulo">Título do projeto</label>
+          <input id="studio-titulo" name="titulo" type="text" required maxlength="120"
+            placeholder="Ex.: Minha primeira página" aria-describedby="studio-aviso">
+          <p id="studio-aviso" class="studio-ajuda" role="status">Os projetos são salvos neste navegador e neste
+            dispositivo.</p>
+          <button id="studio-criar-projeto" class="studio-criar" type="submit" disabled>Criar projeto</button>
+        </form>
+        <noscript>Ative o JavaScript no navegador para criar o projeto.</noscript>
+      </section>
+      <section class="studio-biblioteca" aria-labelledby="titulo-projetos">
+        <div class="studio-biblioteca-cabecalho">
+          <span class="studio-etiqueta">CONTINUE DE ONDE PAROU</span>
+          <h2 id="titulo-projetos" tabindex="-1">Meus projetos</h2>
+          <p>Seus projetos ficam neste navegador, prontos para o próximo passo.</p>
+        </div>
+        <ul id="studio-lista-projetos" class="studio-lista-projetos">
+          <li>Carregando projetos…</li>
+        </ul>
+      </section>
     </div>
 
     <!-- Ambiente — Estrutura - reserva os painéis para as próximas fases -->
@@ -96,7 +100,8 @@
                 <span class="studio-etiqueta">MENTOR TASKFLOW</span>
                 <h2 id="titulo-mentor">Flow</h2>
               </div>
-              <button id="studio-mentor-recolher" type="button" aria-controls="studio-mentor-mensagem" aria-expanded="true">Recolher mensagem</button>
+              <button id="studio-mentor-recolher" type="button" aria-controls="studio-mentor-mensagem"
+                aria-expanded="true">Recolher mensagem</button>
             </div>
             <span id="studio-mentor-estado" class="studio-mentor-estado">Disponível</span>
             <div id="studio-mentor-mensagem" class="studio-mentor-mensagem" aria-live="polite">
@@ -105,84 +110,95 @@
           </div>
         </aside>
         <div class="studio-abertura">
-        <div>
-          <span class="studio-etiqueta">ESCREVA. EXPERIMENTE. EVOLUA.</span>
-          <h1 id="titulo-ambiente" tabindex="-1">Seu código ganha vida aqui.</h1>
-          <p>Edite à esquerda. Acompanhe o resultado à direita.</p>
-        </div>
+          <div>
+            <span class="studio-etiqueta">ESCREVA. EXPERIMENTE. EVOLUA.</span>
+            <h1 id="titulo-ambiente" tabindex="-1">Seu código ganha vida aqui.</h1>
+            <p>Edite à esquerda. Acompanhe o resultado à direita.</p>
+          </div>
         </div>
       </div>
       <div class="studio-alternar-paineis" role="group" aria-label="Painel visível no smartphone">
-        <button id="studio-abrir-editor" type="button" aria-controls="studio-editor-painel" aria-pressed="true">Editor</button>
-        <button id="studio-abrir-previa" type="button" aria-controls="studio-previa-painel" aria-pressed="false">Pré-visualização</button>
+        <button id="studio-abrir-editor" type="button" aria-controls="studio-editor-painel"
+          aria-pressed="true">Editor</button>
+        <button id="studio-abrir-previa" type="button" aria-controls="studio-previa-painel"
+          aria-pressed="false">Pré-visualização</button>
       </div>
       <div class="studio-area-trabalho">
         <details id="studio-explorador" class="studio-explorador" open>
           <summary><span>EXPLORADOR</span><span class="explorador-reticencias" aria-hidden="true">⋯</span></summary>
           <div class="explorador-conteudo">
             <div class="explorador-cabecalho-raiz">
-            <button id="explorador-raiz" type="button" aria-pressed="true">Projeto</button>
-            <div class="explorador-acoes" role="group" aria-label="Ações de arquivos e pastas">
-              <button id="explorador-novo-arquivo" type="button" title="Novo arquivo" aria-label="Novo arquivo" disabled></button>
-              <button id="explorador-nova-pasta" type="button" title="Nova pasta" aria-label="Nova pasta" disabled></button>
-              <button id="explorador-renomear" type="button" title="Renomear item selecionado" aria-label="Renomear item selecionado" disabled></button>
-              <button id="explorador-excluir" type="button" title="Excluir item selecionado" aria-label="Excluir item selecionado" disabled></button>
-            </div>
+              <button id="explorador-raiz" type="button" aria-pressed="true">Projeto</button>
+              <div class="explorador-acoes" role="group" aria-label="Ações de arquivos e pastas">
+                <button id="explorador-novo-arquivo" type="button" title="Novo arquivo" aria-label="Novo arquivo"
+                  disabled></button>
+                <button id="explorador-nova-pasta" type="button" title="Nova pasta" aria-label="Nova pasta"
+                  disabled></button>
+                <button id="explorador-renomear" type="button" title="Renomear item selecionado"
+                  aria-label="Renomear item selecionado" disabled></button>
+                <button id="explorador-excluir" type="button" title="Excluir item selecionado"
+                  aria-label="Excluir item selecionado" disabled></button>
+              </div>
             </div>
             <p id="explorador-local">Criar em: raiz do projeto</p>
             <ul id="explorador-arvore" aria-label="Arquivos e pastas do projeto"></ul>
           </div>
         </details>
-      <div id="studio-paineis" class="studio-paineis" data-painel="editor">
-        <section id="studio-editor-painel" class="studio-painel studio-editor" aria-labelledby="titulo-editor">
-          <header class="studio-painel-cabecalho">
-            <h2 id="titulo-editor">Editor de código</h2>
-            <span class="studio-arquivo"><span aria-hidden="true">&lt;/&gt;</span> <span id="studio-nome-arquivo">Nenhum arquivo</span></span>
-          </header>
-          <div id="studio-abas" class="studio-abas" role="group" aria-label="Arquivos abertos"></div>
-          <div id="studio-arquivo-aviso" class="studio-reserva">
-            <h3 id="studio-arquivo-titulo">Seu projeto começa vazio</h3>
-            <p id="studio-arquivo-mensagem">Crie index.html no explorador para iniciar a edição HTML.</p>
-          </div>
-          <div id="studio-editor-conteudo" hidden>
-          <!-- Editor — Orientação - oferece diagnósticos e referência sem inserir código -->
-          <div class="studio-editor-controles">
-            <button id="studio-ver-problemas" class="studio-retorno" type="button" disabled>Ver problemas</button>
-            <button id="studio-mostrar-referencia" class="studio-retorno" type="button"
-              aria-controls="studio-referencia" aria-expanded="false" aria-pressed="false" disabled>Mostrar código de referência</button>
-          </div>
-          <section id="studio-referencia" class="studio-referencia" aria-labelledby="titulo-referencia" hidden>
-            <h3 id="titulo-referencia">Código de referência</h3>
-            <p>Orientação visual: escreva manualmente no editor. Esta referência não altera seu código.</p>
-            <pre><code id="studio-referencia-codigo"></code></pre>
-          </section>
-          <div class="studio-editor-carregamento">
-            <p id="studio-editor-status" role="status">Carregando o editor HTML…</p>
-            <button id="studio-editor-repetir" class="studio-retorno" type="button" hidden>Tentar novamente</button>
-          </div>
-          <div id="studio-editor" aria-busy="true"></div>
-          <p id="studio-editor-ajuda" class="studio-editor-ajuda">Seu código é salvo automaticamente neste navegador. Use Esc e depois Tab para sair do editor se a tecla Tab estiver indentando.</p>
-          </div>
-        </section>
-        <section id="studio-previa-painel" class="studio-painel studio-previa-painel" aria-labelledby="titulo-previa">
-          <header class="studio-painel-cabecalho studio-browser-cabecalho">
-            <span class="studio-browser-pontos" aria-hidden="true"><span></span><span></span><span></span></span>
-            <h2 id="titulo-previa">Pré-visualização</h2>
-            <span class="studio-browser-endereco" aria-hidden="true">index.html</span>
-          </header>
-          <div id="studio-previa">
-            <div id="studio-previa-diagnosticos" class="studio-previa-diagnosticos" role="status" aria-live="polite" hidden></div>
-            <div class="studio-reserva" id="studio-previa-vazia">
-              <h3>Uma janela para suas ideias</h3>
-              <p>Escreva HTML no editor para visualizar o resultado neste espaço.</p>
+        <div id="studio-paineis" class="studio-paineis" data-painel="editor">
+          <section id="studio-editor-painel" class="studio-painel studio-editor" aria-labelledby="titulo-editor">
+            <header class="studio-painel-cabecalho">
+              <h2 id="titulo-editor">Editor de código</h2>
+              <span class="studio-arquivo"><span aria-hidden="true">&lt;/&gt;</span> <span
+                  id="studio-nome-arquivo">Nenhum arquivo</span></span>
+            </header>
+            <div id="studio-abas" class="studio-abas" role="group" aria-label="Arquivos abertos"></div>
+            <div id="studio-arquivo-aviso" class="studio-reserva">
+              <h3 id="studio-arquivo-titulo">Seu projeto começa vazio</h3>
+              <p id="studio-arquivo-mensagem">Crie index.html no explorador para iniciar a edição HTML.</p>
             </div>
-            <iframe id="studio-previa-iframe" title="Resultado do código HTML"
-              sandbox="" referrerpolicy="no-referrer" hidden></iframe>
-          </div>
-        </section>
-      </div>
+            <div id="studio-editor-conteudo" hidden>
+              <!-- Editor — Orientação - oferece diagnósticos e referência sem inserir código -->
+              <div class="studio-editor-controles">
+                <button id="studio-ver-problemas" class="studio-retorno" type="button" disabled>Ver problemas</button>
+                <button id="studio-mostrar-referencia" class="studio-retorno" type="button"
+                  aria-controls="studio-referencia" aria-expanded="false" aria-pressed="false" disabled>Mostrar código
+                  de referência</button>
+              </div>
+              <section id="studio-referencia" class="studio-referencia" aria-labelledby="titulo-referencia" hidden>
+                <h3 id="titulo-referencia">Código de referência</h3>
+                <p>Orientação visual: escreva manualmente no editor. Esta referência não altera seu código.</p>
+                <pre><code id="studio-referencia-codigo"></code></pre>
+              </section>
+              <div class="studio-editor-carregamento">
+                <p id="studio-editor-status" role="status">Carregando o editor HTML…</p>
+                <button id="studio-editor-repetir" class="studio-retorno" type="button" hidden>Tentar novamente</button>
+              </div>
+              <div id="studio-editor" aria-busy="true"></div>
+              <p id="studio-editor-ajuda" class="studio-editor-ajuda">Seu código é salvo automaticamente neste
+                navegador. Use Esc e depois Tab para sair do editor se a tecla Tab estiver indentando.</p>
+            </div>
+          </section>
+          <section id="studio-previa-painel" class="studio-painel studio-previa-painel" aria-labelledby="titulo-previa">
+            <header class="studio-painel-cabecalho studio-browser-cabecalho">
+              <span class="studio-browser-pontos" aria-hidden="true"><span></span><span></span><span></span></span>
+              <h2 id="titulo-previa">Pré-visualização</h2>
+              <span class="studio-browser-endereco" aria-hidden="true">index.html</span>
+            </header>
+            <div id="studio-previa">
+              <div id="studio-previa-diagnosticos" class="studio-previa-diagnosticos" role="status" aria-live="polite"
+                hidden></div>
+              <div class="studio-reserva" id="studio-previa-vazia">
+                <h3>Uma janela para suas ideias</h3>
+                <p>Escreva HTML no editor para visualizar o resultado neste espaço.</p>
+              </div>
+              <iframe id="studio-previa-iframe" title="Resultado do código HTML" sandbox="" referrerpolicy="no-referrer"
+                hidden></iframe>
+            </div>
+          </section>
+        </div>
       </div>
     </section>
   </main>
 </body>
+
 </html>

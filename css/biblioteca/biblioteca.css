@@ -68,10 +68,28 @@ h1, h2, h3, p { margin: 0; }
 .biblioteca-conteudos-navegacao button { min-height: 44px; padding: 8px 12px; }
 .biblioteca-menu-botao { display: none; }
 
+/* Assuntos — Apresentação - completa a área de leitura e a navegação existentes */
+.biblioteca-categoria-conteudo .biblioteca-assuntos { list-style: none; padding-left: 0; }
+.biblioteca-categoria-conteudo h3:not(:first-child) { margin-top: 20px; }
+.biblioteca-assunto { width: 100%; min-height: 44px; padding: 8px; border: 1px solid transparent; border-radius: 6px; background: transparent; color: var(--biblioteca-secundario); text-align: left; font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+.biblioteca-assunto:hover { background: #241d30; color: var(--biblioteca-texto); }
+.biblioteca-assunto[aria-current="true"] { border-color: #624180; background: #261832; color: var(--biblioteca-texto); }
+.biblioteca-conteudo { min-width: 0; padding: 32px; overflow-wrap: anywhere; }
+.biblioteca-conteudo section + section { margin-top: 28px; }
+.biblioteca-conteudo h2 { margin-bottom: 10px; font-size: 19px; line-height: 1.4; }
+.biblioteca-conteudo p, .biblioteca-conteudo li { color: var(--biblioteca-secundario); }
+.biblioteca-conteudo ul { margin: 0; padding-left: 22px; }
+.biblioteca-conteudo li + li { margin-top: 8px; }
+.biblioteca-conteudo pre { margin: 12px 0 0; font-size: 13px; line-height: 1.7; overflow-wrap: normal; white-space: pre; }
+.biblioteca-conteudo .biblioteca-exemplo-contexto { font-size: 12px; }
+.biblioteca-conteudos-navegacao button { border: 1px solid var(--biblioteca-borda); border-radius: 6px; background: #241d30; color: var(--biblioteca-texto); }
+.biblioteca-conteudos-navegacao button:hover:not(:disabled) { border-color: var(--biblioteca-foco); }
+.biblioteca-conteudos-navegacao button:disabled { opacity: .5; cursor: default; }
+
 /* Biblioteca — Responsividade - mantém menu recolhível e blocos dentro da largura */
 @media (max-width: 960px) {
     .biblioteca-layout { grid-template-columns: 220px minmax(0, 1fr); gap: 24px; }
-    .biblioteca-leitura-cabecalho, .biblioteca-estado-vazio { padding: 28px; }
+    .biblioteca-leitura-cabecalho, .biblioteca-estado-vazio, .biblioteca-conteudo { padding: 28px; }
 }
 @media (max-width: 760px) {
     .biblioteca-cabecalho { gap: 12px; padding: 16px; }
@@ -85,6 +103,7 @@ h1, h2, h3, p { margin: 0; }
     .biblioteca-menu { padding: 16px 8px; border: 1px solid var(--biblioteca-borda); border-radius: 8px; }
     .biblioteca-grupo { margin-right: 0; }
     .biblioteca-leitura-cabecalho { padding: 24px; }
+    .biblioteca-conteudo { padding: 24px; }
     .biblioteca-estado-vazio { min-height: 280px; padding: 28px 24px; }
     .biblioteca-conteudos-navegacao { padding: 20px; }
 }
