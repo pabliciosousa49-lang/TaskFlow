@@ -724,9 +724,8 @@ html.agenda-aberta body {
 .agenda-formulario {
     min-width: 0;
     padding: 20px;
-    border: 1px solid var(--cor-sucesso);
     border-radius: var(--raio-medio);
-    background: var(--agenda-superficie);
+    background: black;
 }
 
 .agenda-registros>h3,
