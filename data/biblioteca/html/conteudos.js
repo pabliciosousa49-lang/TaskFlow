@@ -1,13 +1,31 @@
 // HTML — Conteúdo - progressão didática com exemplos exibidos como texto.
+const efeitosNavegador = {
+    title: "O texto de title aparece na aba e nos favoritos do documento. Ele não cria um título visível no corpo da página.",
+    "meta-description": "A descrição não aparece no corpo. Buscadores podem usá-la no resumo do resultado de busca, mas não há garantia de exibição ou classificação.",
+    viewport: "O viewport ajusta a área inicial de layout à largura do dispositivo. Não produz conteúdo visível nem substitui CSS responsivo.",
+    compartilhamento: "Serviços compatíveis podem usar esses metadados para montar um cartão de compartilhamento. O HTML sozinho não desenha esse cartão; são necessárias URLs públicas reais.",
+    "carregamento-scripts": "Esses elementos não produzem conteúdo visual por si mesmos. defer controla a execução dos arquivos após a análise do documento, na ordem indicada. Nenhum script é executado nesta documentação.",
+    imagens: "Sem o arquivo images/equipe.jpg, a imagem não pode aparecer. Nesta prévia o recurso é bloqueado e fica sua alternativa textual; forneça a imagem em seu projeto para visualizar a fotografia.",
+    "textos-alternativos": "As imagens externas não são carregadas nesta prévia. A marca informativa mantém sua alternativa textual e a decoração com alt vazio não acrescenta descrição.",
+    "organizacao-arquivos": "A prévia mostra a estrutura, não fornece os arquivos referenciados. A fotografia depende de retrato.jpg, e a navegação para páginas externas à prévia fica bloqueada.",
+    audio: "Os controles de áudio são exibidos, mas não há reprodução: o arquivo externo é bloqueado. Forneça o MP3 e a transcrição em seu próprio projeto.",
+    video: "Os controles de vídeo são exibidos sem carregar MP4 ou legendas externas. Forneça esses arquivos em seu projeto para testar a reprodução e a faixa WebVTT.",
+    "html-css": "O título aparece com o estilo padrão do navegador. A folha css/style.css não é carregada nesta prévia; a cor só mudará quando o arquivo CSS indicado existir e for carregado no seu projeto.",
+    "html-javascript": "O botão e o parágrafo aparecem, mas o clique não altera a mensagem: nenhum JavaScript é executado na prévia. Teste o script indicado no seu próprio projeto.",
+    "idioma-documento": "O corpo é renderizado normalmente. lang não acrescenta um efeito visual: informa o idioma para pronúncia e tratamento do texto.",
+    "validacao-nativa": "Os campos e limites declarados aparecem na prévia. O envio está bloqueado por isolamento; copie o documento para testar o fluxo completo de validação e envio no navegador.",
+    "atributos-formularios": "O seletor de arquivo aparece, mas nenhum dado é enviado. O destino /envios e seu processamento precisam existir no projeto; não fazem parte desta prévia."
+};
+
 function assunto(id, titulo, objetivo, explicacao, sintaxe, exemploCodigo, responsabilidadeCodigo, aplicacaoReal, boasPraticas, contextoExemplo = "body") {
-    return { id, titulo, objetivo, explicacao, sintaxe, exemploCodigo, responsabilidadeCodigo, aplicacaoReal, boasPraticas, contextoExemplo };
+    return { id, titulo, objetivo, explicacao, sintaxe, exemploCodigo, responsabilidadeCodigo, aplicacaoReal, boasPraticas, contextoExemplo, efeitoNavegador: efeitosNavegador[id] };
 }
 
 export const conteudos = {
     id: "html", nome: "HTML",
     niveis: [
-        { id: "basico", nome: "Básico", assuntos: [], modulos: [
-            { id: "introducao", titulo: "1. Introdução ao HTML", assuntos: [
+        { id: "basico", nome: "Básico — Primeiros passos", assuntos: [], modulos: [
+            { id: "introducao", titulo: "1. O que é HTML e para que serve", assuntos: [
                 assunto("o-que-e-html", "O que é HTML", "Reconhecer o papel do HTML na construção de páginas.",
                     "HTML é uma linguagem de marcação: seus elementos identificam o significado e a estrutura do conteúdo. Um título, um parágrafo e um link têm funções diferentes, mesmo antes de receberem estilos. CSS cuida da apresentação; JavaScript pode acrescentar comportamento. HTML não é uma linguagem de programação.",
                     "<p>Conteúdo de um parágrafo.</p>",
@@ -16,7 +34,9 @@ export const conteudos = {
 <a href="https://developer.mozilla.org/pt-BR/">Consultar a documentação</a>`,
                     ["h1 identifica o título principal desse conteúdo.", "p delimita um parágrafo; a cria um link cujo destino está em href."],
                     "Montar o conteúdo de uma página antes de decidir suas cores e interações.",
-                    ["Escolha elementos pelo significado.", "Não use tags de título apenas para obter uma fonte maior."]),
+                    ["Escolha elementos pelo significado.", "Não use tags de título apenas para obter uma fonte maior."])
+            ] },
+            { id: "pagina-web", titulo: "2. Como funciona uma página web", assuntos: [
                 assunto("interpretacao-navegador", "Como o navegador interpreta HTML", "Entender como a marcação se torna uma árvore de elementos.",
                     "O navegador lê a marcação e constrói o DOM, uma árvore que representa o documento em memória. Elementos aninhados formam relações de pai e filho. O navegador carrega os recursos referenciados e combina o documento com estilos para apresentar a página. Sua recuperação automática de alguns erros não torna uma marcação incorreta confiável.",
                     "<main><p>Texto com <strong>importância</strong>.</p></main>",
@@ -26,7 +46,9 @@ export const conteudos = {
 </main>`,
                     ["main é pai de h1 e p nessa árvore.", "strong é filho de p e marca importância sem interromper o parágrafo."],
                     "Comparar o código-fonte com a árvore na aba Elementos das ferramentas do navegador.",
-                    ["Inspecione o DOM ao investigar aninhamento.", "Não dependa da recuperação automática de erros."]),
+                    ["Inspecione o DOM ao investigar aninhamento.", "Não dependa da recuperação automática de erros."])
+            ] },
+            { id: "estrutura-documento", titulo: "3. Estrutura básica de um documento HTML", assuntos: [
                 assunto("estrutura-documento", "Estrutura básica de um documento", "Criar um arquivo HTML completo e pronto para abrir.",
                     "Um documento separa metadados, no head, do conteúdo apresentado, no body. charset permite interpretar acentos; viewport prepara o dimensionamento em dispositivos móveis. Salve o exemplo como index.html em UTF-8 e abra-o no navegador.",
                     "<!doctype html>\n<html lang=\"pt-BR\">\n    <head>...</head>\n    <body>...</body>\n</html>",
@@ -63,7 +85,7 @@ export const conteudos = {
                     "Corrigir um arquivo que misturou metadados com texto visível.",
                     ["Use uma única estrutura html/head/body.", "Coloque DOCTYPE no início do arquivo."], "documento")
             ] },
-            { id: "elementos-atributos", titulo: "2. Elementos e atributos", assuntos: [
+            { id: "elementos-atributos", titulo: "4. Elementos, tags e atributos", assuntos: [
                 assunto("tags-elementos", "Tags e elementos", "Identificar abertura, fechamento e elementos vazios.",
                     "Uma tag é uma marcação delimitada por sinais de menor e maior. O elemento inclui abertura, conteúdo e fechamento, quando existem. Elementos vazios, como img e br, não recebem conteúdo nem fechamento. A indentação ajuda a ler o aninhamento sem mudar o significado.",
                     "<strong>Texto importante</strong>\n<br>",
@@ -79,7 +101,9 @@ export const conteudos = {
 <button type="button" disabled>Disponível em breve</button>`,
                     ["href define o destino; id identifica um elemento e class agrupa elementos para CSS ou scripts.", "disabled impede a interação nativa com o botão."],
                     "Identificar elementos e destinos; crie estudos.html para testar o link local.",
-                    ["Use aspas nos valores e IDs únicos.", "Remova atributos booleanos para desativá-los."]),
+                    ["Use aspas nos valores e IDs únicos.", "Remova atributos booleanos para desativá-los."])
+            ] },
+            { id: "titulos-paragrafos", titulo: "5. Títulos e parágrafos", assuntos: [
                 assunto("titulos-paragrafos", "Títulos e parágrafos", "Organizar a leitura com títulos e blocos de texto.",
                     "h1 a h6 representam níveis de títulos, não tamanhos de fonte escolhidos livremente. p agrupa um parágrafo. Ao subdividir uma seção, use o nível seguinte para comunicar a relação entre os conteúdos.",
                     "<h1>Página</h1>\n<h2>Seção</h2>\n<p>Texto.</p>",
@@ -89,7 +113,27 @@ export const conteudos = {
 <p>Vou estudar os elementos básicos do HTML.</p>`,
                     ["h1 apresenta o assunto geral e h2 uma subdivisão.", "Cada p reúne uma ideia em um bloco de texto."],
                     "Estruturar um plano de estudos para localizar suas etapas.",
-                    ["Não salte níveis apenas para obter uma fonte menor.", "Controle a aparência dos títulos com CSS."]),
+                    ["Não salte níveis apenas para obter uma fonte menor.", "Controle a aparência dos títulos com CSS."])
+            ] },
+            { id: "textos", titulo: "6. Formatação e organização de textos", assuntos: [
+                assunto("formatacao-textos", "Formatação e organização de textos", "Expressar importância e ênfase sem confundir significado com aparência.",
+                    "strong marca importância; em expressa ênfase que pode mudar o sentido de uma frase; small representa comentários laterais, como uma nota legal. A aparência habitual desses elementos pode ser modificada por CSS. Escolha o significado primeiro, em vez de usar tags apenas para obter negrito ou itálico.",
+                    "<p>Texto com <strong>importância</strong> e <em>ênfase</em>.</p>",
+                    `<p><strong>Atenção:</strong> salve o arquivo antes de fechar.</p>
+<p>Estude <em>um assunto por vez</em> para acompanhar os exemplos.</p>
+<p><small>Material de apoio para estudo individual.</small></p>`,
+                    ["strong identifica o aviso importante, normalmente exibido em negrito.", "em marca a ênfase da orientação, normalmente em itálico; small delimita a nota complementar."],
+                    "Organizar avisos, orientações e notas em uma página de estudo.",
+                    ["Não substitua headings por parágrafos com strong.", "Use CSS para aparência e essas tags para significado."]),
+                assunto("quebras-separadores", "Quebras de linha e separadores", "Diferenciar uma quebra textual de uma mudança temática.",
+                    "br indica uma quebra necessária no mesmo texto, como em um endereço ou poema. hr representa uma mudança de tema. Não devem ser repetidos para criar espaçamento ou substituir a estrutura de parágrafos.",
+                    "Texto<br>Continuação\n<hr>",
+                    `<p>Rua dos Estudos, 120<br>Recife — PE</p>
+<hr>
+<p>Atendimento: segunda a sexta.</p>`,
+                    ["br separa as linhas do endereço.", "hr indica a transição para outro tema."],
+                    "Apresentar um endereço e separar informações de atendimento.",
+                    ["Use p para parágrafos e CSS para margens.", "br e hr são elementos vazios."]),
                 assunto("comentarios", "Comentários", "Documentar decisões sem exibi-las como conteúdo.",
                     "Comentários são delimitados por <!-- e -->. Podem explicar uma decisão ou indicar uma região do arquivo. Não aparecem como texto na página, mas ficam acessíveis no código-fonte e no DOM, portanto não servem para guardar segredos.",
                     "<!-- Observação para quem mantém o arquivo -->",
@@ -100,18 +144,9 @@ export const conteudos = {
 </ol>`,
                     ["O comentário explica a ordem escolhida.", "ol e li continuam sendo o conteúdo apresentado."],
                     "Registrar uma decisão que não é evidente na marcação.",
-                    ["Evite comentários que apenas repetem tags.", "Não aninhe comentários nem registre credenciais."]),
-                assunto("quebras-separadores", "Quebras de linha e separadores", "Diferenciar uma quebra textual de uma mudança temática.",
-                    "br indica uma quebra necessária no mesmo texto, como em um endereço ou poema. hr representa uma mudança de tema. Não devem ser repetidos para criar espaçamento ou substituir a estrutura de parágrafos.",
-                    "Texto<br>Continuação\n<hr>",
-                    `<p>Rua dos Estudos, 120<br>Recife — PE</p>
-<hr>
-<p>Atendimento: segunda a sexta.</p>`,
-                    ["br separa as linhas do endereço.", "hr indica a transição para outro tema."],
-                    "Apresentar um endereço e separar informações de atendimento.",
-                    ["Use p para parágrafos e CSS para margens.", "br e hr são elementos vazios."])
+                    ["Evite comentários que apenas repetem tags.", "Não aninhe comentários nem registre credenciais."])
             ] },
-            { id: "conteudo-navegacao", titulo: "3. Conteúdo e navegação", assuntos: [
+            { id: "links", titulo: "7. Links", assuntos: [
                 assunto("links", "Links", "Navegar para páginas ou pontos do mesmo documento.",
                     "a com href cria um hiperlink. O destino pode ser outra página, uma URL externa ou um fragmento iniciado por # que aponta para um id. Seu texto deve comunicar o destino sem depender de frases ao redor.",
                     "<a href=\"#contato\">Contato</a>",
@@ -122,7 +157,9 @@ export const conteudos = {
 </section>`,
                     ["href=#contato aponta para o elemento com id=contato.", "section agrupa as informações e h2 nomeia a seção."],
                     "Criar um índice de uma página longa.",
-                    ["Prefira textos descritivos a clique aqui.", "Use links para navegar e botões para ações."]),
+                    ["Prefira textos descritivos a clique aqui.", "Use links para navegar e botões para ações."])
+            ] },
+            { id: "imagens", titulo: "8. Imagens", assuntos: [
                 assunto("imagens", "Imagens", "Inserir uma imagem com alternativa textual e proporção correta.",
                     "img referencia um arquivo em src e oferece uma alternativa em alt. width e height podem informar dimensões intrínsecas para reservar espaço antes do carregamento. O HTML não cria o arquivo: ele deve existir no caminho informado.",
                     "<img src=\"images/foto.jpg\" alt=\"Descrição\" width=\"640\" height=\"360\">",
@@ -131,7 +168,9 @@ export const conteudos = {
      width="640" height="360">`,
                     ["src localiza o arquivo; alt comunica seu conteúdo.", "width e height informam a proporção: ajuste-os às dimensões da imagem usada."],
                     "Forneça images/equipe.jpg para mostrar a equipe em uma página institucional.",
-                    ["Não distorça a proporção da imagem.", "Não use o nome do arquivo como alternativa textual."]),
+                    ["Não distorça a proporção da imagem.", "Não use o nome do arquivo como alternativa textual."])
+            ] },
+            { id: "listas", titulo: "9. Listas", assuntos: [
                 assunto("listas", "Listas ordenadas e não ordenadas", "Escolher a lista conforme a importância da sequência.",
                     "ol representa uma sequência relevante; ul representa um conjunto sem ordem obrigatória. li delimita cada item. Uma sublista deve ficar dentro de um li para manter a relação entre itens.",
                     "<ul><li>Item</li></ul>\n<ol><li>Etapa</li></ol>",
@@ -147,7 +186,9 @@ export const conteudos = {
 </ol>`,
                     ["ul agrupa materiais sem prioridade de ordem.", "ol expressa uma sequência; li delimita um material ou etapa."],
                     "Documentar materiais e instruções de uma atividade.",
-                    ["Não simule listas com marcadores em parágrafos.", "Use ol quando trocar a ordem mudar a orientação."]),
+                    ["Não simule listas com marcadores em parágrafos.", "Use ol quando trocar a ordem mudar a orientação."])
+            ] },
+            { id: "caminhos-arquivos", titulo: "10. Caminhos e organização de arquivos", assuntos: [
                 assunto("caminhos", "Caminhos relativos e absolutos", "Resolver destinos conforme a localização do documento.",
                     "Caminhos relativos são resolvidos a partir da URL do documento, salvo quando há base. ../ sobe um diretório; ./ indica o atual. URLs completas incluem protocolo e domínio. Um caminho iniciado por / parte da raiz do site e pode ignorar o prefixo de um projeto no GitHub Pages.",
                     "./contato.html\n../index.html\nhttps://example.org/pagina",
@@ -168,8 +209,21 @@ export const conteudos = {
                     ["Use nomes claros e consistentes.", "Confira todos os links depois de mover recursos."])
             ] }
         ] },
-        { id: "intermediario", nome: "Intermediário", assuntos: [], modulos: [
-            { id: "html-semantico", titulo: "4. HTML semântico", assuntos: [
+        { id: "intermediario", nome: "Intermediário — Estruturando páginas", assuntos: [], modulos: [
+            { id: "html-semantico", titulo: "1. HTML semântico", assuntos: [
+                assunto("html-semantico", "HTML semântico", "Escolher elementos que comuniquem a função do conteúdo.",
+                    "HTML semântico usa elementos pelo significado: nav representa navegação, main identifica o conteúdo principal e article reúne uma publicação independente. Essa escolha ajuda pessoas, navegadores e tecnologias assistivas a entenderem a estrutura. Ela não define automaticamente o layout, que continua sendo responsabilidade do CSS.",
+                    "<main><h1>Assunto principal</h1><p>Conteúdo</p></main>",
+                    `<nav aria-label="Nesta página"><a href="#aula">Aula</a></nav>
+<main id="aula">
+    <h1>Aprendendo semântica</h1>
+    <p>A estrutura informa a função de cada região.</p>
+</main>`,
+                    ["nav agrupa a navegação; aria-label informa seu nome.", "main identifica a região principal e id oferece um destino ao link; h1 nomeia o assunto."],
+                    "Planejar as regiões de uma página antes de escolher cores e posições.",
+                    ["Pergunte qual é a função do conteúdo antes de escolher a tag.", "Use recipientes genéricos somente quando não houver significado mais específico."])
+            ] },
+            { id: "regioes-principais", titulo: "2. Header, nav e main", assuntos: [
                 assunto("header", "Header", "Reconhecer conteúdo introdutório da página ou de uma seção.",
                     "header reúne introdução, título e informações relacionadas. Pode servir à página ou estar dentro de um article. Não posiciona conteúdo no topo por si só: a posição visual depende do CSS.",
                     "<header>Introdução</header>",
@@ -202,7 +256,9 @@ export const conteudos = {
 </main>`,
                     ["main identifica a região principal.", "id fornece um destino para o link de salto."],
                     "Separar uma aula dos menus recorrentes da plataforma.",
-                    ["Não coloque main dentro de nav, aside, article, header ou footer.", "Evite múltiplos main visíveis."]),
+                    ["Não coloque main dentro de nav, aside, article, header ou footer.", "Evite múltiplos main visíveis."])
+            ] },
+            { id: "secoes", titulo: "3. Section, article e aside", assuntos: [
                 assunto("section", "Section", "Agrupar um tema identificável do documento.",
                     "section representa uma seção temática quando não há elemento mais específico. Geralmente possui um título que explica o tema. Se o propósito for apenas envolver elementos para layout, div costuma ser mais adequada.",
                     "<section><h2>Tema</h2><p>Conteúdo</p></section>",
@@ -237,7 +293,9 @@ export const conteudos = {
 </aside>`,
                     ["main mantém a explicação central.", "aside apresenta uma definição complementar."],
                     "Mostrar um glossário sem interromper a sequência de uma aula.",
-                    ["Reserve aside para conteúdo complementar.", "Não separe como acessória uma informação essencial ao entendimento."]),
+                    ["Reserve aside para conteúdo complementar.", "Não separe como acessória uma informação essencial ao entendimento."])
+            ] },
+            { id: "rodape-grupos", titulo: "4. Footer, div e span", assuntos: [
                 assunto("footer", "Footer", "Identificar encerramento e autoria no contexto correto.",
                     "footer representa o rodapé da página ou de sua seção. Pode conter autoria, direitos e links relacionados. Um article pode ter seu próprio footer, distinto do rodapé geral do site.",
                     "<footer>Informações de encerramento</footer>",
@@ -258,23 +316,7 @@ export const conteudos = {
 </div>`,
                     ["div agrupa os dois parágrafos.", "span marca apenas a duração; as classes não aplicam estilos sozinhas."],
                     "Preparar um grupo para layout e um trecho para destaque visual com CSS.",
-                    ["Prefira um elemento semântico quando adequado.", "Não use div clicável como substituta de button."]),
-                assunto("hierarquia-semantica", "Hierarquia semântica", "Relacionar regiões, seções e títulos pela organização do conteúdo.",
-                    "A estrutura deve comunicar quais informações são principais, subdivisões ou complementos. O aninhamento acompanha essa relação. Inserir section não reduz automaticamente o nível dos títulos: escolha h2, h3 e os demais explicitamente.",
-                    "<main><h1>Página</h1><section><h2>Seção</h2></section></main>",
-                    `<header><p>Portal de estudos</p></header>
-<main>
-    <h1>Trilha de HTML</h1>
-    <section>
-        <h2>Elementos de conteúdo</h2>
-        <h3>Parágrafos</h3>
-        <p>Um parágrafo reúne uma ideia no texto.</p>
-    </section>
-</main>
-<footer><p>Material de referência.</p></footer>`,
-                    ["header e footer ficam fora do conteúdo específico de main.", "h1, h2 e h3 representam assunto, seção e tópico."],
-                    "Planejar uma documentação antes de aplicar seu layout.",
-                    ["Confira se a estrutura faz sentido sem estilos.", "Não confunda posição visual com hierarquia."])
+                    ["Prefira um elemento semântico quando adequado.", "Não use div clicável como substituta de button."])
             ] },
             { id: "formularios", titulo: "5. Formulários", assuntos: [
                 assunto("form", "Form", "Agrupar campos e compreender o envio dos valores.",
@@ -287,7 +329,9 @@ export const conteudos = {
 </form>`,
                     ["Sem action, o envio usa a URL atual; get acrescenta dados à consulta da URL.", "name=q identifica o valor e submit aciona o envio."],
                     "Teste em um arquivo HTML e observe a consulta na URL. Exibir resultados exige outra implementação.",
-                    ["Não aninhe formulários.", "Não envie informações sensíveis em URLs."]),
+                    ["Não aninhe formulários.", "Não envie informações sensíveis em URLs."])
+            ] },
+            { id: "labels-inputs", titulo: "6. Labels e inputs", assuntos: [
                 assunto("label", "Label", "Dar um rótulo visível a um controle.",
                     "label descreve o que deve ser preenchido ou escolhido. for aponta para o id do controle; clicar no rótulo normalmente foca ou ativa o controle. placeholder oferece uma dica temporária e não substitui um rótulo persistente.",
                     "<label for=\"nome\">Nome</label>\n<input id=\"nome\" name=\"nome\">",
@@ -304,6 +348,19 @@ export const conteudos = {
                     ["value inicia um texto que pode ser editado.", "maxlength limita caracteres; name identifica o dado em um envio."],
                     "Oferecer um valor inicial editável em um formulário de perfil.",
                     ["Escolha o tipo conforme a informação.", "Não use value como substituto de label."]),
+                assunto("tipos-input", "Tipos de input", "Escolher controles e verificações adequados ao dado.",
+                    "text aceita texto geral; email verifica um formato de endereço; date representa uma data; checkbox representa uma escolha booleana. number serve para quantidades, não para identificadores com zeros iniciais. A aparência pode variar conforme navegador e sistema operacional.",
+                    "<input type=\"email\">\n<input type=\"date\">\n<input type=\"checkbox\">",
+                    `<label for="email">E-mail</label>
+<input id="email" name="email" type="email" autocomplete="email">
+<label for="data-estudo">Data de estudo</label>
+<input id="data-estudo" name="data" type="date">
+<label><input name="lembrete" type="checkbox" value="sim"> Desejo um lembrete</label>`,
+                    ["email verifica formato, não a existência do endereço.", "date escolhe uma data; checkbox participa do envio normal somente quando marcado."],
+                    "Coletar contatos, datas e preferências em controles reconhecidos pelo dispositivo.",
+                    ["Use tel para telefone e text para códigos, não number.", "Teste em diferentes navegadores sem depender de uma aparência única."])
+            ] },
+            { id: "botoes-selecao", titulo: "7. Botões e campos de seleção", assuntos: [
                 assunto("button", "Button", "Distinguir envio, restauração e outras ações.",
                     "button oferece interação nativa por mouse, toque e teclado. Dentro de form, omitir type pode causar envio. submit envia; reset restaura valores iniciais; button não envia e pode receber uma ação de JavaScript quando ela estiver implementada.",
                     "<button type=\"submit\">Enviar</button>",
@@ -337,17 +394,23 @@ export const conteudos = {
                     ["O texto entre as tags é o valor inicial editável.", "rows ajusta a área visível; maxlength limita caracteres."],
                     "Registrar observações, mensagens ou descrições de um projeto.",
                     ["Não insira indentação extra dentro da tag se ela não deve compor o valor.", "Ofereça um rótulo e espaço confortável de escrita."]),
-                assunto("tipos-input", "Tipos de input", "Escolher controles e verificações adequados ao dado.",
-                    "text aceita texto geral; email verifica um formato de endereço; date representa uma data; checkbox representa uma escolha booleana. number serve para quantidades, não para identificadores com zeros iniciais. A aparência pode variar conforme navegador e sistema operacional.",
-                    "<input type=\"email\">\n<input type=\"date\">\n<input type=\"checkbox\">",
-                    `<label for="email">E-mail</label>
-<input id="email" name="email" type="email" autocomplete="email">
-<label for="data-estudo">Data de estudo</label>
-<input id="data-estudo" name="data" type="date">
-<label><input name="lembrete" type="checkbox" value="sim"> Desejo um lembrete</label>`,
-                    ["email verifica formato, não a existência do endereço.", "date escolhe uma data; checkbox participa do envio normal somente quando marcado."],
-                    "Coletar contatos, datas e preferências em controles reconhecidos pelo dispositivo.",
-                    ["Use tel para telefone e text para códigos, não number.", "Teste em diferentes navegadores sem depender de uma aparência única."]),
+                assunto("agrupamento", "Elementos de agrupamento", "Escolher o agrupamento conforme a relação dos conteúdos.",
+                    "Listas, figuras e recipientes genéricos agrupam conteúdo de formas diferentes. dl representa associações entre termos e descrições, com dt e dd. Em formulários, fieldset agrupa controles relacionados e legend identifica o grupo.",
+                    "<dl><dt>Termo</dt><dd>Descrição</dd></dl>",
+                    `<dl>
+    <dt>HTML</dt>
+    <dd>Linguagem para estruturar conteúdo.</dd>
+</dl>
+<fieldset>
+    <legend>Formato de estudo</legend>
+    <label><input type="radio" name="formato" value="texto"> Texto</label>
+    <label><input type="radio" name="formato" value="video"> Vídeo</label>
+</fieldset>`,
+                    ["dt apresenta o termo e dd a descrição.", "fieldset e legend identificam o grupo; radios com mesmo name permitem uma escolha."],
+                    "Criar um glossário e uma preferência entre formatos de estudo.",
+                    ["Escolha o grupo pela relação dos dados.", "Use legend para explicar controles relacionados."])
+            ] },
+            { id: "validacao-nativa", titulo: "8. Validação nativa de formulários", assuntos: [
                 assunto("validacao-nativa", "Validação nativa", "Declarar restrições básicas para o envio.",
                     "required exige valor; minlength e maxlength restringem certos textos; min e max restringem valores compatíveis. O navegador verifica as condições no envio normal e mostra mensagens próprias. Essa validação não garante segurança: um servidor também deve validar o que recebe.",
                     "<input required minlength=\"3\" maxlength=\"20\">",
@@ -373,7 +436,7 @@ export const conteudos = {
                     "Preparar um upload. /envios precisa de um serviço real; este trecho não cria esse serviço.",
                     ["Use HTTPS para proteger o transporte.", "Valide tipo, tamanho e conteúdo do arquivo no servidor."])
             ] },
-            { id: "estruturas-midias", titulo: "6. Estruturas e mídias", assuntos: [
+            { id: "tabelas", titulo: "9. Tabelas", assuntos: [
                 assunto("tabelas", "Tabelas", "Representar dados relacionados em linhas e colunas.",
                     "table organiza dados tabulares; tr cria linhas; th identifica cabeçalhos; td contém valores. caption dá um título. scope informa se o cabeçalho descreve linha ou coluna. Não use tabelas para organizar o layout geral da página.",
                     "<table><caption>Título</caption><tr><th scope=\"col\">Coluna</th></tr><tr><td>Valor</td></tr></table>",
@@ -387,7 +450,9 @@ export const conteudos = {
 </table>`,
                     ["thead e tbody agrupam cabeçalhos e dados.", "scope associa linhas e colunas; caption identifica o conjunto."],
                     "Mostrar um cronograma ou comparar dados com dois eixos.",
-                    ["Inclua cabeçalhos e título explicativos.", "Planeje rolagem do recipiente com CSS para tabelas largas."]),
+                    ["Inclua cabeçalhos e título explicativos.", "Planeje rolagem do recipiente com CSS para tabelas largas."])
+            ] },
+            { id: "midias", titulo: "10. Elementos de mídia", assuntos: [
                 assunto("audio", "Áudio", "Disponibilizar reprodução manual de mídia sonora.",
                     "audio incorpora som; controls oferece os controles nativos. source informa o arquivo e seu tipo. O suporte ao formato depende do navegador. Uma transcrição deve acompanhar o áudio quando o conteúdo for necessário à compreensão da página.",
                     "<audio controls><source src=\"audio/aula.mp3\" type=\"audio/mpeg\"></audio>",
@@ -420,26 +485,11 @@ export const conteudos = {
 </figure>`,
                     ["figure mantém exemplo e legenda como unidade.", "pre preserva espaços; code identifica código; entidades exibem tags como texto."],
                     "Apresentar um trecho de código com legenda em um tutorial.",
-                    ["Coloque figcaption como primeiro ou último filho de figure.", "Faça a legenda acrescentar contexto."]),
-                assunto("agrupamento", "Elementos de agrupamento", "Escolher o agrupamento conforme a relação dos conteúdos.",
-                    "Listas, figuras e recipientes genéricos agrupam conteúdo de formas diferentes. dl representa associações entre termos e descrições, com dt e dd. Em formulários, fieldset agrupa controles relacionados e legend identifica o grupo.",
-                    "<dl><dt>Termo</dt><dd>Descrição</dd></dl>",
-                    `<dl>
-    <dt>HTML</dt>
-    <dd>Linguagem para estruturar conteúdo.</dd>
-</dl>
-<fieldset>
-    <legend>Formato de estudo</legend>
-    <label><input type="radio" name="formato" value="texto"> Texto</label>
-    <label><input type="radio" name="formato" value="video"> Vídeo</label>
-</fieldset>`,
-                    ["dt apresenta o termo e dd a descrição.", "fieldset e legend identificam o grupo; radios com mesmo name permitem uma escolha."],
-                    "Criar um glossário e uma preferência entre formatos de estudo.",
-                    ["Escolha o grupo pela relação dos dados.", "Use legend para explicar controles relacionados."])
+                    ["Coloque figcaption como primeiro ou último filho de figure.", "Faça a legenda acrescentar contexto."])
             ] }
         ] },
-        { id: "avancado", nome: "Avançado", assuntos: [], modulos: [
-            { id: "acessibilidade", titulo: "7. Acessibilidade", assuntos: [
+        { id: "avancado", nome: "Avançado — Qualidade e boas práticas", assuntos: [], modulos: [
+            { id: "acessibilidade", titulo: "1. Acessibilidade com HTML", assuntos: [
                 assunto("semantica-acessibilidade", "HTML semântico e acessibilidade", "Relacionar elementos nativos à navegação assistiva.",
                     "Elementos nativos comunicam funções e oferecem comportamentos de teclado nos controles. Regiões como nav e main ajudam a percorrer páginas. Essa base não basta sozinha: contraste, foco, linguagem e testes de uso também fazem parte da acessibilidade.",
                     "<main><h1>Título principal</h1><p>Conteúdo</p></main>",
@@ -501,7 +551,39 @@ export const conteudos = {
                     "Distinguir menus e mostrar uma dúvida expansível sem JavaScript.",
                     ["Não sobrescreva papéis nativos com papéis incompatíveis.", "Não use aria-hidden em controles focáveis nem anuncie estados inexistentes."])
             ] },
-            { id: "metadados-seo", titulo: "8. Metadados e SEO", assuntos: [
+            { id: "hierarquia", titulo: "2. Hierarquia semântica", assuntos: [
+                assunto("hierarquia-semantica", "Hierarquia semântica", "Relacionar regiões, seções e títulos pela organização do conteúdo.",
+                    "A estrutura deve comunicar quais informações são principais, subdivisões ou complementos. O aninhamento acompanha essa relação. Inserir section não reduz automaticamente o nível dos títulos: escolha h2, h3 e os demais explicitamente.",
+                    "<main><h1>Página</h1><section><h2>Seção</h2></section></main>",
+                    `<header><p>Portal de estudos</p></header>
+<main>
+    <h1>Trilha de HTML</h1>
+    <section>
+        <h2>Elementos de conteúdo</h2>
+        <h3>Parágrafos</h3>
+        <p>Um parágrafo reúne uma ideia no texto.</p>
+    </section>
+</main>
+<footer><p>Material de referência.</p></footer>`,
+                    ["header e footer ficam fora do conteúdo específico de main.", "h1, h2 e h3 representam assunto, seção e tópico."],
+                    "Planejar uma documentação antes de aplicar seu layout.",
+                    ["Confira se a estrutura faz sentido sem estilos.", "Não confunda posição visual com hierarquia."]),
+                assunto("hierarquia-titulos", "Hierarquia de títulos", "Revisar headings como um índice lógico.",
+                    "Títulos estruturam a leitura e a navegação por headings em leitores de tela. Sua sequência representa assuntos e subdivisões. Fonte grande não transforma um texto em heading, e usar headings não garante posições em buscadores.",
+                    "<h1>Assunto</h1>\n<h2>Seção</h2>\n<h3>Subseção</h3>",
+                    `<h1>Guia de formulários</h1>
+<h2>Campos de texto</h2>
+<h3>Entrada de uma linha</h3>
+<p>Use input para entradas curtas.</p>
+<h3>Entrada de várias linhas</h3>
+<p>Use textarea para mensagens.</p>
+<h2>Envio dos dados</h2>
+<p>Configure destino e método no formulário.</p>`,
+                    ["Os h3 são subseções de Campos de texto.", "O último h2 retorna ao nível de seção."],
+                    "Auditar os tópicos de uma documentação longa usando sua sequência de títulos.",
+                    ["Adote um h1 principal claro e níveis coerentes.", "Não escolha headings apenas pelo estilo visual."])
+            ] },
+            { id: "metadados", titulo: "3. Metadados", assuntos: [
                 assunto("title", "Title", "Identificar a página fora de seu conteúdo visível.",
                     "title, no head, nomeia a aba e pode aparecer em favoritos e resultados de busca. Deve diferenciar a página das demais. O título visível continua sendo um heading no body. Buscadores podem escolher outra formulação nos resultados.",
                     "<title>Assunto | Nome do site</title>",
@@ -509,13 +591,6 @@ export const conteudos = {
                     ["title informa assunto e site.", "Seu conteúdo é texto, não outra marcação HTML."],
                     "Identificar uma aula entre várias abas e favoritos.",
                     ["Use títulos específicos em cada página.", "Evite repetir palavras-chave ou prometer um título exato na busca."], "head"),
-                assunto("meta-description", "Meta description", "Descrever o conteúdo de maneira curta e fiel.",
-                    "meta com name=description oferece um resumo do documento. Buscadores podem usá-lo no trecho de resultado ou escolher outro texto conforme a consulta. Não altera o conteúdo visível nem garante posições nos resultados.",
-                    "<meta name=\"description\" content=\"Resumo da página.\">",
-                    `<meta name="description" content="Aprenda a criar formulários HTML com rótulos, campos e validação nativa, usando exemplos explicados.">`,
-                    ["name identifica o metadado.", "content contém o resumo do conteúdo real."],
-                    "Oferecer uma descrição própria para a página de uma aula.",
-                    ["Escreva resumos distintos e relevantes.", "Um limite fixo de caracteres não garante exibição completa."], "head"),
                 assunto("viewport", "Viewport", "Configurar a área inicial de layout em dispositivos móveis.",
                     "width=device-width usa a largura do dispositivo para o layout; initial-scale=1.0 define a escala inicial. Isso evita uma área virtual larga em navegadores móveis, mas não substitui CSS responsivo nem impede conteúdos largos de transbordarem.",
                     "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">",
@@ -537,20 +612,6 @@ export const conteudos = {
                     ["lang em html define o idioma predominante.", "lang=en identifica a expressão inglesa sem mudar o restante do texto."],
                     "Melhorar a pronúncia de um glossário bilíngue em leitores de tela.",
                     ["Declare o idioma realmente usado.", "Não confunda idioma com codificação: lang e charset são diferentes."], "documento"),
-                assunto("hierarquia-titulos", "Hierarquia de títulos", "Revisar headings como um índice lógico.",
-                    "Títulos estruturam a leitura e a navegação por headings em leitores de tela. Sua sequência representa assuntos e subdivisões. Fonte grande não transforma um texto em heading, e usar headings não garante posições em buscadores.",
-                    "<h1>Assunto</h1>\n<h2>Seção</h2>\n<h3>Subseção</h3>",
-                    `<h1>Guia de formulários</h1>
-<h2>Campos de texto</h2>
-<h3>Entrada de uma linha</h3>
-<p>Use input para entradas curtas.</p>
-<h3>Entrada de várias linhas</h3>
-<p>Use textarea para mensagens.</p>
-<h2>Envio dos dados</h2>
-<p>Configure destino e método no formulário.</p>`,
-                    ["Os h3 são subseções de Campos de texto.", "O último h2 retorna ao nível de seção."],
-                    "Auditar os tópicos de uma documentação longa usando sua sequência de títulos.",
-                    ["Adote um h1 principal claro e níveis coerentes.", "Não escolha headings apenas pelo estilo visual."]),
                 assunto("compartilhamento", "Metadados para compartilhamento", "Fornecer informações para cartões de links.",
                     "Open Graph usa metadados como og:title, og:type, og:url e og:image. Serviços compatíveis podem usá-los para montar cartões, dependendo do serviço e de seu cache. Esses campos não substituem title ou a descrição geral do documento.",
                     "<meta property=\"og:title\" content=\"Título do conteúdo\">",
@@ -564,7 +625,16 @@ export const conteudos = {
                     "Substitua example.org por URLs reais para preparar o compartilhamento de uma aula.",
                     ["Use URLs absolutas e recursos acessíveis publicamente.", "Teste no serviço de destino e considere seu cache."], "head")
             ] },
-            { id: "integracao-boas-praticas", titulo: "9. Integração e boas práticas", assuntos: [
+            { id: "seo", titulo: "4. SEO técnico básico", assuntos: [
+                assunto("meta-description", "Meta description", "Descrever o conteúdo de maneira curta e fiel.",
+                    "meta com name=description oferece um resumo do documento. Buscadores podem usá-lo no trecho de resultado ou escolher outro texto conforme a consulta. Não altera o conteúdo visível nem garante posições nos resultados.",
+                    "<meta name=\"description\" content=\"Resumo da página.\">",
+                    `<meta name="description" content="Aprenda a criar formulários HTML com rótulos, campos e validação nativa, usando exemplos explicados.">`,
+                    ["name identifica o metadado.", "content contém o resumo do conteúdo real."],
+                    "Oferecer uma descrição própria para a página de uma aula.",
+                    ["Escreva resumos distintos e relevantes.", "Um limite fixo de caracteres não garante exibição completa."], "head")
+            ] },
+            { id: "integracao-css", titulo: "5. Integração com CSS", assuntos: [
                 assunto("html-css", "Conexão entre HTML e CSS", "Vincular estilos mantendo suas responsabilidades separadas.",
                     "link com rel=stylesheet carrega CSS a partir de href, relativo ao documento HTML. Já url() dentro do CSS é relativo à própria folha. HTML define estrutura, enquanto CSS controla apresentação.",
                     "<link rel=\"stylesheet\" href=\"css/style.css\">",
@@ -581,7 +651,9 @@ export const conteudos = {
 </html>`,
                     ["link conecta css/style.css ao documento.", "class=titulo fornece um seletor, sem gerar aparência sozinha."],
                     "Crie css/style.css e escreva .titulo { color: rebeccapurple; } para testar a conexão.",
-                    ["Confira o carregamento na aba Rede.", "Separe estilos reutilizáveis quando isso facilitar a manutenção."], "documento"),
+                    ["Confira o carregamento na aba Rede.", "Separe estilos reutilizáveis quando isso facilitar a manutenção."], "documento")
+            ] },
+            { id: "integracao-javascript", titulo: "6. Integração com JavaScript", assuntos: [
                 assunto("html-javascript", "Conexão entre HTML e JavaScript", "Vincular um script aos elementos da página.",
                     "script com src referencia JavaScript, que pode ler o DOM e responder a eventos. HTML mantém a responsabilidade pela estrutura. defer permite que um script clássico externo execute após a análise do documento, com seus elementos disponíveis.",
                     "<script src=\"js/app.js\" defer></script>",
@@ -608,7 +680,9 @@ export const conteudos = {
 <script src="js/app.js" defer></script>`,
                     ["Os downloads não impedem a análise do documento.", "configuracao.js executa antes de app.js; forneça ambos os arquivos."],
                     "Carregar uma configuração antes do código que depende dela, usando scripts clássicos com defer.",
-                    ["Use async somente se não houver dependência de ordem.", "defer não tem esse efeito em scripts clássicos inline; módulos precisam de carregamento compatível."], "head"),
+                    ["Use async somente se não houver dependência de ordem.", "defer não tem esse efeito em scripts clássicos inline; módulos precisam de carregamento compatível."], "head")
+            ] },
+            { id: "organizacao", titulo: "7. Organização de documentos", assuntos: [
                 assunto("organizacao-documentos", "Organização de documentos", "Manter uma estrutura previsível para leitura e alteração.",
                     "Uma sequência consistente separa declaração, metadados, referências e conteúdo. Agrupe informações relacionadas e mantenha indentação regular. Organização não significa envolver cada linha em um recipiente: elementos adicionais precisam ter função clara.",
                     "<!doctype html>\n<html><head>...</head><body>...</body></html>",
@@ -630,7 +704,9 @@ export const conteudos = {
 </html>`,
                     ["head concentra metadados em sequência previsível.", "header, main e footer organizam regiões sem recipientes extras."],
                     "Permitir que outra pessoa encontre rapidamente conteúdo e referências.",
-                    ["Mantenha indentação consistente.", "Comente decisões relevantes, não cada tag."], "documento"),
+                    ["Mantenha indentação consistente.", "Comente decisões relevantes, não cada tag."], "documento")
+            ] },
+            { id: "validacao-erros", titulo: "8. Validação e identificação de erros", assuntos: [
                 assunto("validacao-html", "Validação de HTML", "Usar um verificador de conformidade e entender seu alcance.",
                     "O Nu HTML Checker identifica problemas como aninhamento inválido, atributos inadequados e IDs duplicados. Não substitui testes de links, acessibilidade e carregamento. O navegador conseguir mostrar uma página não comprova a conformidade de sua marcação.",
                     "<!-- Valide o documento completo, incluindo DOCTYPE, head e body. -->",
@@ -662,7 +738,9 @@ export const conteudos = {
 </section>`,
                     ["div envolve parágrafos completos, sem ser inserida dentro deles.", "O fragmento corresponde a um único id presente."],
                     "Investigar um layout cuja árvore real ficou diferente da marcação esperada.",
-                    ["Inspecione DOM, console e Rede conforme o erro.", "Confira a capitalização de caminhos e valide o documento."]),
+                    ["Inspecione DOM, console e Rede conforme o erro.", "Confira a capitalização de caminhos e valide o documento."])
+            ] },
+            { id: "boas-praticas", titulo: "9. Boas práticas de desenvolvimento", assuntos: [
                 assunto("manutencao", "Boas práticas de manutenção", "Preservar referências e significado nas mudanças.",
                     "Nomes claros, IDs estáveis e ausência de duplicação facilitam alterações. Antes de renomear elementos, procure referências em links, CSS e JavaScript. A manutenção deve preservar significado, acessibilidade e comportamento, não apenas aparência.",
                     "<a href=\"#plano-estudos\">Plano</a>\n<section id=\"plano-estudos\">...</section>",

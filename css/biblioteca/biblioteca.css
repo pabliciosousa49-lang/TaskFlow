@@ -86,10 +86,62 @@ h1, h2, h3, p { margin: 0; }
 .biblioteca-conteudos-navegacao button:hover:not(:disabled) { border-color: var(--biblioteca-foco); }
 .biblioteca-conteudos-navegacao button:disabled { opacity: .5; cursor: default; }
 
+/* Documentação HTML — Leitura - coluna contínua com hierarquia e separadores discretos */
+body.biblioteca-html { isolation: isolate; }
+body.biblioteca-html::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(ellipse at 12% 15%, rgba(125, 2, 249, .15), transparent 55%), radial-gradient(ellipse at 90% 75%, rgba(77, 124, 230, .1), transparent 55%); animation: biblioteca-atmosfera 18s ease-in-out infinite alternate; }
+@keyframes biblioteca-atmosfera { from { opacity: .35; } to { opacity: .8; } }
+#biblioteca-html { grid-template-columns: 270px minmax(0, 1fr); }
+#biblioteca-html .biblioteca-menu { position: sticky; top: 24px; max-height: calc(100vh - 48px); overflow-y: auto; scrollbar-width: thin; }
+#biblioteca-html .biblioteca-leitura { align-self: start; }
+#biblioteca-html .biblioteca-leitura-cabecalho,
+#biblioteca-html .biblioteca-conteudo { width: 100%; max-width: 780px; margin: auto; padding: 36px; }
+#biblioteca-html .biblioteca-conteudo { font-size: 15px; line-height: 1.85; }
+#biblioteca-html .biblioteca-conteudo section + section { margin-top: 30px; padding-top: 28px; border-top: 1px solid var(--biblioteca-borda); }
+#biblioteca-html .biblioteca-conteudo h2 { margin-bottom: 14px; font-size: 20px; }
+#biblioteca-html .biblioteca-conteudos-navegacao { max-width: 780px; margin: auto; }
+
+/* Documentação HTML — Módulos - expansão nativa por mouse, toque e teclado */
+#biblioteca-html .biblioteca-categoria-conteudo { padding: 10px 8px 14px 12px; }
+#biblioteca-html .biblioteca-modulo + .biblioteca-modulo { margin-top: 6px; }
+#biblioteca-html .biblioteca-modulo summary { min-height: 44px; padding: 10px 8px; border-radius: 6px; color: var(--biblioteca-texto); cursor: pointer; font-size: 13px; line-height: 1.6; }
+#biblioteca-html .biblioteca-modulo summary::marker { color: var(--biblioteca-foco); }
+#biblioteca-html .biblioteca-modulo summary:hover { background: #241d30; }
+#biblioteca-html .biblioteca-modulo .biblioteca-assuntos { margin: 4px 0 12px; padding-left: 12px; }
+
+/* Documentação HTML — Observações - destaca contexto e orientações sem interromper a leitura */
+#biblioteca-html .biblioteca-exemplo-contexto { padding: 12px 16px; border-left: 3px solid #624180; background: #20172b; border-radius: 4px; }
+#biblioteca-html .biblioteca-conteudo .biblioteca-observacao { padding: 20px; border: 1px solid var(--biblioteca-borda); border-left: 3px solid #624180; border-radius: 8px; background: #20172b; }
+#biblioteca-html .biblioteca-observacao h2 { font-size: 16px; }
+
+/* Documentação HTML — Código - identifica linguagem e mantém cópia separada do texto */
+#biblioteca-html .biblioteca-codigo { min-width: 0; max-width: 100%; margin-top: 12px; border: 1px solid var(--biblioteca-borda); border-radius: 8px; overflow: hidden; background: var(--biblioteca-fundo); }
+#biblioteca-html .biblioteca-codigo-ferramentas { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 12px; padding: 4px 12px; border-bottom: 1px solid var(--biblioteca-borda); color: var(--biblioteca-secundario); font: 11px Consolas, monospace; }
+#biblioteca-html .biblioteca-codigo-ferramentas button { min-height: 44px; padding: 8px; border: 1px solid transparent; border-radius: 5px; background: transparent; color: var(--biblioteca-foco); font: 12px "Segoe UI", Arial, sans-serif; }
+#biblioteca-html .biblioteca-codigo-ferramentas button:hover { border-color: #624180; background: #261832; }
+#biblioteca-html .biblioteca-codigo pre { margin: 0; border: 0; border-radius: 0; }
+#biblioteca-html .biblioteca-codigo pre:focus-visible { outline-offset: -3px; }
+#biblioteca-html .biblioteca-copia-resultado { padding: 8px 16px; border-top: 1px solid var(--biblioteca-borda); font-size: 12px; }
+#biblioteca-html .biblioteca-copia-resultado:empty { display: none; }
+#biblioteca-html .biblioteca-codigo-ferramentas button:focus-visible { outline-offset: -3px; }
+
+/* Documentação HTML — Aprendizado - exemplos coloridos e resultado no mesmo fluxo */
+#biblioteca-html .biblioteca-token-tag { color: #93c5fd; }
+#biblioteca-html .biblioteca-token-atributo { color: #c4b5fd; }
+#biblioteca-html .biblioteca-token-valor { color: #b5e3b0; }
+#biblioteca-html .biblioteca-token-comentario { color: #aaa6b4; }
+#biblioteca-html .biblioteca-token-texto { color: var(--biblioteca-texto); }
+#biblioteca-html .biblioteca-sintaxe { margin-bottom: 18px; }
+#biblioteca-html .biblioteca-sintaxe summary { min-height: 44px; padding: 8px 0; color: var(--biblioteca-foco); cursor: pointer; font-size: 13px; }
+#biblioteca-html .biblioteca-resultado { min-width: 0; margin-bottom: 14px; border: 1px solid var(--biblioteca-borda); border-radius: 8px; overflow: hidden; }
+#biblioteca-html .biblioteca-resultado-barra { padding: 12px 16px; border-bottom: 1px solid var(--biblioteca-borda); background: #201b2b; color: var(--biblioteca-secundario); font-size: 12px; }
+#biblioteca-html .biblioteca-resultado iframe { display: block; width: 100%; height: 320px; border: 0; background: white; color-scheme: light; }
+
 /* Biblioteca — Responsividade - mantém menu recolhível e blocos dentro da largura */
 @media (max-width: 960px) {
     .biblioteca-layout { grid-template-columns: 220px minmax(0, 1fr); gap: 24px; }
     .biblioteca-leitura-cabecalho, .biblioteca-estado-vazio, .biblioteca-conteudo { padding: 28px; }
+    #biblioteca-html .biblioteca-leitura-cabecalho, #biblioteca-html .biblioteca-conteudo { padding: 28px; }
+    #biblioteca-html { grid-template-columns: 220px minmax(0, 1fr); }
 }
 @media (max-width: 760px) {
     .biblioteca-cabecalho { gap: 12px; padding: 16px; }
@@ -106,4 +158,12 @@ h1, h2, h3, p { margin: 0; }
     .biblioteca-conteudo { padding: 24px; }
     .biblioteca-estado-vazio { min-height: 280px; padding: 28px 24px; }
     .biblioteca-conteudos-navegacao { padding: 20px; }
+    #biblioteca-html .biblioteca-leitura-cabecalho, #biblioteca-html .biblioteca-conteudo { padding: 24px 20px; }
+    #biblioteca-html .biblioteca-conteudo .biblioteca-observacao { padding: 16px; }
+    #biblioteca-html { grid-template-columns: minmax(0, 1fr); }
+    #biblioteca-html .biblioteca-menu { position: static; max-height: none; overflow-y: visible; }
+    #biblioteca-html .biblioteca-resultado iframe { height: 280px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    body.biblioteca-html::before { animation: none; opacity: .35; }
 }
