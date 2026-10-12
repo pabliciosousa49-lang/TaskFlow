@@ -1,1 +1,90 @@
-/* Biblioteca Técnica — Estilos exclusivos reservados para a Fase 2. */
+/* Biblioteca — Identidade - tema próprio, sem importar os estilos da plataforma */
+:root {
+    color-scheme: dark;
+    --biblioteca-fundo: #0b0a0f;
+    --biblioteca-superficie: #14121b;
+    --biblioteca-borda: #302a3d;
+    --biblioteca-texto: #f3f0f8;
+    --biblioteca-secundario: #b5afc2;
+    --biblioteca-roxo: #7d02f9;
+    --biblioteca-foco: #c7a2ff;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; min-height: 100vh; background: var(--biblioteca-fundo); color: var(--biblioteca-texto); font: 15px/1.7 "Segoe UI", Arial, sans-serif; }
+button { font: inherit; cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+h1, h2, h3, p { margin: 0; }
+:focus-visible { outline: 2px solid var(--biblioteca-foco); outline-offset: 4px; }
+.biblioteca-pular { position: absolute; left: 16px; top: -100px; padding: 12px 16px; background: var(--biblioteca-superficie); z-index: 10; }
+.biblioteca-pular:focus { top: 12px; }
+
+/* Cabeçalho — Orientação - identifica ambiente, tecnologia e retorno */
+.biblioteca-cabecalho { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 24px; padding: 22px max(24px, calc((100vw - 1240px) / 2)); border-bottom: 1px solid var(--biblioteca-borda); background: var(--biblioteca-superficie); }
+.biblioteca-identidade { display: flex; align-items: center; gap: 12px; min-width: 0; margin-right: auto; }
+.biblioteca-identidade strong { font-size: 19px; letter-spacing: -.4px; }
+.biblioteca-identidade p { font-size: 12px; color: var(--biblioteca-secundario); }
+.biblioteca-simbolo { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid #6f339e; border-radius: 12px; color: var(--biblioteca-foco); background: #271636; font: 18px Consolas, monospace; }
+.biblioteca-tecnologia { padding: 5px 12px; border: 1px solid var(--biblioteca-borda); border-radius: 6px; font-size: 12px; font-weight: 700; }
+.biblioteca-tecnologia[data-identidade="html"] { color: #f4af8c; }
+.biblioteca-tecnologia[data-identidade="css"] { color: #99c9f4; }
+.biblioteca-tecnologia[data-identidade="javascript"] { color: #e7d581; }
+.biblioteca-retorno { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; border-radius: 6px; color: var(--biblioteca-secundario); font-size: 13px; }
+.biblioteca-retorno:hover { background: #241d30; color: var(--biblioteca-texto); }
+.biblioteca-tecnologias { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; max-width: 1240px; margin: auto; padding: 16px 24px 0; }
+.biblioteca-tecnologias a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 16px; border: 1px solid transparent; border-radius: 8px; color: var(--biblioteca-secundario); font-size: 13px; }
+.biblioteca-tecnologias a:hover { background: var(--biblioteca-superficie); }
+.biblioteca-tecnologias a[aria-current="page"] { border-color: #70479f; background: #281937; color: var(--biblioteca-texto); font-weight: 700; }
+
+/* Documentação — Layout - separa navegação e uma área confortável de leitura */
+.biblioteca-layout { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 36px; width: 100%; max-width: 1240px; margin: auto; padding: 28px 24px 48px; }
+.biblioteca-menu { min-width: 0; align-self: start; padding: 20px 0; border-right: 1px solid var(--biblioteca-borda); }
+.biblioteca-etiqueta { color: var(--biblioteca-secundario); font-size: 10px; font-weight: 700; letter-spacing: 1.4px; }
+.biblioteca-menu > .biblioteca-etiqueta, .biblioteca-menu > h2 { margin-left: 12px; }
+.biblioteca-menu h2 { margin-top: 6px; margin-bottom: 22px; font-size: 17px; }
+.biblioteca-grupo { margin: 6px 16px 6px 0; }
+.biblioteca-categoria { display: flex; align-items: center; gap: 12px; min-height: 48px; width: 100%; padding: 12px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--biblioteca-texto); text-align: left; font-size: 14px; }
+.biblioteca-categoria:hover { background: var(--biblioteca-superficie); }
+.biblioteca-categoria[aria-expanded="true"] { border-color: #624180; background: #261832; }
+.biblioteca-categoria-numero { color: var(--biblioteca-foco); font: 11px Consolas, monospace; }
+.biblioteca-categoria-seta { margin-left: auto; color: var(--biblioteca-secundario); }
+.biblioteca-categoria[aria-expanded="true"] .biblioteca-categoria-seta { transform: rotate(180deg); }
+.biblioteca-categoria-conteudo { padding: 12px 14px 14px 36px; color: var(--biblioteca-secundario); font-size: 12px; overflow-wrap: anywhere; }
+.biblioteca-categoria-conteudo ul { margin: 8px 0; padding-left: 16px; }
+.biblioteca-categoria-conteudo h3 { font-size: 13px; }
+.biblioteca-menu-aviso { padding: 12px; color: var(--biblioteca-secundario); font-size: 13px; }
+.biblioteca-leitura { min-width: 0; border: 1px solid var(--biblioteca-borda); border-radius: 14px; background: var(--biblioteca-superficie); }
+.biblioteca-leitura-cabecalho { padding: 32px; border-bottom: 1px solid var(--biblioteca-borda); }
+.biblioteca-leitura h1 { margin: 12px 0; font-size: clamp(24px, 3vw, 34px); line-height: 1.2; letter-spacing: -.7px; overflow-wrap: anywhere; }
+.biblioteca-nivel { display: inline-block; padding: 4px 10px; border: 1px solid var(--biblioteca-borda); border-radius: 5px; color: var(--biblioteca-foco); font-size: 11px; }
+.biblioteca-estado-vazio { display: grid; justify-items: start; gap: 14px; min-height: 320px; padding: 40px 32px; }
+.biblioteca-vazio-simbolo { color: var(--biblioteca-foco); font: 30px Consolas, monospace; }
+.biblioteca-estado-vazio h2 { font-size: 21px; line-height: 1.3; }
+.biblioteca-estado-vazio p { max-width: 560px; color: var(--biblioteca-secundario); font-size: 14px; }
+.biblioteca-estado-vazio .biblioteca-vazio-nota { font-size: 12px; }
+.biblioteca-leitura pre { max-width: 100%; overflow-x: auto; padding: 16px; background: var(--biblioteca-fundo); border: 1px solid var(--biblioteca-borda); border-radius: 8px; }
+.biblioteca-leitura code { font-family: Consolas, "Courier New", monospace; }
+.biblioteca-conteudos-navegacao { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding: 24px 32px; }
+.biblioteca-conteudos-navegacao button { min-height: 44px; padding: 8px 12px; }
+.biblioteca-menu-botao { display: none; }
+
+/* Biblioteca — Responsividade - mantém menu recolhível e blocos dentro da largura */
+@media (max-width: 960px) {
+    .biblioteca-layout { grid-template-columns: 220px minmax(0, 1fr); gap: 24px; }
+    .biblioteca-leitura-cabecalho, .biblioteca-estado-vazio { padding: 28px; }
+}
+@media (max-width: 760px) {
+    .biblioteca-cabecalho { gap: 12px; padding: 16px; }
+    .biblioteca-identidade { flex: 1 1 180px; }
+    .biblioteca-retorno { padding-left: 0; }
+    .biblioteca-tecnologias { padding: 12px 16px 0; gap: 4px; }
+    .biblioteca-tecnologias a { padding: 8px 12px; }
+    .biblioteca-layout { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 20px 16px 32px; }
+    .biblioteca-menu-botao { display: block; min-height: 48px; padding: 10px 16px; border: 1px solid var(--biblioteca-borda); border-radius: 8px; background: var(--biblioteca-superficie); color: var(--biblioteca-texto); text-align: left; }
+    body[data-menu-aberto="false"] .biblioteca-menu { display: none; }
+    .biblioteca-menu { padding: 16px 8px; border: 1px solid var(--biblioteca-borda); border-radius: 8px; }
+    .biblioteca-grupo { margin-right: 0; }
+    .biblioteca-leitura-cabecalho { padding: 24px; }
+    .biblioteca-estado-vazio { min-height: 280px; padding: 28px 24px; }
+    .biblioteca-conteudos-navegacao { padding: 20px; }
+}

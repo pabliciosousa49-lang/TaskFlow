@@ -7,7 +7,49 @@
   <link rel="stylesheet" href="../../css/biblioteca/biblioteca.css">
   <script type="module" src="../../js/biblioteca/biblioteca.js"></script>
 </head>
-<body>
-  <main id="biblioteca-javascript" data-tecnologia="javascript"></main>
+<body data-menu-aberto="false">
+  <a class="biblioteca-pular" href="#biblioteca-leitura">Ir para o conteúdo</a>
+  <header class="biblioteca-cabecalho">
+    <div class="biblioteca-identidade">
+      <span class="biblioteca-simbolo" aria-hidden="true">&lt;/&gt;</span>
+      <div><strong>TaskFlow</strong><p>Biblioteca Técnica</p></div>
+    </div>
+    <span class="biblioteca-tecnologia" data-identidade="javascript">JavaScript</span>
+    <a class="biblioteca-retorno" href="../../index.html">← Voltar ao TaskFlow</a>
+  </header>
+  <nav class="biblioteca-tecnologias" aria-label="Tecnologias da Biblioteca">
+    <a href="./html.html" data-tecnologia-link="html">HTML</a>
+    <a href="./css.html" data-tecnologia-link="css">CSS</a>
+    <a href="./javascript.html" data-tecnologia-link="javascript" aria-current="page">JavaScript</a>
+  </nav>
+  <main id="biblioteca-javascript" class="biblioteca-layout" data-tecnologia="javascript">
+    <button id="biblioteca-alternar-menu" class="biblioteca-menu-botao" type="button"
+      aria-controls="biblioteca-menu" aria-expanded="false" disabled>Mostrar níveis</button>
+    <aside id="biblioteca-menu" class="biblioteca-menu" aria-labelledby="biblioteca-menu-titulo">
+      <span class="biblioteca-etiqueta">GUIA DE ESTUDOS</span>
+      <h2 id="biblioteca-menu-titulo">Níveis de JavaScript</h2>
+      <nav id="biblioteca-niveis" aria-label="Níveis e assuntos de JavaScript">
+        <p class="biblioteca-menu-aviso">Carregando níveis…</p>
+      </nav>
+    </aside>
+    <article id="biblioteca-leitura" class="biblioteca-leitura" tabindex="-1" aria-labelledby="biblioteca-titulo">
+      <header class="biblioteca-leitura-cabecalho">
+        <span class="biblioteca-etiqueta">BIBLIOTECA / JAVASCRIPT</span>
+        <h1 id="biblioteca-titulo">Documentação de JavaScript</h1>
+        <span id="biblioteca-nivel" class="biblioteca-nivel">Todos os níveis</span>
+      </header>
+      <div id="biblioteca-estado-vazio" class="biblioteca-estado-vazio" role="status">
+        <span class="biblioteca-vazio-simbolo" aria-hidden="true">{ }</span>
+        <h2 id="biblioteca-vazio-titulo">Conteúdo em preparação</h2>
+        <p id="biblioteca-vazio-descricao">Ainda não há assuntos disponíveis para JavaScript. Os materiais serão organizados do básico ao avançado.</p>
+        <p class="biblioteca-vazio-nota">Explicações, exemplos de código e boas práticas aparecerão nesta área quando estiverem disponíveis.</p>
+      </div>
+      <nav class="biblioteca-conteudos-navegacao" aria-label="Navegação entre assuntos" hidden>
+        <button type="button" disabled>← Assunto anterior</button>
+        <button type="button" disabled>Próximo assunto →</button>
+      </nav>
+      <noscript><p class="biblioteca-menu-aviso">Ative o JavaScript para carregar os níveis da Biblioteca.</p></noscript>
+    </article>
+  </main>
 </body>
 </html>
