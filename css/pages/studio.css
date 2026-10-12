@@ -160,28 +160,58 @@ button:disabled { opacity: .55; cursor: default; }
 @keyframes mascote-sucesso { 0%, 100% { transform: translateY(0); } 45% { transform: translateY(-6px); } }
 @keyframes mascote-erro { 0%, 100% { transform: translateX(0); } 30% { transform: translateX(-3px); } 65% { transform: translateX(3px); } }
 
+/* Abas — Documentos - limita a rolagem horizontal à barra de arquivos */
+.studio-abas { display: flex; max-width: 100%; min-width: 0; overflow-x: auto; border-bottom: 1px solid var(--studio-borda); background: var(--studio-card); }
+.studio-aba { display: flex; flex-shrink: 0; border-right: 1px solid var(--studio-borda); border-top: 2px solid transparent; }
+.studio-aba[data-ativa="true"] { border-top-color: var(--studio-roxo); background: var(--studio-editor-fundo); }
+.studio-aba button { min-height: 44px; border: 0; background: transparent; color: var(--studio-secundario); padding: 8px 12px; cursor: pointer; font: 12px Consolas, monospace; }
+.studio-aba[data-ativa="true"] button { color: var(--studio-texto); }
+.studio-aba button[data-fechar] { min-width: 44px; font-size: 18px; }
+.studio-aba button:hover { background: #ffffff0a; }
+
 /* Explorador — Estrutura - mantém arquivos virtuais ao lado do ambiente existente */
 .studio-area-trabalho { display: grid; grid-template-columns: 220px minmax(0, 1fr); align-items: start; gap: 16px; }
 .studio-area-trabalho:has(> .studio-explorador:not([open])) { grid-template-columns: 124px minmax(0, 1fr); }
-.studio-explorador { min-width: 0; border: 1px solid var(--studio-borda); border-radius: var(--studio-raio); background: var(--studio-superficie); }
-.studio-explorador summary { min-height: 48px; padding: 13px 12px; color: var(--studio-secundario); font-size: 12px; font-weight: 700; cursor: pointer; }
+/* Explorador — IDE - linhas compactas, ferramentas alinhadas e nomes truncados */
+.studio-explorador { min-width: 0; border: 1px solid var(--studio-borda); border-radius: 0; background: var(--studio-superficie); font-family: "Segoe UI", Arial, sans-serif; }
+.studio-explorador summary { display: flex; align-items: center; gap: 8px; min-height: 34px; padding: 6px 10px; color: var(--studio-secundario); font-size: 10px; letter-spacing: 1px; font-weight: 600; cursor: pointer; list-style: none; }
+.studio-explorador summary::-webkit-details-marker { display: none; }
+.studio-explorador summary::before { content: "›"; font-size: 16px; }
+.studio-explorador[open] summary::before { content: "⌄"; }
 .studio-explorador[open] summary { border-bottom: 1px solid var(--studio-borda); }
-.explorador-conteudo { min-width: 0; padding: 10px; }
-.studio-explorador button { min-height: 44px; min-width: 0; border: 1px solid var(--studio-borda); border-radius: 6px; background: transparent; color: var(--studio-texto); font-size: 11px; cursor: pointer; }
-.studio-explorador button:hover:not(:disabled) { background: var(--studio-card); }
-#explorador-raiz { width: 100%; padding: 8px; overflow-wrap: anywhere; font-weight: 700; text-align: left; }
-#explorador-raiz[aria-pressed="true"] { border-color: var(--studio-roxo); }
-.explorador-acoes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin: 10px 0; }
-#explorador-local { margin: 8px 0 12px; color: var(--studio-secundario); overflow-wrap: anywhere; font-size: 10px; }
+.explorador-reticencias { margin-left: auto; font-size: 19px; line-height: 1; letter-spacing: 0; }
+.studio-explorador:not([open]) summary { font-size: 9px; letter-spacing: .3px; }
+.studio-explorador:not([open]) .explorador-reticencias { display: none; }
+.explorador-conteudo { min-width: 0; padding: 0; }
+.explorador-cabecalho-raiz { display: flex; align-items: center; min-width: 0; gap: 2px; padding: 3px 5px; background: var(--studio-card); }
+.studio-explorador button { min-height: 28px; min-width: 0; border: 0; border-radius: 0; background: transparent; color: var(--studio-texto); font-size: 12px; cursor: pointer; }
+.studio-explorador button:hover:not(:disabled) { background: #25212f; }
+.studio-explorador button:focus-visible { outline: 1px solid var(--studio-foco); outline-offset: -1px; }
+#explorador-raiz { flex: 1; display: block; min-width: 0; padding: 5px 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; font-weight: 700; text-transform: uppercase; text-align: left; }
+#explorador-raiz::before { content: "⌄ "; }
+#explorador-raiz[aria-pressed="true"] { box-shadow: inset 2px 0 var(--studio-roxo); }
+.explorador-acoes { display: flex; align-items: center; flex-shrink: 0; gap: 0; }
+.explorador-acoes button { display: grid; place-items: center; width: 25px; height: 28px; padding: 4px; color: var(--studio-secundario); }
+.explorador-acoes svg { width: 16px; height: 16px; }
+#explorador-local { margin: 0; padding: 5px 10px; color: var(--studio-secundario); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; }
 #explorador-arvore, #explorador-arvore ul { margin: 0; padding: 0; list-style: none; }
-#explorador-arvore { max-height: calc(var(--studio-editor-altura) + 100px); overflow: auto; }
-#explorador-arvore ul { margin-left: 8px; padding-left: 7px; border-left: 1px solid var(--studio-borda); }
-#explorador-arvore .explorador-item { display: flex; align-items: center; gap: 7px; width: 100%; padding: 8px 6px; border-color: transparent; text-align: left; }
-#explorador-arvore .explorador-item[aria-pressed="true"] { background: #2d1b44; border-color: var(--studio-roxo); }
-#explorador-arvore .explorador-item[aria-current="true"] .explorador-nome { color: var(--studio-verde); }
-.explorador-icone { flex-shrink: 0; color: var(--studio-foco); font-family: Consolas, monospace; }
-.explorador-nome { min-width: 0; overflow-wrap: anywhere; }
-.explorador-vazio { padding: 12px 6px; color: var(--studio-secundario); font-size: 12px; }
+#explorador-arvore { height: var(--studio-editor-altura); overflow: auto; }
+#explorador-arvore ul { margin-left: 12px; border-left: 1px solid #312b4070; }
+#explorador-arvore .explorador-item { display: flex; align-items: center; gap: 5px; width: 100%; height: 28px; min-height: 28px; padding: 2px 7px; border: 0; border-radius: 0; text-align: left; }
+#explorador-arvore .explorador-item[aria-pressed="true"] { background: #2d1b44; }
+#explorador-arvore .explorador-item[aria-current="true"] { background: #302044; box-shadow: inset 2px 0 var(--studio-roxo); }
+#explorador-arvore .explorador-item[aria-current="true"]::after { content: "•"; margin-left: auto; color: var(--studio-foco); }
+.explorador-seta { flex: 0 0 10px; width: 10px; color: var(--studio-secundario); font-size: 17px; line-height: 1; text-align: center; }
+.explorador-icone { display: grid; place-items: center; flex: 0 0 16px; width: 16px; height: 16px; color: var(--studio-secundario); }
+.explorador-icone svg { width: 16px; height: 16px; }
+.explorador-icone[data-icone="pasta"], .explorador-icone[data-icone="pasta-aberta"] { color: #c7a2ff; }
+.explorador-icone[data-icone="html"] { color: #ef9366; }
+.explorador-icone[data-icone="css"] { color: #80bcf2; }
+.explorador-icone[data-icone="js"] { color: #e6cd75; }
+.explorador-icone[data-icone="json"] { color: #a9cf84; }
+.explorador-icone[data-icone="imagem"] { color: #c29be5; }
+.explorador-nome { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.explorador-vazio { padding: 12px 10px; color: var(--studio-secundario); font-size: 12px; }
 #studio-arquivo-aviso { min-height: var(--studio-editor-altura); }
 
 /* Studio — Responsividade - adapta proporções e alterna painéis sem recriar o editor */
@@ -221,7 +251,19 @@ button:disabled { opacity: .55; cursor: default; }
     .studio-mentor-mensagem p { font-size: 11px; }
     .studio-area-trabalho,
     .studio-area-trabalho:has(> .studio-explorador:not([open])) { grid-template-columns: minmax(0, 1fr); }
-    #explorador-arvore { max-height: 220px; }
+    #explorador-arvore { height: auto; max-height: 220px; }
+    .studio-explorador summary { min-height: 44px; }
+    .explorador-acoes button { width: 44px; height: 44px; }
+    #explorador-raiz { min-height: 44px; }
+    #explorador-arvore .explorador-item { height: 44px; min-height: 44px; }
+}
+@media (pointer: coarse) {
+    .explorador-cabecalho-raiz { flex-wrap: wrap; }
+    #explorador-raiz { flex-basis: 100%; }
+    .explorador-acoes { margin-left: auto; }
+    .studio-explorador summary, #explorador-raiz { min-height: 44px; }
+    .explorador-acoes button { width: 44px; height: 44px; }
+    #explorador-arvore .explorador-item { height: 44px; min-height: 44px; }
 }
 @media (prefers-reduced-motion: reduce) {
     #studio-gerenciamento, #studio-ambiente, .mascote-flutuacao, .mascote-imagem { animation: none !important; }

@@ -118,14 +118,16 @@
       </div>
       <div class="studio-area-trabalho">
         <details id="studio-explorador" class="studio-explorador" open>
-          <summary>Explorador</summary>
+          <summary><span>EXPLORADOR</span><span class="explorador-reticencias" aria-hidden="true">⋯</span></summary>
           <div class="explorador-conteudo">
+            <div class="explorador-cabecalho-raiz">
             <button id="explorador-raiz" type="button" aria-pressed="true">Projeto</button>
-            <div class="explorador-acoes">
-              <button id="explorador-novo-arquivo" type="button" disabled>Novo arquivo</button>
-              <button id="explorador-nova-pasta" type="button" disabled>Nova pasta</button>
-              <button id="explorador-renomear" type="button" disabled>Renomear</button>
-              <button id="explorador-excluir" type="button" disabled>Excluir</button>
+            <div class="explorador-acoes" role="group" aria-label="Ações de arquivos e pastas">
+              <button id="explorador-novo-arquivo" type="button" title="Novo arquivo" aria-label="Novo arquivo" disabled></button>
+              <button id="explorador-nova-pasta" type="button" title="Nova pasta" aria-label="Nova pasta" disabled></button>
+              <button id="explorador-renomear" type="button" title="Renomear item selecionado" aria-label="Renomear item selecionado" disabled></button>
+              <button id="explorador-excluir" type="button" title="Excluir item selecionado" aria-label="Excluir item selecionado" disabled></button>
+            </div>
             </div>
             <p id="explorador-local">Criar em: raiz do projeto</p>
             <ul id="explorador-arvore" aria-label="Arquivos e pastas do projeto"></ul>
@@ -134,9 +136,10 @@
       <div id="studio-paineis" class="studio-paineis" data-painel="editor">
         <section id="studio-editor-painel" class="studio-painel studio-editor" aria-labelledby="titulo-editor">
           <header class="studio-painel-cabecalho">
-            <h2 id="titulo-editor">Editor HTML</h2>
+            <h2 id="titulo-editor">Editor de código</h2>
             <span class="studio-arquivo"><span aria-hidden="true">&lt;/&gt;</span> <span id="studio-nome-arquivo">Nenhum arquivo</span></span>
           </header>
+          <div id="studio-abas" class="studio-abas" role="group" aria-label="Arquivos abertos"></div>
           <div id="studio-arquivo-aviso" class="studio-reserva">
             <h3 id="studio-arquivo-titulo">Seu projeto começa vazio</h3>
             <p id="studio-arquivo-mensagem">Crie index.html no explorador para iniciar a edição HTML.</p>

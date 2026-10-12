@@ -3,6 +3,8 @@ import { EditorView, keymap, lineNumbers, highlightActiveLine, highlightActiveLi
 import { history, historyKeymap, defaultKeymap, indentWithTab } from "@codemirror/commands";
 import { indentOnInput, indentUnit, syntaxHighlighting, HighlightStyle } from "@codemirror/language";
 import { html } from "@codemirror/lang-html";
+import { css } from "@codemirror/lang-css";
+import { javascript } from "@codemirror/lang-javascript";
 import { tags } from "@lezer/highlight";
 import { criarValidacaoHTML } from "./validacao.js";
 import { criarEstruturaInicialHTML } from "./documento-html.js";
@@ -16,7 +18,14 @@ const coresHTML = HighlightStyle.define([
     { tag: tags.angleBracket, color: "#808080" },
     { tag: tags.comment, color: "#6a9955" },
     { tag: tags.string, color: "#ce9178" },
-    { tag: tags.meta, color: "#c586c0" }
+    { tag: tags.meta, color: "#c586c0" },
+    { tag: tags.keyword, color: "#c586c0" },
+    { tag: tags.number, color: "#b5cea8" },
+    { tag: tags.bool, color: "#569cd6" },
+    { tag: tags.variableName, color: "#dcdcaa" },
+    { tag: tags.propertyName, color: "#9cdcfe" },
+    { tag: tags.className, color: "#d7ba7d" },
+    { tag: tags.operator, color: "#d4d4d4" }
 ]);
 
 const temaEditor = EditorView.theme({
@@ -45,7 +54,7 @@ export function carregarDocumentoHTML(editor, codigo, aoAlterarCodigo, { posicao
     editor.setState(criarEstadoHTML(codigo, cursor, aoAlterarCodigo, somenteLeitura));
 }
 
-function criarEstadoHTML(codigo, cursor, aoAlterarCodigo, somenteLeitura) {
+function criarEstadoHTML(codigo, cursor, aoAlterarCodigo, somenteLeitura, linguagem = "html") {
     return EditorState.create({
             doc: codigo,
             selection: { anchor: cursor },
@@ -58,18 +67,18 @@ function criarEstadoHTML(codigo, cursor, aoAlterarCodigo, somenteLeitura) {
                 history(),
                 indentOnInput(),
                 indentUnit.of("  "),
-                html({ autoCloseTags: true }),
+                linguagem === "html" ? html({ autoCloseTags: true }) : linguagem === "css" ? css() : linguagem === "javascript" ? javascript() : [],
                 keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
                 syntaxHighlighting(coresHTML),
                 temaEditor,
-                criarValidacaoHTML(),
+                linguagem === "html" ? criarValidacaoHTML() : [],
                 EditorView.updateListener.of((atualizacao) => {
                     if (atualizacao.docChanged) {
                         aoAlterarCodigo(atualizacao.state.doc.toString());
                     }
                 }),
                 EditorView.contentAttributes.of({
-                    "aria-label": "Editor de código HTML — index.html",
+                    "aria-label": "Editor de código",
                     "aria-describedby": "studio-editor-ajuda",
                     spellcheck: "false",
                     autocapitalize: "off",
@@ -77,4 +86,49 @@ function criarEstadoHTML(codigo, cursor, aoAlterarCodigo, somenteLeitura) {
                 })
             ]
     });
+}
+
+export function linguagemArquivo(nome) {
+    return ({ html: "html", htm: "html", css: "css", js: "javascript" })[nome.split(".").at(-1).toLowerCase()] || "texto";
+}
+
+// Documentos — Estado - conserva histórico, cursor e rolagem por arquivo na mesma view
+const documentos = new WeakMap();
+
+export function limparDocumentosEditor(editor) {
+    documentos.set(editor, { ativo: null, arquivos: new Map() });
+}
+
+export function abrirDocumentoEditor(editor, item, aoAlterarCodigo, posicaoCursor = 0) {
+    if (!documentos.has(editor)) limparDocumentosEditor(editor);
+    const memoria = documentos.get(editor);
+    const anterior = memoria.arquivos.get(memoria.ativo);
+    if (anterior) {
+        anterior.estado = editor.state;
+        anterior.top = editor.scrollDOM.scrollTop;
+        anterior.left = editor.scrollDOM.scrollLeft;
+    }
+    const linguagem = linguagemArquivo(item.nome);
+    let documento = memoria.arquivos.get(item.id);
+    if (!documento || documento.linguagem !== linguagem || documento.estado.doc.toString() !== item.conteudo) {
+        const cursor = documento?.estado.selection.main.head ?? posicaoCursor;
+        documento = { linguagem, estado: criarEstadoHTML(item.conteudo, Math.min(cursor, item.conteudo.length), aoAlterarCodigo, false, linguagem), top: documento?.top || 0, left: documento?.left || 0 };
+        memoria.arquivos.set(item.id, documento);
+    }
+    if (memoria.ativo !== item.id || editor.state !== documento.estado) {
+        editor.setState(documento.estado);
+        const estado = documento.estado;
+        editor.requestMeasure({ write() {
+            if (editor.state !== estado) return;
+            editor.scrollDOM.scrollTop = documento.top;
+            editor.scrollDOM.scrollLeft = documento.left;
+        } });
+    }
+    memoria.ativo = item.id;
+}
+
+export function descartarDocumentoEditor(editor, id) {
+    const memoria = documentos.get(editor);
+    memoria?.arquivos.delete(id);
+    if (memoria?.ativo === id) memoria.ativo = null;
 }
