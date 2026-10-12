@@ -160,6 +160,9 @@ button:disabled { opacity: .55; cursor: default; }
 @keyframes mascote-sucesso { 0%, 100% { transform: translateY(0); } 45% { transform: translateY(-6px); } }
 @keyframes mascote-erro { 0%, 100% { transform: translateX(0); } 30% { transform: translateX(-3px); } 65% { transform: translateX(3px); } }
 
+.studio-previa-diagnosticos { padding: 10px 14px; border-bottom: 1px solid var(--studio-borda); color: var(--studio-aviso); font-size: 11px; overflow-wrap: anywhere; }
+.studio-previa-diagnosticos ul { margin: 0; padding-left: 16px; }
+
 /* Abas — Documentos - limita a rolagem horizontal à barra de arquivos */
 .studio-abas { display: flex; max-width: 100%; min-width: 0; overflow-x: auto; border-bottom: 1px solid var(--studio-borda); background: var(--studio-card); }
 .studio-aba { display: flex; flex-shrink: 0; border-right: 1px solid var(--studio-borda); border-top: 2px solid transparent; }

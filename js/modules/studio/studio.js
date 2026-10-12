@@ -154,8 +154,7 @@ function carregarArquivoNoEditor(codigo, opcoes = {}) {
 
 function documentoPrincipal() {
     const arquivos = projetoAtivo?.arquivos || [];
-    return arquivos.find((item) => item.tipo === "arquivo" && item.caminho === "index.html") ||
-        arquivos.filter((item) => item.tipo === "arquivo" && item.nome === "index.html").sort((a, b) => a.caminho.localeCompare(b.caminho))[0];
+    return arquivos.find((item) => item.tipo === "arquivo" && item.caminho === "index.html");
 }
 
 function atualizarPrevia() {
@@ -163,9 +162,11 @@ function atualizarPrevia() {
     const principal = documentoPrincipal();
     document.querySelector("#studio-previa-vazia p").textContent = principal
         ? "Escreva HTML em index.html para visualizar o resultado."
-        : "Crie um arquivo chamado index.html para visualizar seu projeto.";
+        : "Crie um arquivo index.html na raiz do projeto para visualizar sua aplicação.";
     const codigo = principal?.id === arquivoEditorAbertoId ? editorStudio.state.doc.toString() : (principal?.conteudo || "");
-    previaStudio.agendar(codigo);
+    const arquivos = (projetoAtivo?.arquivos || []).map((item) => item.id === arquivoEditorAbertoId
+        ? { ...item, conteudo: editorStudio.state.doc.toString() } : item);
+    previaStudio.agendar(codigo, arquivos, "index.html");
 }
 
 function atualizarApresentacaoArquivo(item) {
@@ -297,7 +298,8 @@ async function abrirProjeto(id, novo = false) {
         if (!projeto) throw new Error("O projeto selecionado não foi encontrado.");
         clearTimeout(temporizadorSalvamento);
         previaStudio ||= componentesStudio.criarPreviaHTML(
-            document.querySelector("#studio-previa-iframe"), document.querySelector("#studio-previa-vazia")
+            document.querySelector("#studio-previa-iframe"), document.querySelector("#studio-previa-vazia"),
+            document.querySelector("#studio-previa-diagnosticos")
         );
         if (!editorStudio) editorStudio = componentesStudio.criarEditorHTML(container, aoAlterarCodigo, { somenteLeitura: true });
         else carregarArquivoNoEditor("", { somenteLeitura: true });
