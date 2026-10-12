@@ -18,7 +18,6 @@ let alteracoesPendentes = false;
 let temporizadorSalvamento;
 let abrindoProjeto = false;
 let criandoProjeto = false;
-let referenciaInicializada = false;
 let pedidoAbertura;
 let mentorStudio;
 let exploradorStudio;
@@ -137,8 +136,8 @@ async function carregarComponentes() {
     if (!carregamentoComponentes) {
         carregamentoComponentes = Promise.all([
             import("./editor.js"), import("./previa.js"),
-            import("./referencia.js"), import("./validacao.js"), import("./explorador.js"), import("./abas.js")
-        ]).then(([editor, previa, referencia, validacao, explorador, abas]) => ({ ...editor, ...previa, ...referencia, ...validacao, ...explorador, ...abas }))
+            import("./validacao.js"), import("./explorador.js"), import("./abas.js")
+        ]).then(([editor, previa, validacao, explorador, abas]) => ({ ...editor, ...previa, ...validacao, ...explorador, ...abas }))
             .catch((erro) => { carregamentoComponentes = null; throw erro; });
     }
     return carregamentoComponentes;
@@ -171,21 +170,12 @@ function atualizarPrevia() {
 
 function atualizarApresentacaoArquivo(item) {
     const editavel = arquivoEditavel(item);
-    const html = editavel && componentesStudio.linguagemArquivo(item.nome) === "html";
     document.querySelector("#studio-nome-arquivo").textContent = item?.caminho || "Nenhum arquivo";
     document.querySelector("#studio-editor-conteudo").hidden = !editavel;
     document.querySelector("#studio-arquivo-aviso").hidden = editavel;
     document.querySelector("#studio-arquivo-titulo").textContent = "Nenhum arquivo aberto";
     document.querySelector("#studio-arquivo-mensagem").textContent = "Crie um arquivo ou abra um arquivo pelo explorador para começar a editar.";
-    document.querySelector("#studio-ver-problemas").disabled = !html;
-    document.querySelector("#studio-mostrar-referencia").disabled = !html;
-    if (!html) {
-        document.querySelector("#studio-referencia").hidden = true;
-        const botao = document.querySelector("#studio-mostrar-referencia");
-        botao.setAttribute("aria-pressed", "false");
-        botao.setAttribute("aria-expanded", "false");
-        botao.textContent = "Mostrar código de referência";
-    }
+
 }
 
 // Arquivos — Alternância - confirma o salvamento e restaura o estado do documento escolhido
@@ -331,13 +321,6 @@ async function abrirProjeto(id, novo = false) {
         if (principal) selecionarArquivo(principal);
         else atualizarApresentacaoArquivo(null);
         exploradorStudio.atualizar(projetoAtivo, arquivoSelecionadoId);
-        if (!referenciaInicializada) {
-            componentesStudio.iniciarReferenciaHTML(
-                document.querySelector("#studio-mostrar-referencia"),
-                document.querySelector("#studio-referencia"), document.querySelector("#studio-referencia-codigo")
-            );
-            referenciaInicializada = true;
-        }
         atualizarApresentacaoArquivo(principal);
         atualizarPrevia();
         botaoSalvarStudio.disabled = false;
@@ -432,9 +415,6 @@ document.querySelector("#studio-voltar").addEventListener("click", () => {
         window.location.assign("../index.html");
     }
 });
-document.querySelector("#studio-ver-problemas").addEventListener("click", () => {
-    if (editorStudio && componentesStudio) componentesStudio.mostrarProblemasHTML(editorStudio);
-});
 document.querySelector("#studio-abrir-editor").addEventListener("click", () => selecionarPainel("editor"));
 document.querySelector("#studio-abrir-previa").addEventListener("click", () => selecionarPainel("previa"));
 document.querySelector("#studio-editor-repetir").addEventListener("click", () => {
@@ -454,6 +434,12 @@ window.addEventListener("beforeunload", (event) => {
 
 // Studio — Inicialização - carrega registros sem criar projetos durante uma recarga
 async function iniciarStudio() {
+    try {
+        const { iniciarRoleta } = await import("./roleta.js");
+        iniciarRoleta(document.querySelector("#studio-roleta"), document.querySelector("#studio-documentacao"));
+    } catch {
+        document.querySelector("#studio-roleta").hidden = true;
+    }
     try {
         const { criarMentorStudio } = await import("./mentor.js");
         mentorStudio = criarMentorStudio(document.querySelector("#studio-mentor"));

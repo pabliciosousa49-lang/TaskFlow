@@ -95,13 +95,6 @@ button:disabled { opacity: .55; cursor: default; }
 .studio-painel h2 { color: var(--studio-secundario); font-size: 12px; font-weight: 600; }
 .studio-arquivo { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; padding: 7px 12px; border-bottom: 2px solid var(--studio-roxo); border-radius: 6px 6px 0 0; background: var(--studio-editor-fundo); color: var(--studio-texto); font: 12px Consolas, monospace; }
 .studio-arquivo > span { color: var(--studio-verde); }
-.studio-editor-controles { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--studio-borda); }
-.studio-editor-controles .studio-retorno { background: transparent; font-weight: 400; }
-#studio-mostrar-referencia[aria-pressed="true"] { border-color: var(--studio-roxo); background: #291941; color: var(--studio-foco); }
-.studio-referencia { min-width: 0; padding: 16px; border-bottom: 1px solid var(--studio-borda); background: #191322; }
-.studio-referencia h3 { font-size: 13px; }
-.studio-referencia p { margin-top: 4px; color: var(--studio-secundario); font-size: 12px; }
-.studio-referencia pre { max-width: 100%; max-height: 200px; margin: 12px 0 0; overflow: auto; color: #e0d5ef; opacity: .7; font: 13px/1.6 Consolas, "Courier New", monospace; }
 #studio-editor { min-width: 0; max-width: 100%; overflow: hidden; }
 #studio-editor .cm-editor { height: var(--studio-editor-altura); }
 #studio-editor .cm-scroller { overflow: auto; font: 14px/1.7 Consolas, "Courier New", monospace; }
@@ -217,6 +210,50 @@ button:disabled { opacity: .55; cursor: default; }
 .explorador-vazio { padding: 12px 10px; color: var(--studio-secundario); font-size: 12px; }
 #studio-arquivo-aviso { min-height: var(--studio-editor-altura); }
 
+/* Editor — Sugestões - widgets do CodeMirror sem alterar o documento */
+.studio-sugestao-inline { color: var(--studio-secundario); opacity: .55; pointer-events: none; user-select: none; }
+#studio-editor .cm-tooltip-autocomplete { max-width: min(360px, 90vw); border: 1px solid var(--studio-borda); background: #211b2b; color: var(--studio-texto); }
+#studio-editor .cm-tooltip-autocomplete > ul > li[aria-selected="true"] { background: #563385; color: white; }
+
+/* Roleta — Identidade - roxo, verde e branco da logo TaskFlow */
+.studio-roleta { --roleta-tamanho: clamp(320px, calc(100dvh - 300px), 480px); --roleta-roxo: #7d02f9; --roleta-verde: #82ee16; position: fixed; right: 0; top: 100px; z-index: 30; width: calc(var(--roleta-tamanho) / 2); pointer-events: none; }
+#studio-roleta-alternar { display: block; margin: 0 10px 6px auto; min-height: 44px; pointer-events: auto; border-color: #7645ad; background: #181020; box-shadow: 0 4px 16px #0005; }
+#studio-roleta-alternar[aria-expanded="true"] { border-color: var(--roleta-verde); }
+#studio-roleta-painel { position: relative; width: 100%; max-height: calc(100dvh - 160px); overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; pointer-events: auto; }
+.studio-roleta-circulo { position: relative; width: var(--roleta-tamanho); height: var(--roleta-tamanho); border-radius: 50%; background: radial-gradient(circle, #100b18 27%, #372049 28%, #20112d 70%); touch-action: none; user-select: none; }
+.studio-roleta-circulo::before { content: ""; position: absolute; inset: 2px; border: 2px solid #9458cf; border-radius: 50%; pointer-events: none; box-shadow: inset 0 0 12px #7d02f926; }
+.studio-roleta-tecnologia { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; border-radius: 0; background: #25172f; color: #f6f3fa; cursor: pointer; }
+.studio-roleta-tecnologia:hover { background: #412155; }
+.studio-roleta-tecnologia[aria-pressed="true"] { background: linear-gradient(115deg, #6227a0, #3c1c58); }
+.studio-roleta-tecnologia[aria-pressed="true"] .studio-roleta-rotulo { box-shadow: inset 3px 0 var(--roleta-verde); }
+.studio-roleta-rotulo { position: absolute; display: flex; align-items: center; justify-content: center; gap: 5px; width: calc(var(--roleta-tamanho) * .20); min-height: 36px; padding: 3px; border-radius: 4px; }
+.studio-roleta-icone { flex: 0 0 24px; width: 24px; font-size: 23px; line-height: 1; color: #f6f3fa; }
+.studio-roleta-icone.fa-linkedin { color: #0a66c2; }
+.studio-roleta-nome { min-width: 0; font: 10px/1.2 "Segoe UI", Arial, sans-serif; overflow-wrap: anywhere; text-align: left; }
+.studio-roleta-tecnologia:focus-visible { outline: none; }
+.studio-roleta-tecnologia:focus-visible .studio-roleta-rotulo { outline: 2px solid var(--roleta-verde); outline-offset: 1px; }
+.studio-roleta-controles { position: relative; padding: 12px 8px; border: 1px solid #704095; border-right: 0; border-radius: 8px 0 0 8px; background: #181020; }
+.studio-roleta-controles p { margin-bottom: 8px; color: #e2d4ec; font-size: 12px; }
+.studio-roleta-controles > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.studio-roleta-controles button { min-width: 0; min-height: 44px; padding: 6px; border: 1px solid #704095; border-radius: 6px; background: #25172f; color: #f6f3fa; font-size: 12px; }
+#studio-roleta-abrir { grid-column: 1 / -1; border-color: #82ee1670; }
+/* Roleta — Espaço - libera a prévia no desktop enquanto o aro está aberto */
+body.studio-roleta-aberta .studio-conteudo { padding-right: calc(clamp(320px, calc(100dvh - 300px), 480px) / 2 + 32px); }
+
+/* Documentação — Painel - leitura isolada sem reconstruir o editor */
+.studio-documentacao { width: min(1040px, calc(100vw - 48px)); height: min(840px, calc(100dvh - 48px)); max-width: none; max-height: none; padding: 0; border: 1px solid #624180; border-radius: 12px; background: var(--studio-fundo); color: var(--studio-texto); overflow: hidden; }
+.studio-documentacao::backdrop { background: #07050cb8; }
+.studio-documentacao[open] { display: flex; flex-direction: column; animation: studio-documentacao-entrada .18s ease-out; }
+.studio-documentacao.studio-documentacao-fechando { animation: studio-documentacao-saida .16s ease-in forwards; }
+.studio-documentacao > header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--studio-borda); background: #191322; }
+.studio-documentacao > header span { color: var(--studio-secundario); font-size: 11px; }
+.studio-documentacao h2 { font-size: 18px; }
+#studio-documentacao-conteudo { flex: 1; min-height: 0; overflow: auto; }
+#studio-documentacao-conteudo iframe { display: block; width: 100%; height: 100%; border: 0; }
+.studio-documentacao-aviso { padding: 28px; color: var(--studio-secundario); }
+@keyframes studio-documentacao-entrada { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes studio-documentacao-saida { to { opacity: 0; transform: translateY(6px); } }
+
 /* Studio — Responsividade - adapta proporções e alterna painéis sem recriar o editor */
 @media (max-width: 1100px) {
     .studio-cabecalho { padding: 16px 24px; }
@@ -227,6 +264,12 @@ button:disabled { opacity: .55; cursor: default; }
     .studio-browser-endereco { display: none; }
 }
 @media (max-width: 768px) {
+    body.studio-roleta-aberta .studio-conteudo { padding-right: 16px; }
+    .studio-roleta-nome { display: none; }
+    .studio-roleta { top: auto; bottom: 16px; }
+    #studio-roleta-painel { position: absolute; right: 0; bottom: 50px; max-height: calc(100dvh - 90px); }
+    .studio-documentacao { width: calc(100vw - 16px); height: calc(100dvh - 16px); }
+    .studio-documentacao > header { padding: 12px; }
     :root { --studio-editor-altura: clamp(320px, 56dvh, 560px); }
     .studio-cabecalho { gap: 12px; padding: 14px 16px; }
     .studio-identidade { flex-basis: 100%; }
@@ -247,7 +290,6 @@ button:disabled { opacity: .55; cursor: default; }
     .studio-paineis[data-painel="editor"] .studio-previa-painel,
     .studio-paineis[data-painel="previa"] .studio-editor { display: none; }
     #studio-editor .cm-scroller { font-size: 16px; }
-    .studio-editor-controles button { flex: 1 1 150px; }
     .studio-mentor { grid-template-columns: 90px minmax(0, 1fr); padding: 10px; }
     .mascote-viewport { width: 90px; height: 100px; }
     #studio-mentor-recolher { max-width: 92px; }
@@ -260,6 +302,10 @@ button:disabled { opacity: .55; cursor: default; }
     #explorador-raiz { min-height: 44px; }
     #explorador-arvore .explorador-item { height: 44px; min-height: 44px; }
 }
+@media (max-height: 600px) {
+    .studio-roleta { top: auto; bottom: 16px; }
+    #studio-roleta-painel { position: absolute; right: 0; bottom: 50px; max-height: calc(100dvh - 90px); }
+}
 @media (pointer: coarse) {
     .explorador-cabecalho-raiz { flex-wrap: wrap; }
     #explorador-raiz { flex-basis: 100%; }
@@ -269,6 +315,8 @@ button:disabled { opacity: .55; cursor: default; }
     #explorador-arvore .explorador-item { height: 44px; min-height: 44px; }
 }
 @media (prefers-reduced-motion: reduce) {
+    .studio-documentacao[open] { animation: none; }
+    .studio-documentacao.studio-documentacao-fechando { animation: none; }
     #studio-gerenciamento, #studio-ambiente, .mascote-flutuacao, .mascote-imagem { animation: none !important; }
     .studio-retorno, .studio-criar, .studio-lista-projetos li, #studio-titulo { transition: none; }
     .studio-retorno:hover:not(:disabled), .studio-criar:hover:not(:disabled) { transform: none; }

@@ -6,6 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TaskFlow Studio</title>
   <link rel="stylesheet" href="../css/pages/studio.css">
+  <!-- Ícones — Reuso - mesmas folhas já utilizadas na recepção -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
   <!-- Editor — Dependências - fixa módulos compartilhados sem exigir build no deploy -->
   <script type="importmap">
   {
@@ -157,25 +160,14 @@
               <p id="studio-arquivo-mensagem">Crie index.html no explorador para iniciar a edição HTML.</p>
             </div>
             <div id="studio-editor-conteudo" hidden>
-              <!-- Editor — Orientação - oferece diagnósticos e referência sem inserir código -->
-              <div class="studio-editor-controles">
-                <button id="studio-ver-problemas" class="studio-retorno" type="button" disabled>Ver problemas</button>
-                <button id="studio-mostrar-referencia" class="studio-retorno" type="button"
-                  aria-controls="studio-referencia" aria-expanded="false" aria-pressed="false" disabled>Mostrar código
-                  de referência</button>
-              </div>
-              <section id="studio-referencia" class="studio-referencia" aria-labelledby="titulo-referencia" hidden>
-                <h3 id="titulo-referencia">Código de referência</h3>
-                <p>Orientação visual: escreva manualmente no editor. Esta referência não altera seu código.</p>
-                <pre><code id="studio-referencia-codigo"></code></pre>
-              </section>
               <div class="studio-editor-carregamento">
                 <p id="studio-editor-status" role="status">Carregando o editor HTML…</p>
                 <button id="studio-editor-repetir" class="studio-retorno" type="button" hidden>Tentar novamente</button>
               </div>
               <div id="studio-editor" aria-busy="true"></div>
               <p id="studio-editor-ajuda" class="studio-editor-ajuda">Seu código é salvo automaticamente neste
-                navegador. Use Esc e depois Tab para sair do editor se a tecla Tab estiver indentando.</p>
+                navegador. Use Ctrl+Espaço para sugestões; Tab aceita a sugestão e Esc a descarta. Use Esc e depois Tab
+                para sair do editor se a tecla Tab estiver indentando.</p>
             </div>
           </section>
           <section id="studio-previa-painel" class="studio-painel studio-previa-painel" aria-labelledby="titulo-previa">
@@ -197,8 +189,31 @@
           </section>
         </div>
       </div>
+
     </section>
   </main>
+      <!-- Tecnologias — Consulta - permanece recolhida para liberar a área de trabalho -->
+      <aside id="studio-roleta" class="studio-roleta" hidden aria-label="Materiais de apoio">
+        <button id="studio-roleta-alternar" class="studio-retorno" type="button" aria-controls="studio-roleta-painel" aria-expanded="false">Tecnologias ◐</button>
+        <div id="studio-roleta-painel" hidden>
+          <div class="studio-roleta-circulo" role="group" aria-label="Roleta de tecnologias: arraste para girar"></div>
+          <div class="studio-roleta-controles">
+            <p id="studio-roleta-indicador" aria-live="polite"></p>
+            <div>
+              <button id="studio-roleta-anterior" type="button" aria-label="Tecnologia anterior">↑</button>
+              <button id="studio-roleta-proxima" type="button" aria-label="Próxima tecnologia">↓</button>
+              <button id="studio-roleta-abrir" type="button">Abrir material</button>
+            </div>
+          </div>
+        </div>
+      </aside>
+      <dialog id="studio-documentacao" class="studio-documentacao" aria-labelledby="studio-documentacao-titulo">
+        <header>
+          <div><span>Biblioteca Técnica</span><h2 id="studio-documentacao-titulo">Documentação</h2></div>
+          <button id="studio-documentacao-fechar" class="studio-retorno" type="button" autofocus>Fechar ×</button>
+        </header>
+        <div id="studio-documentacao-conteudo"></div>
+      </dialog>
 </body>
 
 </html>

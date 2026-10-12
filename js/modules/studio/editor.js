@@ -8,6 +8,8 @@ import { javascript } from "@codemirror/lang-javascript";
 import { tags } from "@lezer/highlight";
 import { criarValidacaoHTML } from "./validacao.js";
 import { criarEstruturaInicialHTML } from "./documento-html.js";
+import { criarAutocompletar } from "./autocompletar.js";
+import { criarSugestoesInline } from "./sugestoes-inline.js";
 export { criarEstruturaInicialHTML } from "./documento-html.js";
 
 // Editor — Aparência - distingue tags, atributos e valores no tema escuro
@@ -68,6 +70,8 @@ function criarEstadoHTML(codigo, cursor, aoAlterarCodigo, somenteLeitura, lingua
                 indentOnInput(),
                 indentUnit.of("  "),
                 linguagem === "html" ? html({ autoCloseTags: true }) : linguagem === "css" ? css() : linguagem === "javascript" ? javascript() : [],
+                criarSugestoesInline(linguagem),
+                criarAutocompletar(linguagem),
                 keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
                 syntaxHighlighting(coresHTML),
                 temaEditor,
