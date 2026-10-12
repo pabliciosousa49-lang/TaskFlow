@@ -24,21 +24,30 @@ const atributosPermitidos = new Set((
 export function montarDocumentoPrevia(codigo, arquivos = [], caminhoHTML = "index.html") {
     const diagnosticos = [];
     const scripts = [];
+    const estilos = [];
     // Template desconectado — Processamento - analisa sem inserir conteúdo na página principal
     const template = document.createElement("template");
     template.innerHTML = codigo;
 
+    // Estilos — Montagem - mantém a ordem da cascata e serializa CSS no head do srcdoc.
+    function adicionarEstilo(conteudo, media) {
+        const style = document.createElement("style");
+        style.textContent = conteudo.replace(/</g, "\\3c ");
+        if (media) style.setAttribute("media", media);
+        estilos.push(style.outerHTML);
+    }
+
     for (const elemento of template.content.querySelectorAll("*")) {
+        if (elemento.localName === "style" && elemento.namespaceURI === "http://www.w3.org/1999/xhtml") {
+            adicionarEstilo(elemento.textContent, elemento.getAttribute("media"));
+            elemento.remove();
+            continue;
+        }
         if (elemento.localName === "link" && (elemento.getAttribute("rel") || "").toLowerCase().split(/\s+/).includes("stylesheet")) {
             try {
                 const arquivo = resolverArquivoVirtual(arquivos, elemento.getAttribute("href"), caminhoHTML);
-                const style = document.createElement("style");
-                // Escapa o delimitador HTML na cópia para impedir saída do bloco de estilo.
-                style.textContent = arquivo.conteudo.replace(/</g, "\\3c ");
-                const media = elemento.getAttribute("media");
-                if (media) style.setAttribute("media", media);
-                if (elemento.hasAttribute("disabled")) elemento.remove();
-                else elemento.replaceWith(style);
+                if (!elemento.hasAttribute("disabled")) adicionarEstilo(arquivo.conteudo, elemento.getAttribute("media"));
+                elemento.remove();
             } catch (erro) {
                 diagnosticos.push(erro.message);
                 elemento.remove();
@@ -78,6 +87,7 @@ export function montarDocumentoPrevia(codigo, arquivos = [], caminhoHTML = "inde
         `<meta http-equiv="Content-Security-Policy" content="${politicaPrevia}">` +
         `<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">` +
         `<style>html{color-scheme:light}body{overflow-wrap:anywhere}img{max-width:100%}</style>` +
+        estilos.join("") +
         `</head><body>${template.innerHTML}</body></html>`;
     return { documento, diagnosticos: Array.from(new Set(diagnosticos)), scripts };
 }
