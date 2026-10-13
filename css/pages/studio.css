@@ -102,6 +102,12 @@ button:disabled { opacity: .55; cursor: default; }
 .studio-editor-carregamento p { padding: 16px; color: var(--studio-secundario); font-size: 13px; }
 #studio-editor-repetir { margin: 0 16px 16px; }
 .studio-editor-ajuda { padding: 8px 12px; border-top: 1px solid var(--studio-borda); color: var(--studio-secundario); font-size: 11px; line-height: 1.6; }
+/* Editor — Formatação - ação acessível somente para o trecho selecionado */
+.studio-formatacao { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 8px 12px; border-bottom: 1px solid var(--studio-borda); }
+.studio-formatacao button { min-height: 44px; }
+.studio-formatacao button:disabled { opacity: .45; cursor: default; }
+#studio-formatacao-ajuda, #studio-formatacao-status { color: var(--studio-secundario); font-size: 11px; line-height: 1.5; overflow-wrap: anywhere; }
+#studio-formatacao-status:not(:empty) { flex-basis: 100%; color: var(--studio-foco); }
 #studio-editor .cm-lintRange-error { background-color: #ef444419; }
 #studio-editor .cm-diagnostic-error { border-left-color: var(--studio-erro); }
 #studio-editor .cm-panels { max-width: 100%; }
