@@ -16,7 +16,7 @@
     --studio-aviso: #ffd18a;
     --studio-editor-fundo: #15121d;
     --studio-editor-texto: #e4dfef;
-    --studio-editor-altura: clamp(360px, 58dvh, 680px);
+    --studio-editor-altura: clamp(440px, 72dvh, 900px);
     --studio-raio: 14px;
 }
 
@@ -30,7 +30,7 @@ button, a, input { -webkit-tap-highlight-color: transparent; }
 :focus-visible { outline: 2px solid var(--studio-foco); outline-offset: 4px; }
 button:disabled { opacity: .55; cursor: default; }
 .studio-etiqueta { color: var(--studio-secundario); font-size: 10px; font-weight: 700; letter-spacing: 1.6px; }
-.studio-conteudo { width: 100%; max-width: 1600px; margin: auto; padding: 28px 32px 48px; }
+.studio-conteudo { width: 100%; max-width: 1800px; margin: auto; padding: 24px 24px 40px; }
 
 /* Cabeçalho — Navegação - mantém identidade, projeto e ações sempre reconhecíveis */
 .studio-cabecalho { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 24px; padding: 16px 32px; border-bottom: 1px solid var(--studio-borda); background: var(--studio-superficie); }
@@ -89,7 +89,7 @@ button:disabled { opacity: .55; cursor: default; }
 .studio-abertura { min-width: 0; }
 .studio-abertura h1 { margin: 6px 0 8px; font-size: clamp(22px, 2.5vw, 30px); letter-spacing: -.8px; line-height: 1.2; }
 .studio-abertura p { color: var(--studio-secundario); font-size: 13px; }
-.studio-paineis { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); align-items: start; gap: 20px; }
+.studio-paineis { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: start; gap: 16px; }
 .studio-painel { min-width: 0; border: 1px solid var(--studio-borda); border-radius: var(--studio-raio); background: var(--studio-superficie); }
 .studio-painel-cabecalho { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; min-height: 54px; padding: 10px 16px; border-bottom: 1px solid var(--studio-borda); }
 .studio-painel h2 { color: var(--studio-secundario); font-size: 12px; font-weight: 600; }
@@ -101,7 +101,7 @@ button:disabled { opacity: .55; cursor: default; }
 #studio-editor .cm-content:focus-visible { outline: none; }
 .studio-editor-carregamento p { padding: 16px; color: var(--studio-secundario); font-size: 13px; }
 #studio-editor-repetir { margin: 0 16px 16px; }
-.studio-editor-ajuda { padding: 12px 16px; border-top: 1px solid var(--studio-borda); color: var(--studio-secundario); font-size: 11px; line-height: 1.6; }
+.studio-editor-ajuda { padding: 8px 12px; border-top: 1px solid var(--studio-borda); color: var(--studio-secundario); font-size: 11px; line-height: 1.6; }
 #studio-editor .cm-lintRange-error { background-color: #ef444419; }
 #studio-editor .cm-diagnostic-error { border-left-color: var(--studio-erro); }
 #studio-editor .cm-panels { max-width: 100%; }
@@ -234,11 +234,9 @@ button:disabled { opacity: .55; cursor: default; }
 .studio-roleta-tecnologia:focus-visible .studio-roleta-rotulo { outline: 2px solid var(--roleta-verde); outline-offset: 1px; }
 .studio-roleta-controles { position: relative; padding: 12px 8px; border: 1px solid #704095; border-right: 0; border-radius: 8px 0 0 8px; background: #181020; }
 .studio-roleta-controles p { margin-bottom: 8px; color: #e2d4ec; font-size: 12px; }
-.studio-roleta-controles > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
-.studio-roleta-controles button { min-width: 0; min-height: 44px; padding: 6px; border: 1px solid #704095; border-radius: 6px; background: #25172f; color: #f6f3fa; font-size: 12px; }
-#studio-roleta-abrir { grid-column: 1 / -1; border-color: #82ee1670; }
+#studio-roleta-ajuda { margin-bottom: 0; font-size: 11px; line-height: 1.5; color: #bfaed0; }
 /* Roleta — Espaço - libera a prévia no desktop enquanto o aro está aberto */
-body.studio-roleta-aberta .studio-conteudo { padding-right: calc(clamp(320px, calc(100dvh - 300px), 480px) / 2 + 32px); }
+body.studio-roleta-aberta .studio-conteudo { padding-right: calc(clamp(320px, calc(100dvh - 300px), 480px) / 2 + 24px); }
 
 /* Documentação — Painel - leitura isolada sem reconstruir o editor */
 .studio-documentacao { width: min(1040px, calc(100vw - 48px)); height: min(840px, calc(100dvh - 48px)); max-width: none; max-height: none; padding: 0; border: 1px solid #624180; border-radius: 12px; background: var(--studio-fundo); color: var(--studio-texto); overflow: hidden; }
@@ -270,7 +268,7 @@ body.studio-roleta-aberta .studio-conteudo { padding-right: calc(clamp(320px, ca
     #studio-roleta-painel { position: absolute; right: 0; bottom: 50px; max-height: calc(100dvh - 90px); }
     .studio-documentacao { width: calc(100vw - 16px); height: calc(100dvh - 16px); }
     .studio-documentacao > header { padding: 12px; }
-    :root { --studio-editor-altura: clamp(320px, 56dvh, 560px); }
+    :root { --studio-editor-altura: clamp(360px, 68dvh, 760px); }
     .studio-cabecalho { gap: 12px; padding: 14px 16px; }
     .studio-identidade { flex-basis: 100%; }
     .studio-navegacao { flex: 1 1 auto; }

@@ -18,6 +18,7 @@ export function iniciarRoleta(raiz, dialogo) {
         botao.className = "studio-roleta-tecnologia";
         botao.dataset.tecnologia = tecnologia.id;
         botao.setAttribute("aria-label", `${tecnologia.nome} — ${tecnologia.grupo}: abrir documentação`);
+        botao.setAttribute("aria-describedby", "studio-roleta-ajuda");
         botao.title = `${tecnologia.nome} — ${tecnologia.grupo}`;
         const conteudo = document.createElement("span");
         conteudo.className = "studio-roleta-rotulo";
@@ -55,9 +56,9 @@ export function iniciarRoleta(raiz, dialogo) {
             rotulo.style.left = `${centro - raioRotulo * Math.cos(rad)}px`;
             rotulo.style.top = `${centro + raioRotulo * Math.sin(rad)}px`;
             rotulo.style.transform = `translate(-50%, -50%) rotate(${-theta}deg)`;
-            rotulo.hidden = Math.abs(theta) > 80;
-            botao.querySelector(".studio-roleta-nome").hidden = Math.abs(theta) > 55;
-            botao.hidden = Math.abs(theta) > 90 + metade;
+            // A entrada/saída visual depende somente do recorte do contêiner.
+            // Os setores fora do semicírculo são omitidos apenas da árvore acessível.
+            botao.setAttribute("aria-hidden", String(Math.abs(theta) > 90 + metade));
             botao.tabIndex = indice === selecionado ? 0 : -1;
             botao.setAttribute("aria-pressed", String(indice === selecionado));
         });
@@ -65,18 +66,19 @@ export function iniciarRoleta(raiz, dialogo) {
         if (indicador.textContent !== texto) indicador.textContent = texto;
     }
     function parar() { cancelAnimationFrame(quadro); quadro = 0; }
-    function alinhar(delta = 0) {
+    function alinhar(delta = 0, focar = false) {
         parar();
         const inicio = angulo;
         const destino = -ativo() * passo + delta * passo;
         const distancia = normalizar(destino - inicio);
-        if (movimento.matches) { angulo += distancia; renderizar(); return; }
+        if (movimento.matches) { angulo += distancia; renderizar(); if (focar) botoes[ativo()].focus(); return; }
         const comeco = performance.now();
         function animar(agora) {
             const t = Math.min(1, (agora - comeco) / 220);
             angulo = inicio + distancia * (1 - Math.pow(1 - t, 3));
             renderizar();
             if (t < 1) quadro = requestAnimationFrame(animar);
+            else if (focar) botoes[ativo()].focus();
         }
         quadro = requestAnimationFrame(animar);
     }
@@ -91,18 +93,11 @@ export function iniciarRoleta(raiz, dialogo) {
         painel.hidden = false; alternar.setAttribute("aria-expanded", "true"); alternar.textContent = "Recolher ◑";
         document.body.classList.add("studio-roleta-aberta"); renderizar();
     });
-    raiz.querySelector("#studio-roleta-anterior").addEventListener("click", () => alinhar(1));
-    raiz.querySelector("#studio-roleta-proxima").addEventListener("click", () => alinhar(-1));
     raiz.addEventListener("keydown", (event) => {
         if (painel.hidden) return;
         if (["ArrowUp", "ArrowLeft", "ArrowDown", "ArrowRight"].includes(event.key)) {
-            event.preventDefault(); alinhar(["ArrowUp", "ArrowLeft"].includes(event.key) ? 1 : -1);
-            raiz.querySelector("#studio-roleta-abrir").focus();
+            event.preventDefault(); alinhar(["ArrowUp", "ArrowLeft"].includes(event.key) ? 1 : -1, true);
         } else if (event.key === "Escape") { recolher(); alternar.focus(); }
-    });
-    raiz.querySelector("#studio-roleta-abrir").addEventListener("click", (event) => {
-        parar(); angulo = -ativo() * passo; renderizar();
-        abrirDocumento(tecnologias[ativo()], event.currentTarget);
     });
     function posicao(event) {
         const rect = circulo.getBoundingClientRect();
