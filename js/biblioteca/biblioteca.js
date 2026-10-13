@@ -103,9 +103,10 @@ function documentoResultado(assunto) {
 function blocoResultado(assunto) {
     const secao = document.createElement("section");
     const titulo = document.createElement("h2");
-    titulo.textContent = assunto.contextoExemplo === "head" ? "Efeito no navegador" : "Resultado visual";
+    const apenasEfeito = assunto.contextoExemplo === "head" || assunto.resultadoVisual === false;
+    titulo.textContent = apenasEfeito ? "Efeito no navegador" : "Resultado";
     secao.append(titulo);
-    if (assunto.contextoExemplo === "head") {
+    if (apenasEfeito) {
         const efeito = document.createElement("p");
         efeito.textContent = assunto.efeitoNavegador;
         secao.append(efeito);
@@ -221,7 +222,7 @@ function selecionarAssunto(indice, focar = true) {
         : assunto.contextoExemplo === "head"
             ? "Exemplo para inserir dentro de <head> de um documento HTML completo."
             : "Exemplo para inserir dentro de <body> de um documento HTML completo.";
-    const exemplo = blocoLeitura(documentacaoHTML ? "Como funciona no código?" : "Exemplo prático", assunto.exemploCodigo, true);
+    const exemplo = blocoLeitura(documentacaoHTML ? "Exemplo de código" : "Exemplo prático", assunto.exemploCodigo, true);
     exemplo.insertBefore(contexto, exemplo.querySelector(".biblioteca-codigo"));
     if (documentacaoHTML) {
         const referencia = document.createElement("details");
@@ -231,14 +232,15 @@ function selecionarAssunto(indice, focar = true) {
         referencia.append(resumo, blocoCodigo(assunto.sintaxe, "Sintaxe"));
         exemplo.insertBefore(referencia, contexto);
     }
-    const boasPraticas = blocoLeitura("Boas práticas", assunto.boasPraticas);
+    const boasPraticas = blocoLeitura(documentacaoHTML ? "Observações importantes" : "Boas práticas", assunto.boasPraticas);
     if (documentacaoHTML) boasPraticas.className = "biblioteca-observacao";
     conteudoLeitura.append(
-        blocoLeitura(documentacaoHTML ? "O que vamos aprender?" : "Objetivo", assunto.objetivo),
-        blocoLeitura(documentacaoHTML ? "Entendendo o conceito" : "Explicação", assunto.explicacao),
+        ...(!documentacaoHTML ? [blocoLeitura("Objetivo", assunto.objetivo)] : []),
+        blocoLeitura(documentacaoHTML ? "Conceito" : "Explicação", assunto.explicacao),
+        ...(documentacaoHTML ? [blocoLeitura("Responsabilidade", assunto.responsabilidadeCodigo)] : []),
         ...(!documentacaoHTML ? [blocoLeitura("Sintaxe", assunto.sintaxe, true)] : []),
         exemplo,
-        blocoLeitura(documentacaoHTML ? "Entendendo as responsabilidades" : "Responsabilidade", assunto.responsabilidadeCodigo),
+        ...(!documentacaoHTML ? [blocoLeitura("Responsabilidade", assunto.responsabilidadeCodigo)] : []),
         ...(documentacaoHTML ? [blocoResultado(assunto)] : []),
         blocoLeitura(documentacaoHTML ? "Aplicação prática" : "Aplicação real", assunto.aplicacaoReal),
         boasPraticas
