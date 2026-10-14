@@ -120,8 +120,10 @@ export function criarAutocompletar(linguagem) {
 }
 
 function fontesAdicionais(linguagem) {
+    // O CodeMirror associa consultas e resultados à identidade da fonte.
+    const completarReferencia = context => completarCaminhos(context, linguagem);
     return EditorState.languageData.of(() => [
-        { autocomplete: context => completarCaminhos(context, linguagem) },
+        { autocomplete: completarReferencia },
         { autocomplete: linguagem === "html" ? completarHTML5 : linguagem === "javascript" ? completarDocument : completarCSS }
     ]);
 }

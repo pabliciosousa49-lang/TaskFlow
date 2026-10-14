@@ -131,3 +131,13 @@ test("fonte integrada simulada: aplicar pasta, continuar, cursor e contexto atua
     completar().options[0].apply(view); assert.equal(view.codigo, '<link href="./css/style-dark.css">');
     view.state.readOnly = true; assert.equal(completar(), null);
 });
+
+test("regressão: identidade das fontes permanece estável entre consultas do CodeMirror", () => {
+    for (const linguagem of ["html", "css", "javascript"]) {
+        const facet = modulo.namespace.criarAutocompletar(linguagem).at(-1);
+        const primeira = facet.languageData();
+        const segunda = facet.languageData();
+        assert.equal(primeira[0].autocomplete, segunda[0].autocomplete, linguagem);
+        assert.equal(primeira[1].autocomplete, segunda[1].autocomplete, linguagem);
+    }
+});
