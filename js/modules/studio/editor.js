@@ -11,6 +11,7 @@ import { criarEstruturaInicialHTML } from "./documento-html.js";
 import { criarAutocompletar } from "./autocompletar.js";
 import { criarSugestoesInline } from "./sugestoes-inline.js";
 import { criarFormatacao } from "./formatacao.js";
+export { atualizarContextoCaminhos } from "./autocompletar.js";
 export { criarEstruturaInicialHTML } from "./documento-html.js";
 
 // Editor — Aparência - distingue tags, atributos e valores no tema escuro

@@ -173,6 +173,10 @@ function atualizarPrevia() {
 }
 
 function atualizarApresentacaoArquivo(item) {
+    componentesStudio?.atualizarContextoCaminhos(editorStudio, () => ({
+        caminho: projetoAtivo?.arquivos.find(arquivo => arquivo.id === arquivoEditorAbertoId)?.caminho,
+        arquivos: projetoAtivo?.arquivos || []
+    }));
     const editavel = arquivoEditavel(item);
     document.querySelector("#studio-nome-arquivo").textContent = item?.caminho || "Nenhum arquivo";
     document.querySelector("#studio-editor-conteudo").hidden = !editavel;

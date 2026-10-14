@@ -1,9 +1,10 @@
 import { EditorState, Prec, Transaction } from "@codemirror/state";
 import { keymap } from "@codemirror/view";
-import { autocompletion, acceptCompletion } from "@codemirror/autocomplete";
+import { autocompletion, acceptCompletion, startCompletion, closeCompletion, completionStatus } from "@codemirror/autocomplete";
 import { syntaxTree } from "@codemirror/language";
 import { isolateHistory } from "@codemirror/commands";
 import { criarEstruturaInicialHTML } from "./documento-html.js";
+import { sugerirCaminhos } from "./caminhos-editor.js";
 import { htmlLanguage } from "@codemirror/lang-html";
 
 export function contextoEditavel(state, pos) {
@@ -72,6 +73,36 @@ function completarCSS(context) {
         options: valoresCSS[valor[1]].map((label) => ({ label, type: "keyword" })), validFor: /^[\w-]*$/ } : null;
 }
 
+// Caminhos — Contexto - consulta o projeto atual sem duplicar a árvore do explorador.
+const contextosCaminhos = new WeakMap();
+export function atualizarContextoCaminhos(view, obterContexto) {
+    if (!view) return;
+    contextosCaminhos.set(view, obterContexto);
+    if (completionStatus(view.state)) {
+        closeCompletion(view);
+        startCompletion(view);
+    }
+}
+function completarCaminhos(context, linguagem) {
+    if (context.state.readOnly || !context.state.selection.main.empty || context.state.selection.ranges.length !== 1) return null;
+    const dados = contextosCaminhos.get(context.view)?.();
+    const resultado = sugerirCaminhos(context.state.doc.toString(), context.pos, linguagem, dados);
+    if (!resultado) return null;
+    return { from: resultado.from, to: resultado.to, filter: false, options: resultado.options.map(item => ({
+        label: item.label, type: item.type,
+        apply(view) {
+            // Recalcula com a árvore atual para não inserir uma sugestão removida.
+            const atual = sugerirCaminhos(view.state.doc.toString(), view.state.selection.main.head, linguagem, contextosCaminhos.get(view)?.());
+            const opcao = atual?.options.find(opcao => opcao.label === item.label);
+            if (!opcao) return;
+            closeCompletion(view);
+            view.dispatch({ changes: { from: atual.from, to: opcao.to, insert: opcao.insert },
+                selection: { anchor: atual.from + opcao.insert.length }, annotations: Transaction.userEvent.of("input.complete") });
+            if (opcao.pasta) startCompletion(view);
+        }
+    })) };
+}
+
 // Linguagens — Sugestões - acrescenta fontes sem substituir o suporte nativo.
 export function criarAutocompletar(linguagem) {
     if (!["html", "css", "javascript"].includes(linguagem)) return [];
@@ -89,5 +120,8 @@ export function criarAutocompletar(linguagem) {
 }
 
 function fontesAdicionais(linguagem) {
-    return EditorState.languageData.of(() => [{ autocomplete: linguagem === "html" ? completarHTML5 : linguagem === "javascript" ? completarDocument : completarCSS }]);
+    return EditorState.languageData.of(() => [
+        { autocomplete: context => completarCaminhos(context, linguagem) },
+        { autocomplete: linguagem === "html" ? completarHTML5 : linguagem === "javascript" ? completarDocument : completarCSS }
+    ]);
 }
