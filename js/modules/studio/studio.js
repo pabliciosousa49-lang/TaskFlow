@@ -12,6 +12,7 @@ let componentesStudio;
 let carregamentoComponentes;
 let editorStudio;
 let previaStudio;
+let documentoPreviaSelecionado;
 let projetoAtivo;
 let codigoSalvo = "";
 let alteracoesPendentes = false;
@@ -153,19 +154,22 @@ function carregarArquivoNoEditor(codigo, opcoes = {}) {
 
 function documentoPrincipal() {
     const arquivos = projetoAtivo?.arquivos || [];
-    return arquivos.find((item) => item.tipo === "arquivo" && item.caminho === "index.html");
+    const selecionado = documentoPreviaSelecionado?.projetoId === projetoAtivo?.id
+        ? arquivos.find((item) => item.id === documentoPreviaSelecionado.arquivoId && item.tipo === "arquivo" && /\.html?$/i.test(item.nome))
+        : null;
+    return selecionado || arquivos.find((item) => item.tipo === "arquivo" && item.caminho === "index.html");
 }
 
 function atualizarPrevia() {
     if (!previaStudio) return;
     const principal = documentoPrincipal();
     document.querySelector("#studio-previa-vazia p").textContent = principal
-        ? "Escreva HTML em index.html para visualizar o resultado."
-        : "Crie um arquivo index.html na raiz do projeto para visualizar sua aplicação.";
+        ? `Escreva HTML em ${principal.caminho} para visualizar o resultado.`
+        : "Abra um arquivo HTML ou crie index.html na raiz para visualizar sua aplicação.";
     const codigo = principal?.id === arquivoEditorAbertoId ? editorStudio.state.doc.toString() : (principal?.conteudo || "");
     const arquivos = (projetoAtivo?.arquivos || []).map((item) => item.id === arquivoEditorAbertoId
         ? { ...item, conteudo: editorStudio.state.doc.toString() } : item);
-    previaStudio.agendar(codigo, arquivos, "index.html");
+    previaStudio.agendar(codigo, arquivos, principal?.caminho || "index.html", projetoAtivo?.id || "");
 }
 
 function atualizarApresentacaoArquivo(item) {
@@ -189,6 +193,7 @@ function selecionarArquivo(item, primeiraAbertura = false) {
             primeiraAbertura && atual.nome === "index.html" ? atual.conteudo.indexOf("<body>\n") + "<body>\n".length : 0);
     } finally { trocandoDocumento = false; }
     arquivoEditorAbertoId = arquivoSelecionadoId = atual.id;
+    if (/\.html?$/i.test(atual.nome)) documentoPreviaSelecionado = { projetoId: projetoAtivo.id, arquivoId: atual.id };
     projetoEditorAbertoId = projetoAtivo.id;
     codigoSalvo = atual.conteudo;
     alteracoesPendentes = false;

@@ -1,0 +1,47 @@
+[
+  {
+    "tipo": "arquivo",
+    "caminho": "index.html",
+    "conteudo": "<!doctype html><html lang=\"pt-BR\"><head><meta charset=\"UTF-8\"><link rel=\"stylesheet\" href=\"/css/style.css\"></head><body><h1>Projeto de teste</h1><img src=\"assets/images/logo.svg\" alt=\"Logo de teste\"><a href=\"./pages/login.html\">Abrir login</a><p>Não há servidor separado.</p></body></html>"
+  },
+  {
+    "tipo": "arquivo",
+    "caminho": "pages/login.html",
+    "conteudo": "<!doctype html><html lang=\"pt-BR\"><head><meta charset=\"UTF-8\"><link rel=\"stylesheet\" href=\"../css/style.css\"><script type=\"module\" src=\"../js/app.js\"></script></head><body><h1>Login de teste</h1><p id=\"status\">Aguardando JS</p><label>Nome <input id=\"nome\"></label><button id=\"ir\">Ir por JavaScript</button><a href=\"./dashboard.html?origem=link#resultado\">Ir por link</a><a href=\"../index.html\">Início</a><form id=\"form\"><input name=\"usuario\" value=\"aluno\"><button>Testar submit</button></form></body></html>"
+  },
+  {
+    "tipo": "arquivo",
+    "caminho": "pages/dashboard.html",
+    "conteudo": "<!doctype html><html lang=\"pt-BR\"><head><link rel=\"stylesheet\" href=\"/css/style.css\"><script src=\"/js/dashboard.js\" defer></script></head><body><h1 id=\"resultado\">Dashboard</h1><p id=\"parametros\"></p><button id=\"voltar\">Voltar na prévia</button><a href=\"/index.html\">Início por /</a></body></html>"
+  },
+  {
+    "tipo": "arquivo",
+    "caminho": "css/style.css",
+    "conteudo": "@import \"./base.css\"; body {font-family: sans-serif; background-image: url(\"../assets/images/logo.svg\"); background-repeat: no-repeat; background-position: right top;} h1 {color: #7d02f9}"
+  },
+  {
+    "tipo": "arquivo",
+    "caminho": "css/base.css",
+    "conteudo": "body { background-color: #eee; padding: 20px; } button, input, a { margin: 8px; }"
+  },
+  {
+    "tipo": "arquivo",
+    "caminho": "js/app.js",
+    "conteudo": "import { iniciar } from \"./modules/login.js\"; iniciar();"
+  },
+  {
+    "tipo": "arquivo",
+    "caminho": "js/modules/login.js",
+    "conteudo": "export function iniciar() { document.querySelector(\"#status\").textContent = \"Módulo carregado\"; document.querySelector(\"#nome\").addEventListener(\"input\", event => { document.querySelector(\"#status\").textContent = \"Nome: \" + event.target.value; }); document.querySelector(\"#ir\").addEventListener(\"click\", () => TaskFlow.navegar(\"./dashboard.html?origem=js#resultado\")); document.querySelector(\"#form\").addEventListener(\"submit\", event => { event.preventDefault(); document.querySelector(\"#status\").textContent = \"Submit funcionou\"; }); }"
+  },
+  {
+    "tipo": "arquivo",
+    "caminho": "js/dashboard.js",
+    "conteudo": "document.querySelector(\"#parametros\").textContent = \"Consulta: \" + TaskFlow.consulta; document.querySelector(\"#voltar\").addEventListener(\"click\", () => TaskFlow.voltar());"
+  },
+  {
+    "tipo": "arquivo",
+    "caminho": "assets/images/logo.svg",
+    "conteudo": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"40\" height=\"40\"><rect width=\"40\" height=\"40\" fill=\"#7d02f9\"/></svg>"
+  }
+]
