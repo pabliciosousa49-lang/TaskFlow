@@ -17,8 +17,164 @@ const efeitosNavegador = {
     "revisao-pagina": "O corpo é mostrado com estilos padrão. CSS e JavaScript externos não são carregados nesta prévia."
 };
 
+// Pesquisa — Intenções - associa sinônimos aos IDs estáveis dos assuntos.
+const palavrasChave = {
+    "paragrafos": [
+        "p",
+        "parágrafo",
+        "parágrafos",
+        "texto em parágrafo"
+    ],
+    "tipos-input": [
+        "senha",
+        "campo de senha",
+        "password",
+        "input password",
+        "input type=password",
+        "email",
+        "campo de email",
+        "checkbox",
+        "date",
+        "number",
+        "quantidade"
+    ],
+    "button": [
+        "button",
+        "botão",
+        "botões",
+        "criar botão"
+    ],
+    "imagens": [
+        "img",
+        "imagem",
+        "imagens",
+        "foto",
+        "fotografia"
+    ],
+    "links": [
+        "a",
+        "link",
+        "links",
+        "hiperlink",
+        "href"
+    ],
+    "html-css": [
+        "css",
+        "link stylesheet",
+        "stylesheet",
+        "conectar css",
+        "estilo externo"
+    ],
+    "html-javascript": [
+        "javascript",
+        "js",
+        "script",
+        "defer",
+        "conectar javascript"
+    ],
+    "atalho-html5": [
+        "html:5",
+        "emmet"
+    ],
+    "input": [
+        "input",
+        "campo",
+        "campo de texto"
+    ],
+    "form": [
+        "form",
+        "formulário",
+        "formulários"
+    ],
+    "label": [
+        "label",
+        "rótulo",
+        "rotulo do campo"
+    ],
+    "listas": [
+        "ul",
+        "ol",
+        "li",
+        "lista",
+        "listas"
+    ],
+    "quebras-separadores": [
+        "br",
+        "hr",
+        "quebra de linha",
+        "linha horizontal"
+    ],
+    "div-span": [
+        "div",
+        "span"
+    ],
+    "titulos-paragrafos": [
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6",
+        "título",
+        "títulos"
+    ],
+    "metadados": [
+        "meta",
+        "title",
+        "charset",
+        "viewport",
+        "metadados"
+    ],
+    "comentarios": [
+        "comentário",
+        "comentários"
+    ],
+    "validacao-nativa": [
+        "required",
+        "pattern",
+        "validar formulário"
+    ],
+    "restricoes-campos": [
+        "min",
+        "max",
+        "minlength",
+        "maxlength",
+        "limitar campo"
+    ],
+    "atributos-campos": [
+        "placeholder",
+        "disabled",
+        "readonly",
+        "value",
+        "name"
+    ],
+    "data-atributos": [
+        "data",
+        "data-*",
+        "dataset"
+    ],
+    "elementos-tabela": [
+        "thead",
+        "tbody",
+        "tr",
+        "th",
+        "td",
+        "caption"
+    ],
+    "elementos-adicionais": [
+        "details",
+        "summary",
+        "figure",
+        "figcaption",
+        "dl",
+        "dt",
+        "dd",
+        "time"
+    ]
+};
+
 function assunto(id, titulo, objetivo, explicacao, sintaxe, exemploCodigo, responsabilidadeCodigo, aplicacaoReal, boasPraticas, contextoExemplo = "body") {
-    return { id, titulo, objetivo, explicacao, sintaxe, exemploCodigo, responsabilidadeCodigo, aplicacaoReal, boasPraticas, contextoExemplo, efeitoNavegador: efeitosNavegador[id], resultadoVisual: !["atalho-html5", "estrutura-documento", "arquivo-css", "iframe"].includes(id) };
+    return { id, titulo, palavrasChave: palavrasChave[id] || [], objetivo, explicacao, sintaxe, exemploCodigo, responsabilidadeCodigo, aplicacaoReal, boasPraticas, contextoExemplo, efeitoNavegador: efeitosNavegador[id], resultadoVisual: !["atalho-html5", "estrutura-documento", "arquivo-css", "iframe"].includes(id) };
 }
 
 export const conteudos = {
@@ -445,14 +601,16 @@ export const conteudos = {
                     "Oferecer um valor inicial editável em um formulário de perfil.",
                     ["Escolha o tipo conforme a informação.", "Não use value como substituto de label."]),
                 assunto("tipos-input", "Tipos de input", "Escolher controles e verificações adequados ao dado.",
-                    "text aceita texto geral; email verifica um formato de endereço; date representa uma data; checkbox representa uma escolha booleana. number serve para quantidades, não para identificadores com zeros iniciais. A aparência pode variar conforme navegador e sistema operacional.",
-                    "<input type=\"email\">\n<input type=\"date\">\n<input type=\"checkbox\">",
+                    "text aceita texto geral; password oculta visualmente os caracteres de um campo de senha; email verifica um formato de endereço; date representa uma data; checkbox representa uma escolha booleana. number serve para quantidades, não para identificadores com zeros iniciais. A aparência pode variar conforme navegador e sistema operacional.",
+                    "<input type=\"email\">\n<input type=\"password\">\n<input type=\"date\">\n<input type=\"checkbox\">",
                     `<label for="email">E-mail</label>
 <input id="email" name="email" type="email" autocomplete="email">
+<label for="senha">Senha</label>
+<input id="senha" name="senha" type="password" autocomplete="current-password">
 <label for="data-estudo">Data de estudo</label>
 <input id="data-estudo" name="data" type="date">
 <label><input name="lembrete" type="checkbox" value="sim"> Desejo um lembrete</label>`,
-                    ["email verifica formato, não a existência do endereço.", "date escolhe uma data; checkbox participa do envio normal somente quando marcado."],
+                    ["email verifica formato, não a existência do endereço.", "password mascara o texto na tela; não cria autenticação nem protege o envio por si só.", "date escolhe uma data; checkbox participa do envio normal somente quando marcado."],
                     "Coletar contatos, datas e preferências em controles reconhecidos pelo dispositivo.",
                     ["Use tel para telefone e text para códigos, não number.", "Teste em diferentes navegadores sem depender de uma aparência única."]),
                 assunto("textarea", "Textarea", "Coletar texto com várias linhas.",

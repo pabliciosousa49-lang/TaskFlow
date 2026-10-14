@@ -341,13 +341,116 @@ function construirNiveis(dados) {
     });
 }
 
+// Pesquisa — Correspondência - prioriza termos exatos e evita buscas por letras soltas.
+function normalizarPesquisa(texto) {
+    return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase().replace(/[<>]/g, "").trim().replace(/\s+/g, " ");
+}
+
+function pesquisarAssuntos(consulta) {
+    const termo = normalizarPesquisa(consulta);
+    if (!termo) return [];
+    const curtos = termo.length < 3;
+    const resultados = assuntosOrdenados.map((registro, indice) => {
+        const { assunto } = registro;
+        const palavras = (assunto.palavrasChave || []).map(normalizarPesquisa);
+        const tags = [...assunto.sintaxe.matchAll(/<([a-z][\w-]*)\b/gi)].map((tag) => tag[1].toLowerCase());
+        const titulo = normalizarPesquisa(assunto.titulo);
+        const descricao = normalizarPesquisa(assunto.explicacao);
+        let prioridade = Infinity;
+        if (palavras.includes(termo)) prioridade = 0;
+        else if (tags.includes(termo) || titulo === termo) prioridade = 1;
+        else if (!curtos && titulo.includes(termo)) prioridade = 2;
+        else if (!curtos && palavras.some((palavra) => palavra.includes(termo))) prioridade = 3;
+        else if (!curtos && termo.split(" ").every((parte) =>
+            (titulo + " " + palavras.join(" ") + " " + descricao).split(/[^a-z0-9:*=-]+/).includes(parte))) prioridade = 4;
+        return { registro, indice, prioridade };
+    }).filter((item) => Number.isFinite(item.prioridade));
+    // Uma tag curta com associação explícita não deve listar exemplos incidentais.
+    const exatoCurto = curtos && resultados.some((item) => item.prioridade === 0);
+    return resultados.filter((item) => !exatoCurto || item.prioridade === 0)
+        .sort((a, b) => a.prioridade - b.prioridade || a.indice - b.indice);
+}
+
+// Pesquisa — Interface - o diálogo reutiliza a seleção e a navegação de assuntos.
+function iniciarPesquisa() {
+    const abrir = document.querySelector("#biblioteca-pesquisar");
+    const dialogo = document.querySelector("#biblioteca-pesquisa");
+    if (!documentacaoHTML || !abrir || !dialogo) return;
+    const campo = dialogo.querySelector("#biblioteca-pesquisa-campo");
+    const lista = dialogo.querySelector("#biblioteca-pesquisa-resultados");
+    const status = dialogo.querySelector("#biblioteca-pesquisa-status");
+    let resultados = [], anuncio;
+    function mostrarResultados() {
+        clearTimeout(anuncio);
+        resultados = pesquisarAssuntos(campo.value);
+        lista.replaceChildren();
+        const mensagem = !normalizarPesquisa(campo.value)
+            ? "Digite uma tag, conceito ou intenção. Exemplos: parágrafo, senha ou imagem."
+            : !resultados.length ? "Nenhum assunto encontrado. Tente outra tag ou palavra."
+                : resultados.length + (resultados.length === 1 ? " assunto encontrado." : " assuntos encontrados. Escolha um resultado.");
+        // Aguarda uma pausa na digitação antes de anunciar a contagem.
+        anuncio = setTimeout(() => { status.textContent = mensagem; }, 200);
+        for (const { registro, indice } of resultados) {
+            const item = document.createElement("li");
+            const botao = document.createElement("button");
+            botao.type = "button";
+            const titulo = document.createElement("strong");
+            titulo.textContent = registro.assunto.titulo;
+            const caminho = document.createElement("span");
+            caminho.textContent = registro.nivel.nome + " · " + registro.modulo.titulo;
+            const descricao = document.createElement("span");
+            descricao.textContent = registro.assunto.explicacao.split(/(?<=\.)\s/)[0];
+            botao.append(titulo, caminho, descricao);
+            botao.addEventListener("click", () => {
+                dialogo.close();
+                selecionarAssunto(indice);
+            });
+            item.append(botao);
+            lista.append(item);
+        }
+    }
+    abrir.disabled = false;
+    abrir.addEventListener("click", () => {
+        campo.value = "";
+        mostrarResultados();
+        dialogo.showModal();
+        campo.focus();
+    });
+    campo.addEventListener("input", mostrarResultados);
+    dialogo.querySelector("#biblioteca-pesquisa-formulario").addEventListener("submit", (event) => {
+        event.preventDefault();
+        if (resultados.length === 1) {
+            dialogo.close();
+            selecionarAssunto(resultados[0].indice);
+        } else lista.querySelector("button")?.focus();
+    });
+    dialogo.querySelector("#biblioteca-pesquisa-fechar").addEventListener("click", () => {
+        dialogo.close();
+        abrir.focus();
+    });
+    dialogo.addEventListener("keydown", (event) => {
+        // Não propaga Escape para o painel externo quando a documentação está incorporada.
+        if (event.key === "Escape") event.stopPropagation();
+    });
+    dialogo.addEventListener("cancel", (event) => {
+        event.preventDefault();
+        dialogo.close();
+        abrir.focus();
+    });
+    dialogo.addEventListener("close", () => clearTimeout(anuncio));
+}
+
 async function iniciarBiblioteca() {
     try {
         const carregar = modelos[pagina.dataset.tecnologia];
         if (!carregar) throw new Error("Tecnologia desconhecida.");
         const { conteudos } = await carregar();
         construirNiveis(conteudos);
-        if (assuntosOrdenados.length) selecionarAssunto(0, false);
+        if (assuntosOrdenados.length) {
+            selecionarAssunto(0, false);
+            iniciarPesquisa();
+        }
     } catch {
         niveis.replaceChildren();
         const aviso = document.createElement("p");

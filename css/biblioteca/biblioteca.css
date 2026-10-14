@@ -136,6 +136,24 @@ body.biblioteca-html::before { content: ""; position: fixed; inset: 0; z-index: 
 #biblioteca-html .biblioteca-resultado-barra { padding: 12px 16px; border-bottom: 1px solid var(--biblioteca-borda); background: #201b2b; color: var(--biblioteca-secundario); font-size: 12px; }
 #biblioteca-html .biblioteca-resultado iframe { display: block; width: 100%; height: 320px; border: 0; background: white; color-scheme: light; }
 
+/* Pesquisa HTML — Layout - diálogo acessível com resultados no fluxo e rolagem interna */
+.biblioteca-pesquisa-botao { min-height: 44px; padding: 8px 14px; border: 1px solid var(--biblioteca-borda); border-radius: 6px; background: #241d30; color: var(--biblioteca-texto); }
+.biblioteca-pesquisa-botao:hover:not(:disabled) { border-color: var(--biblioteca-foco); }
+.biblioteca-pesquisa-botao:disabled { opacity: .5; cursor: default; }
+.biblioteca-pesquisa { width: min(680px, calc(100% - 32px)); max-height: calc(100dvh - 32px); margin: auto; padding: 20px; border: 1px solid var(--biblioteca-borda); border-radius: 12px; background: var(--biblioteca-superficie); color: var(--biblioteca-texto); overflow-y: auto; overflow-wrap: anywhere; }
+.biblioteca-pesquisa::backdrop { background: rgba(11, 10, 15, .8); }
+.biblioteca-pesquisa-cabecalho { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+.biblioteca-pesquisa h2 { font-size: 20px; }
+.biblioteca-pesquisa label { display: block; margin-bottom: 8px; }
+.biblioteca-pesquisa input { width: 100%; min-width: 0; min-height: 48px; padding: 10px 12px; border: 1px solid var(--biblioteca-borda); border-radius: 6px; background: var(--biblioteca-fundo); color: var(--biblioteca-texto); font: inherit; font-size: 16px; }
+#biblioteca-pesquisa-status { margin: 14px 0; color: var(--biblioteca-secundario); font-size: 13px; }
+#biblioteca-pesquisa-resultados { list-style: none; margin: 0; padding: 0; }
+#biblioteca-pesquisa-resultados li + li { margin-top: 8px; }
+#biblioteca-pesquisa-resultados button { display: block; width: 100%; min-height: 44px; padding: 12px; border: 1px solid var(--biblioteca-borda); border-radius: 6px; background: var(--biblioteca-fundo); color: var(--biblioteca-texto); text-align: left; overflow-wrap: anywhere; }
+#biblioteca-pesquisa-resultados button:hover { background: #241d30; border-color: var(--biblioteca-foco); }
+#biblioteca-pesquisa-resultados strong, #biblioteca-pesquisa-resultados span { display: block; }
+#biblioteca-pesquisa-resultados span { margin-top: 4px; color: var(--biblioteca-secundario); font-size: 13px; }
+
 /* Biblioteca — Responsividade - mantém menu recolhível e blocos dentro da largura */
 @media (max-width: 960px) {
     .biblioteca-layout { grid-template-columns: 220px minmax(0, 1fr); gap: 24px; }
