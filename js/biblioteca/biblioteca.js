@@ -1,5 +1,7 @@
 const pagina = document.querySelector("main[data-tecnologia]");
 const documentacaoHTML = pagina.dataset.tecnologia === "html";
+const documentacaoCSS = pagina.dataset.tecnologia === "css";
+const documentacaoCompleta = documentacaoHTML || documentacaoCSS;
 const menu = document.querySelector("#biblioteca-menu");
 const alternarMenu = document.querySelector("#biblioteca-alternar-menu");
 const niveis = document.querySelector("#biblioteca-niveis");
@@ -80,8 +82,22 @@ function destacarHTML(codigo, destino) {
     trecho(codigo.slice(fim), "biblioteca-token-texto");
 }
 
+// CSS — Destaque - tokens tratados como texto, sem executar marcação.
+function destacarCSS(codigo, destino) {
+    const tokens = /\/\*[\s\S]*?\*\/|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|#[\da-f]{3,8}\b|@[\w-]+|--[\w-]+|[\w-]+(?=\s*:)|[.#][a-z_][\w-]*|\b\d+(?:\.\d+)?(?:px|rem|em|vh|vw|ms|s|deg|%)?/gi;
+    let fim = 0;
+    function trecho(texto, classe) { const span = document.createElement("span"); span.className = classe; span.textContent = texto; destino.append(span); }
+    for (const token of codigo.matchAll(tokens)) {
+        trecho(codigo.slice(fim, token.index), "biblioteca-token-texto");
+        const valor = token[0];
+        trecho(valor, valor.startsWith("/*") ? "biblioteca-token-comentario" : /^["'\d#]/.test(valor) ? "biblioteca-token-valor" : valor.startsWith("@") || /^[.#]/.test(valor) ? "biblioteca-token-tag" : "biblioteca-token-atributo");
+        fim = token.index + valor.length;
+    }
+    trecho(codigo.slice(fim), "biblioteca-token-texto");
+}
+
 // Resultado — Isolamento - somente elementos visuais no iframe de origem opaca.
-function documentoResultado(assunto) {
+function documentoResultado(assunto, cssExemplo = null) {
     const fonte = assunto.contextoExemplo === "documento"
         ? assunto.exemploCodigo.match(/<body\b[^>]*>([\s\S]*?)<\/body\s*>/i)?.[1] || ""
         : assunto.exemploCodigo;
@@ -92,12 +108,15 @@ function documentoResultado(assunto) {
         if (!permitidos.has(elemento.localName)) { elemento.remove(); continue; }
         for (const atributo of [...elemento.attributes]) {
             const nome = atributo.name.toLowerCase();
+            if (cssExemplo !== null && nome === "style") continue;
+            if (cssExemplo !== null && elemento.localName === "img" && nome === "src" && /^data:image\/svg\+xml;base64,[a-z0-9+/=]+$/i.test(atributo.value)) continue;
             if (nome.startsWith("on") || ["src", "srcset", "poster", "style", "srcdoc", "href", "action", "formaction", "formtarget", "target", "download", "ping", "background", "autofocus"].includes(nome)) elemento.removeAttribute(atributo.name);
         }
         if (elemento.localName === "a" && !elemento.hasAttribute("href")) elemento.setAttribute("aria-disabled", "true");
     }
     const politica = "default-src 'none'; script-src 'none'; style-src 'unsafe-inline'; img-src 'none'; media-src 'none'; connect-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'";
-    return `<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta http-equiv="Content-Security-Policy" content="${politica}"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Resultado do exemplo</title><style>body{margin:16px;overflow-wrap:anywhere}img,video,audio{max-width:100%}a{color:#0000ee;text-decoration:underline}pre{overflow:auto}input,select,textarea{max-width:100%;box-sizing:border-box}</style></head><body>${modelo.innerHTML}</body></html>`;
+    const estilos = cssExemplo === null ? "" : `<style>${cssExemplo.replace(/</g, "\\3c ")} @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }</style>`;
+    return `<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta http-equiv="Content-Security-Policy" content="${cssExemplo === null ? politica : politica.replace("img-src 'none'", "img-src data:")}"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Resultado do exemplo</title><style>body{margin:16px;overflow-wrap:anywhere}img,video,audio{max-width:100%}a{color:#0000ee;text-decoration:underline}pre{overflow:auto}input,select,textarea{max-width:100%;box-sizing:border-box}</style>${estilos}</head><body>${modelo.innerHTML}</body></html>`;
 }
 
 function blocoResultado(assunto) {
@@ -116,36 +135,39 @@ function blocoResultado(assunto) {
     janela.className = "biblioteca-resultado";
     const barra = document.createElement("div");
     barra.className = "biblioteca-resultado-barra";
-    barra.textContent = "Prévia do exemplo · HTML";
+    barra.textContent = documentacaoCSS ? "Prévia do exemplo · CSS" : "Prévia do exemplo · HTML";
     const iframe = document.createElement("iframe");
     iframe.title = `Resultado: ${assunto.titulo}`;
     iframe.setAttribute("sandbox", "");
     iframe.setAttribute("referrerpolicy", "no-referrer");
     iframe.setAttribute("allow", "camera 'none'; microphone 'none'; geolocation 'none'");
-    iframe.srcdoc = documentoResultado(assunto);
+    iframe.srcdoc = documentacaoCSS
+        ? documentoResultado({ ...assunto, exemploCodigo: assunto.exemploHTML }, assunto.exemploCodigo)
+        : documentoResultado(assunto);
     janela.append(barra, iframe);
     const observacao = document.createElement("p");
     observacao.className = "biblioteca-exemplo-contexto";
-    observacao.textContent = `${assunto.efeitoNavegador || "Esta prévia mostra o HTML com os estilos padrão do navegador."} Links, envio de formulários, recursos externos e JavaScript ficam bloqueados nesta demonstração.`;
+    observacao.textContent = documentacaoCSS ? "A prévia aplica o CSS exibido ao HTML de apoio exibido. Hover e foco podem ser testados; o viewport é o iframe. Movimento reduzido é respeitado. JavaScript, envios e recursos de rede ficam bloqueados." : `${assunto.efeitoNavegador || "Esta prévia mostra o HTML com os estilos padrão do navegador."} Links, envio de formulários, recursos externos e JavaScript ficam bloqueados nesta demonstração.`;
     secao.append(janela, observacao);
     return secao;
 }
 
-function blocoCodigo(valor, titulo) {
+function blocoCodigo(valor, titulo, linguagem = documentacaoCSS ? "css" : "html") {
     const bloco = document.createElement("div");
     bloco.className = "biblioteca-codigo";
     const pre = document.createElement("pre");
     const code = document.createElement("code");
-    if (documentacaoHTML) destacarHTML(valor, code);
+    if (documentacaoCSS && linguagem === "css") destacarCSS(valor, code);
+    else if (documentacaoCompleta) destacarHTML(valor, code);
     else code.textContent = valor;
     pre.tabIndex = 0;
     pre.setAttribute("aria-label", titulo);
     pre.append(code);
-    if (documentacaoHTML) {
+    if (documentacaoCompleta) {
         const ferramentas = document.createElement("div");
         ferramentas.className = "biblioteca-codigo-ferramentas";
         const linguagem = document.createElement("span");
-        linguagem.textContent = "HTML";
+        linguagem.textContent = documentacaoCSS && titulo !== "HTML do exemplo" && titulo !== "Conexão no HTML" ? "CSS" : "HTML";
         const copiar = document.createElement("button");
         copiar.type = "button";
         copiar.textContent = "Copiar código";
@@ -215,36 +237,50 @@ function selecionarAssunto(indice, focar = true) {
         leitura.insertBefore(conteudoLeitura, navegacaoAssuntos);
     }
     conteudoLeitura.replaceChildren();
-    const contexto = document.createElement("p");
-    contexto.className = "biblioteca-exemplo-contexto";
-    contexto.textContent = assunto.contextoExemplo === "documento"
-        ? "Exemplo completo: salve como um arquivo .html em UTF-8."
-        : assunto.contextoExemplo === "head"
-            ? "Exemplo para inserir dentro de <head> de um documento HTML completo."
-            : "Exemplo para inserir dentro de <body> de um documento HTML completo.";
-    const exemplo = blocoLeitura(documentacaoHTML ? "Exemplo de código" : "Exemplo prático", assunto.exemploCodigo, true);
-    exemplo.insertBefore(contexto, exemplo.querySelector(".biblioteca-codigo"));
-    if (documentacaoHTML) {
-        const referencia = document.createElement("details");
-        referencia.className = "biblioteca-sintaxe";
-        const resumo = document.createElement("summary");
-        resumo.textContent = "Consultar sintaxe de referência";
-        referencia.append(resumo, blocoCodigo(assunto.sintaxe, "Sintaxe"));
-        exemplo.insertBefore(referencia, contexto);
+    if (documentacaoCSS) {
+        const observacoes = blocoLeitura("Observações importantes", assunto.boasPraticas);
+        observacoes.className = "biblioteca-observacao";
+        const sintaxe = document.createElement("details");
+        sintaxe.className = "biblioteca-sintaxe";
+        const resumo = document.createElement("summary"); resumo.textContent = "Consultar sintaxe de referência";
+        sintaxe.append(resumo, blocoCodigo(assunto.sintaxe, "Sintaxe CSS"));
+        conteudoLeitura.append(blocoLeitura("Conceito", assunto.explicacao), blocoLeitura("Responsabilidade e explicação das propriedades", assunto.responsabilidadeCodigo), sintaxe,
+            blocoLeitura("Exemplo de código", assunto.exemploCodigo, true));
+        if (assunto.htmlReferencia) conteudoLeitura.append(blocoCodigo(assunto.htmlReferencia, "Conexão no HTML", "html"));
+        conteudoLeitura.append(blocoCodigo(assunto.exemploHTML, "HTML do exemplo", "html"), blocoResultado(assunto),
+            blocoLeitura("Aplicação prática", assunto.aplicacaoReal), observacoes);
+    } else {
+        const contexto = document.createElement("p");
+        contexto.className = "biblioteca-exemplo-contexto";
+        contexto.textContent = assunto.contextoExemplo === "documento"
+            ? "Exemplo completo: salve como um arquivo .html em UTF-8."
+            : assunto.contextoExemplo === "head"
+                ? "Exemplo para inserir dentro de <head> de um documento HTML completo."
+                : "Exemplo para inserir dentro de <body> de um documento HTML completo.";
+        const exemplo = blocoLeitura(documentacaoHTML ? "Exemplo de código" : "Exemplo prático", assunto.exemploCodigo, true);
+        exemplo.insertBefore(contexto, exemplo.querySelector(".biblioteca-codigo"));
+        if (documentacaoHTML) {
+            const referencia = document.createElement("details");
+            referencia.className = "biblioteca-sintaxe";
+            const resumo = document.createElement("summary");
+            resumo.textContent = "Consultar sintaxe de referência";
+            referencia.append(resumo, blocoCodigo(assunto.sintaxe, "Sintaxe"));
+            exemplo.insertBefore(referencia, contexto);
+        }
+        const boasPraticas = blocoLeitura(documentacaoHTML ? "Observações importantes" : "Boas práticas", assunto.boasPraticas);
+        if (documentacaoHTML) boasPraticas.className = "biblioteca-observacao";
+        conteudoLeitura.append(
+            ...(!documentacaoHTML ? [blocoLeitura("Objetivo", assunto.objetivo)] : []),
+            blocoLeitura(documentacaoHTML ? "Conceito" : "Explicação", assunto.explicacao),
+            ...(documentacaoHTML ? [blocoLeitura("Responsabilidade", assunto.responsabilidadeCodigo)] : []),
+            ...(!documentacaoHTML ? [blocoLeitura("Sintaxe", assunto.sintaxe, true)] : []),
+            exemplo,
+            ...(!documentacaoHTML ? [blocoLeitura("Responsabilidade", assunto.responsabilidadeCodigo)] : []),
+            ...(documentacaoHTML ? [blocoResultado(assunto)] : []),
+            blocoLeitura(documentacaoHTML ? "Aplicação prática" : "Aplicação real", assunto.aplicacaoReal),
+            boasPraticas
+        );
     }
-    const boasPraticas = blocoLeitura(documentacaoHTML ? "Observações importantes" : "Boas práticas", assunto.boasPraticas);
-    if (documentacaoHTML) boasPraticas.className = "biblioteca-observacao";
-    conteudoLeitura.append(
-        ...(!documentacaoHTML ? [blocoLeitura("Objetivo", assunto.objetivo)] : []),
-        blocoLeitura(documentacaoHTML ? "Conceito" : "Explicação", assunto.explicacao),
-        ...(documentacaoHTML ? [blocoLeitura("Responsabilidade", assunto.responsabilidadeCodigo)] : []),
-        ...(!documentacaoHTML ? [blocoLeitura("Sintaxe", assunto.sintaxe, true)] : []),
-        exemplo,
-        ...(!documentacaoHTML ? [blocoLeitura("Responsabilidade", assunto.responsabilidadeCodigo)] : []),
-        ...(documentacaoHTML ? [blocoResultado(assunto)] : []),
-        blocoLeitura(documentacaoHTML ? "Aplicação prática" : "Aplicação real", assunto.aplicacaoReal),
-        boasPraticas
-    );
     estadoVazio.hidden = true;
     navegacaoAssuntos.hidden = false;
     anterior.disabled = indice === 0;
@@ -310,7 +346,7 @@ function construirNiveis(dados) {
             painel.append(aviso);
         } else {
             for (const modulo of nivel.modulos) {
-                if (documentacaoHTML) {
+                if (documentacaoCompleta) {
                     const detalhes = document.createElement("details");
                     detalhes.className = "biblioteca-modulo";
                     const resumo = document.createElement("summary");
@@ -376,7 +412,7 @@ function pesquisarAssuntos(consulta) {
 function iniciarPesquisa() {
     const abrir = document.querySelector("#biblioteca-pesquisar");
     const dialogo = document.querySelector("#biblioteca-pesquisa");
-    if (!documentacaoHTML || !abrir || !dialogo) return;
+    if (!documentacaoCompleta || !abrir || !dialogo) return;
     const campo = dialogo.querySelector("#biblioteca-pesquisa-campo");
     const lista = dialogo.querySelector("#biblioteca-pesquisa-resultados");
     const status = dialogo.querySelector("#biblioteca-pesquisa-status");
@@ -386,7 +422,7 @@ function iniciarPesquisa() {
         resultados = pesquisarAssuntos(campo.value);
         lista.replaceChildren();
         const mensagem = !normalizarPesquisa(campo.value)
-            ? "Digite uma tag, conceito ou intenção. Exemplos: parágrafo, senha ou imagem."
+            ? (documentacaoCSS ? "Digite uma propriedade, conceito ou intenção. Exemplos: centralizar, padding ou cor de fundo." : "Digite uma tag, conceito ou intenção. Exemplos: parágrafo, senha ou imagem.")
             : !resultados.length ? "Nenhum assunto encontrado. Tente outra tag ou palavra."
                 : resultados.length + (resultados.length === 1 ? " assunto encontrado." : " assuntos encontrados. Escolha um resultado.");
         // Aguarda uma pausa na digitação antes de anunciar a contagem.
