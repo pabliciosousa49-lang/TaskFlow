@@ -6,7 +6,7 @@ export function criarMascote(container, aoMudarEstado) {
     flutuacao.className = "mascote-flutuacao";
     const imagem = document.createElement("img");
     imagem.className = "mascote-imagem";
-    imagem.src = new URL("../../../assets/images/mascote-taskflow.png", import.meta.url).href;
+    imagem.src = new URL("../../../assets/images/mascote-voxel-azul.png", import.meta.url).href;
     imagem.alt = "";
     imagem.draggable = false;
     flutuacao.append(imagem);
