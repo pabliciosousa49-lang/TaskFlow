@@ -147,7 +147,7 @@ function blocoResultado(assunto) {
     janela.append(barra, iframe);
     const observacao = document.createElement("p");
     observacao.className = "biblioteca-exemplo-contexto";
-    observacao.textContent = documentacaoCSS ? "A prévia aplica o CSS exibido ao HTML de apoio exibido. Hover e foco podem ser testados; o viewport é o iframe. Movimento reduzido é respeitado. JavaScript, envios e recursos de rede ficam bloqueados." : `${assunto.efeitoNavegador || "Esta prévia mostra o HTML com os estilos padrão do navegador."} Links, envio de formulários, recursos externos e JavaScript ficam bloqueados nesta demonstração.`;
+    observacao.textContent = documentacaoCSS ? "A prévia combina o CSS principal com os estilos de apoio. Consulte o bloco expansível para copiar o exemplo completo. O viewport é esta janela; JavaScript, envios e recursos de rede ficam bloqueados. Movimento reduzido é respeitado." : `${assunto.efeitoNavegador || "Esta prévia mostra o HTML com os estilos padrão do navegador."} Links, envio de formulários, recursos externos e JavaScript ficam bloqueados nesta demonstração.`;
     secao.append(janela, observacao);
     return secao;
 }
@@ -238,17 +238,43 @@ function selecionarAssunto(indice, focar = true) {
     }
     conteudoLeitura.replaceChildren();
     if (documentacaoCSS) {
-        const observacoes = blocoLeitura("Observações importantes", assunto.boasPraticas);
-        observacoes.className = "biblioteca-observacao";
-        const sintaxe = document.createElement("details");
-        sintaxe.className = "biblioteca-sintaxe";
-        const resumo = document.createElement("summary"); resumo.textContent = "Consultar sintaxe de referência";
-        sintaxe.append(resumo, blocoCodigo(assunto.sintaxe, "Sintaxe CSS"));
-        conteudoLeitura.append(blocoLeitura("Conceito", assunto.explicacao), blocoLeitura("Responsabilidade e explicação das propriedades", assunto.responsabilidadeCodigo), sintaxe,
-            blocoLeitura("Exemplo de código", assunto.exemploCodigo, true));
-        if (assunto.htmlReferencia) conteudoLeitura.append(blocoCodigo(assunto.htmlReferencia, "Conexão no HTML", "html"));
-        conteudoLeitura.append(blocoCodigo(assunto.exemploHTML, "HTML do exemplo", "html"), blocoResultado(assunto),
-            blocoLeitura("Aplicação prática", assunto.aplicacaoReal), observacoes);
+        conteudoLeitura.append(blocoLeitura("O que é", assunto.explicacao), blocoLeitura("Quando usar", assunto.aplicacaoReal));
+        const exemplo = document.createElement("section");
+        exemplo.className = modulo.id === "responsividade" ? "biblioteca-css-exemplo biblioteca-css-exemplo-amplo" : "biblioteca-css-exemplo";
+        exemplo.append(blocoLeitura("CSS principal", assunto.codigoPrincipal, true), blocoResultado(assunto));
+        conteudoLeitura.append(exemplo);
+        if (assunto.orientacao) {
+            const orientacao = blocoLeitura("Observe na prévia", assunto.orientacao);
+            orientacao.className = "biblioteca-css-orientacao";
+            conteudoLeitura.append(orientacao);
+        }
+        const apoio = document.createElement("details");
+        apoio.className = "biblioteca-sintaxe";
+        const resumo = document.createElement("summary");
+        resumo.textContent = "HTML e estilos de apoio · exemplo completo para copiar";
+        apoio.append(resumo, blocoLeitura("Como reproduzir", "Use o HTML abaixo dentro do body. No CSS, os estilos de apoio vêm antes do CSS principal; a prévia usa exatamente essa composição."),
+            blocoCodigo(assunto.exemploHTML, "HTML do exemplo", "html"),
+            blocoCodigo(assunto.estilosApoio, "Estilos de apoio"),
+            blocoCodigo(assunto.exemploCodigo, "CSS completo"));
+        if (assunto.htmlReferencia) apoio.append(blocoCodigo(assunto.htmlReferencia, "Conexão no HTML", "html"));
+        conteudoLeitura.append(apoio, blocoLeitura("Entenda o código", assunto.responsabilidadeCodigo));
+        const cuidados = blocoLeitura("Cuidados e erros comuns", assunto.boasPraticas);
+        cuidados.className = "biblioteca-observacao";
+        conteudoLeitura.append(cuidados);
+        const relacionados = (assunto.relacionados || []).map(id => assuntosOrdenados.findIndex(item => item.assunto.id === id)).filter(i => i >= 0 && i !== indice);
+        if (relacionados.length) {
+            const secao = document.createElement("section");
+            secao.className = "biblioteca-css-relacionados";
+            const titulo = document.createElement("h2"); titulo.textContent = "Veja também";
+            secao.append(titulo);
+            for (const i of relacionados) {
+                const link = document.createElement("button"); link.type = "button";
+                link.textContent = assuntosOrdenados[i].assunto.titulo;
+                link.addEventListener("click", () => selecionarAssunto(i));
+                secao.append(link);
+            }
+            conteudoLeitura.append(secao);
+        }
     } else {
         const contexto = document.createElement("p");
         contexto.className = "biblioteca-exemplo-contexto";

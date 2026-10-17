@@ -135,8 +135,10 @@ export function criarProjeto(titulo) {
     if (!tituloValido(titulo)) throw new Error("Informe um título válido de até 120 caracteres.");
     const projetos = lerProjetos();
     const agora = new Date().toISOString();
-    const projeto = { id: criarId(new Set(projetos.map((item) => item.id))), titulo: titulo.trim(), linguagem: "html",
-        criadoEm: agora, atualizadoEm: agora, formatoArquivos: 1, arquivos: [], arquivoEditorId: null };
+    const projeto = {
+        id: criarId(new Set(projetos.map((item) => item.id))), titulo: titulo.trim(), linguagem: "html",
+        criadoEm: agora, atualizadoEm: agora, formatoArquivos: 1, arquivos: [], arquivoEditorId: null
+    };
     gravarProjetos([...projetos, projeto]);
     return projeto;
 }
@@ -168,8 +170,10 @@ function adicionarItem(idProjeto, nome, parentId, tipo, atualizadoEmEsperado) {
     const projeto = alterarProjeto(idProjeto, atualizadoEmEsperado, (atual) => {
         validarNomeNoDiretorio(atual, nome, parentId);
         const parent = atual.arquivos.find((entrada) => entrada.id === parentId);
-        item = { id: criarId(new Set(atual.arquivos.map((entrada) => entrada.id))), nome,
-            caminho: parent ? `${parent.caminho}/${nome}` : nome, parentId, tipo };
+        item = {
+            id: criarId(new Set(atual.arquivos.map((entrada) => entrada.id))), nome,
+            caminho: parent ? `${parent.caminho}/${nome}` : nome, parentId, tipo
+        };
         if (tipo === "arquivo") item.conteudo = nome === "index.html" ? criarEstruturaInicialHTML(atual.titulo) : "";
         atual.arquivos.push(item);
         if (tipo === "arquivo" && nome === "index.html" && !atual.arquivoEditorId) atual.arquivoEditorId = item.id;

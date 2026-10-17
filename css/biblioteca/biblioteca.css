@@ -154,7 +154,22 @@ body:is(.biblioteca-html, .biblioteca-css)::before { content: ""; position: fixe
 #biblioteca-pesquisa-resultados strong, #biblioteca-pesquisa-resultados span { display: block; }
 #biblioteca-pesquisa-resultados span { margin-top: 4px; color: var(--biblioteca-secundario); font-size: 13px; }
 
+/* CSS — Leitura - aproxima código e resultado sem afetar a documentação HTML. */
+#biblioteca-css .biblioteca-css-exemplo { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; margin-block: 28px; }
+#biblioteca-css .biblioteca-conteudo .biblioteca-css-exemplo > section { min-width: 0; margin: 0; padding: 0; border: 0; }
+#biblioteca-css .biblioteca-css-exemplo .biblioteca-codigo { margin-bottom: 0; }
+#biblioteca-css .biblioteca-css-exemplo pre { max-height: 440px; }
+#biblioteca-css .biblioteca-css-exemplo .biblioteca-exemplo-contexto { line-height: 1.6; }
+#biblioteca-css .biblioteca-css-orientacao { padding-left: 16px; border-left: 2px solid var(--biblioteca-foco); }
+#biblioteca-css .biblioteca-sintaxe { margin-block: 24px; }
+#biblioteca-css .biblioteca-sintaxe summary { line-height: 1.6; }
+#biblioteca-css .biblioteca-css-relacionados button { min-height: 44px; margin: 4px 8px 4px 0; padding: 8px 12px; border: 1px solid var(--biblioteca-borda); border-radius: 6px; background: #241d30; color: var(--biblioteca-texto); font: inherit; font-size: 13px; text-align: left; overflow-wrap: anywhere; }
+#biblioteca-css .biblioteca-css-relacionados button:hover { border-color: var(--biblioteca-foco); }
+
 /* Biblioteca — Responsividade - mantém menu recolhível e blocos dentro da largura */
+@media (min-width: 1200px) {
+    #biblioteca-css .biblioteca-css-exemplo:not(.biblioteca-css-exemplo-amplo) { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+}
 @media (max-width: 960px) {
     .biblioteca-layout { grid-template-columns: 220px minmax(0, 1fr); gap: 24px; }
     .biblioteca-leitura-cabecalho, .biblioteca-estado-vazio, .biblioteca-conteudo { padding: 28px; }

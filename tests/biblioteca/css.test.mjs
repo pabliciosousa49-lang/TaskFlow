@@ -40,7 +40,10 @@ for (const assunto of assuntos) {
         assert(assunto.palavrasChave.length > 0);
         assert(!/em preparação|lorem ipsum/i.test(assunto.explicacao));
         assert(!/<script|\son\w+=/i.test(assunto.exemploHTML));
-        for (const [linguagem, fonte] of [["css", assunto.exemploCodigo], ["html", assunto.exemploHTML]]) {
+        assert.equal(assunto.exemploCodigo, assunto.estilosApoio + "\n" + assunto.codigoPrincipal);
+        assert(assunto.codigoPrincipal.includes("\n"), "CSS principal legível em várias linhas");
+        assert(assunto.relacionados.every(id => id !== assunto.id && assuntos.some(a => a.id === id)), "referências existentes");
+        for (const [linguagem, fonte] of [["css", assunto.codigoPrincipal], ["css", assunto.estilosApoio], ["css", assunto.exemploCodigo], ["html", assunto.exemploHTML]]) {
             const cursor = parsers[linguagem].parse(fonte).cursor();
             do { assert(!cursor.type.isError && cursor.name !== "MismatchedCloseTag", linguagem + ": " + fonte.slice(cursor.from, cursor.to)); } while (cursor.next());
         }
@@ -72,6 +75,7 @@ class Elemento {
     querySelector(s) { return this.querySelectorAll(s)[0] || null; }
 }
 function iniciar(tecnologia) {
+    const copias = [];
     const elementos = {};
     for (const id of ["biblioteca-menu", "biblioteca-alternar-menu", "biblioteca-niveis", "biblioteca-leitura", "biblioteca-estado-vazio", "biblioteca-titulo", "biblioteca-nivel", "biblioteca-vazio-titulo", "biblioteca-vazio-descricao", "biblioteca-pesquisar", "biblioteca-pesquisa", "biblioteca-pesquisa-campo", "biblioteca-pesquisa-resultados", "biblioteca-pesquisa-status", "biblioteca-pesquisa-formulario", "biblioteca-pesquisa-fechar"]) {
         elementos["#" + id] = new Elemento(); elementos["#" + id].id = id;
@@ -86,11 +90,11 @@ function iniciar(tecnologia) {
         return node;
     } };
     const mobile = { matches: false, addEventListener() {} };
-    const ctx = vm.createContext({ document, window: { matchMedia: () => mobile }, navigator: { clipboard: { writeText: async () => {} } }, setTimeout: fn => { fn(); return 1; }, clearTimeout() {} });
+    const ctx = vm.createContext({ document, window: { matchMedia: () => mobile }, navigator: { clipboard: { writeText: async texto => { copias.push(texto); } } }, setTimeout: fn => { fn(); return 1; }, clearTimeout() {} });
     const fonte = readFileSync(new URL("../../js/biblioteca/biblioteca.js", import.meta.url), "utf8").replace(/iniciarBiblioteca\(\);\s*$/, "");
     vm.runInContext(fonte + ";globalThis.api={construirNiveis,selecionarAssunto,pesquisarAssuntos,iniciarPesquisa,destacarCSS,blocoCodigo};", ctx);
     ctx.api.construirNiveis(tecnologia === "css" ? css : tecnologia === "html" ? html : javascript);
-    return { api: ctx.api, elementos, nav, mobile };
+    return { api: ctx.api, elementos, nav, mobile, copias };
 }
 
 test("pesquisa CSS: sinônimos, acentos, parciais e relevância", () => {
@@ -138,4 +142,58 @@ test("tokens e regressão HTML/JavaScript: fontes e exemplos continuam textuais"
     assert.equal(bibliotecaHTML.api.pesquisarAssuntos("senha")[0].registro.assunto.id, "tipos-input");
     assert.equal(bibliotecaHTML.elementos["#biblioteca-leitura"].querySelector("iframe").getAttribute("sandbox"), "");
     assert.equal(iniciar("javascript").elementos["#biblioteca-niveis"].querySelectorAll("button").length, 3);
+});
+
+test("leitura CSS: principal e resultado juntos, apoio recolhido e cópia fiel", async () => {
+    const { api, elementos, copias } = iniciar("css");
+    for (let i = 0; i < assuntos.length; i++) {
+        api.selecionarAssunto(i);
+        const conteudo = elementos["#biblioteca-leitura"].querySelector(".biblioteca-conteudo");
+        assert.deepEqual(conteudo.children.slice(0, 2).map(s => s.querySelector("h2").textContent), ["O que é", "Quando usar"]);
+        const exemplo = conteudo.querySelector(".biblioteca-css-exemplo");
+        assert.equal(exemplo.querySelector("code").textContent, assuntos[i].codigoPrincipal);
+        assert(exemplo.querySelector("iframe"));
+        const apoio = conteudo.querySelector("details");
+        assert(!apoio.open, "HTML e estilos de apoio começam recolhidos");
+        assert(apoio.querySelectorAll("code").some(c => c.textContent === assuntos[i].exemploCodigo));
+        exemplo.querySelector("button").disparar("click");
+        await Promise.resolve();
+        assert.equal(copias.at(-1), assuntos[i].codigoPrincipal);
+        const completo = apoio.querySelectorAll(".biblioteca-codigo").find(b => b.querySelector("code").textContent === assuntos[i].exemploCodigo);
+        completo.querySelector("button").disparar("click");
+        await Promise.resolve();
+        assert.equal(copias.at(-1), assuntos[i].exemploCodigo);
+    }
+});
+
+test("Veja também seleciona o assunto, sincroniza o menu e atualiza anterior/próximo", () => {
+    const { api, elementos, nav } = iniciar("css");
+    const indice = assuntos.findIndex(a => a.id === "padding");
+    api.selecionarAssunto(indice);
+    const relacionados = elementos["#biblioteca-leitura"].querySelector(".biblioteca-css-relacionados");
+    relacionados.querySelector("button").disparar("click");
+    const destino = assuntos.findIndex(a => a.id === assuntos[indice].relacionados[0]);
+    assert.equal(elementos["#biblioteca-titulo"].textContent, assuntos[destino].titulo);
+    assert.equal(elementos["#biblioteca-niveis"].querySelectorAll("button").filter(b => b.getAttribute("aria-current") === "true").length, 1);
+    nav.children[1].disparar("click");
+    assert.equal(elementos["#biblioteca-titulo"].textContent, assuntos[destino + 1].titulo);
+});
+
+test("responsividade tem prévia ampla; exemplos de interação e rolagem possuem orientação", () => {
+    const { api, elementos } = iniciar("css");
+    api.selecionarAssunto(assuntos.findIndex(a => a.id === "media-queries"));
+    assert(elementos["#biblioteca-leitura"].querySelector(".biblioteca-css-exemplo-amplo"));
+    for (const id of ["padding", "margin", "box-model", "flexbox", "grid", "absolute", "fixed", "sticky", "overflow", "hover", "focus", "active", "keyframes"]) {
+        assert(assuntos.find(a => a.id === id).orientacao?.length > 40, id);
+    }
+    assert(assuntos.find(a => a.id === "overflow").exemploHTML.includes('tabindex="0"'));
+});
+
+test("HTML conserva a sequência de leitura e não recebe componentes exclusivos do CSS", () => {
+    const { api, elementos } = iniciar("html");
+    api.selecionarAssunto(0);
+    const conteudo = elementos["#biblioteca-leitura"].querySelector(".biblioteca-conteudo");
+    assert.deepEqual(conteudo.children.map(s => s.querySelector("h2")?.textContent), ["Conceito", "Responsabilidade", "Exemplo de código", "Resultado", "Aplicação prática", "Observações importantes"]);
+    assert.equal(conteudo.querySelector(".biblioteca-css-exemplo"), null);
+    assert.equal(conteudo.querySelector(".biblioteca-css-relacionados"), null);
 });
