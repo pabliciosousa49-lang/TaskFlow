@@ -1,7 +1,8 @@
 const pagina = document.querySelector("main[data-tecnologia]");
 const documentacaoHTML = pagina.dataset.tecnologia === "html";
 const documentacaoCSS = pagina.dataset.tecnologia === "css";
-const documentacaoCompleta = documentacaoHTML || documentacaoCSS;
+const documentacaoProgramacao = ["javascript", "typescript", "react"].includes(pagina.dataset.tecnologia);
+const documentacaoCompleta = documentacaoHTML || documentacaoCSS || documentacaoProgramacao;
 const menu = document.querySelector("#biblioteca-menu");
 const alternarMenu = document.querySelector("#biblioteca-alternar-menu");
 const niveis = document.querySelector("#biblioteca-niveis");
@@ -9,7 +10,9 @@ const tamanhoMobile = window.matchMedia("(max-width: 760px)");
 const modelos = {
     html: () => import("../../data/biblioteca/html/conteudos.js"),
     css: () => import("../../data/biblioteca/css/conteudos.js"),
-    javascript: () => import("../../data/biblioteca/javascript/conteudos.js")
+    javascript: () => import("../../data/biblioteca/javascript/conteudos.js"),
+    typescript: () => import("../../data/biblioteca/typescript/conteudos.js"),
+    react: () => import("../../data/biblioteca/react/conteudos.js")
 };
 let menuAberto = false;
 const leitura = document.querySelector("#biblioteca-leitura");
@@ -96,6 +99,19 @@ function destacarCSS(codigo, destino) {
     trecho(codigo.slice(fim), "biblioteca-token-texto");
 }
 
+// Programação — Destaque - coloração lexical; código permanece texto inerte.
+function destacarScript(codigo, destino) {
+    const tokens = /\/\*[\s\S]*?\*\/|\/\/[^\n]*|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`|\b(?:const|let|function|return|if|else|for|of|import|from|export|default|async|await|try|catch|throw|new|typeof|interface|type|extends|readonly|unknown|never|number|string|boolean|void|true|false|null|undefined)\b|\b\d+(?:\.\d+)?\b/g;
+    let fim = 0;
+    function trecho(texto, classe) { const span = document.createElement("span"); span.className = classe; span.textContent = texto; destino.append(span); }
+    for (const token of codigo.matchAll(tokens)) {
+        trecho(codigo.slice(fim, token.index), "biblioteca-token-texto");
+        trecho(token[0], token[0].startsWith("//") || token[0].startsWith("/*") ? "biblioteca-token-comentario" : /^["'`\d]/.test(token[0]) ? "biblioteca-token-valor" : "biblioteca-token-tag");
+        fim = token.index + token[0].length;
+    }
+    trecho(codigo.slice(fim), "biblioteca-token-texto");
+}
+
 // Resultado — Isolamento - somente elementos visuais no iframe de origem opaca.
 function documentoResultado(assunto, cssExemplo = null) {
     const fonte = assunto.contextoExemplo === "documento"
@@ -152,12 +168,13 @@ function blocoResultado(assunto) {
     return secao;
 }
 
-function blocoCodigo(valor, titulo, linguagem = documentacaoCSS ? "css" : "html") {
+function blocoCodigo(valor, titulo, linguagem = documentacaoCSS ? "css" : documentacaoProgramacao ? pagina.dataset.tecnologia === "react" ? "jsx" : pagina.dataset.tecnologia : "html") {
     const bloco = document.createElement("div");
     bloco.className = "biblioteca-codigo";
     const pre = document.createElement("pre");
     const code = document.createElement("code");
     if (documentacaoCSS && linguagem === "css") destacarCSS(valor, code);
+    else if (["javascript", "typescript", "jsx"].includes(linguagem)) destacarScript(valor, code);
     else if (documentacaoCompleta) destacarHTML(valor, code);
     else code.textContent = valor;
     pre.tabIndex = 0;
@@ -166,8 +183,8 @@ function blocoCodigo(valor, titulo, linguagem = documentacaoCSS ? "css" : "html"
     if (documentacaoCompleta) {
         const ferramentas = document.createElement("div");
         ferramentas.className = "biblioteca-codigo-ferramentas";
-        const linguagem = document.createElement("span");
-        linguagem.textContent = documentacaoCSS && titulo !== "HTML do exemplo" && titulo !== "Conexão no HTML" ? "CSS" : "HTML";
+        const rotulo = document.createElement("span");
+        rotulo.textContent = linguagem === "jsx" ? "JSX / React" : linguagem.toUpperCase();
         const copiar = document.createElement("button");
         copiar.type = "button";
         copiar.textContent = "Copiar código";
@@ -190,7 +207,7 @@ function blocoCodigo(valor, titulo, linguagem = documentacaoCSS ? "css" : "html"
                 resultado.textContent = "Código selecionado. Use Ctrl+C, ⌘C ou a opção Copiar do dispositivo.";
             }
         });
-        ferramentas.append(linguagem, copiar);
+        ferramentas.append(rotulo, copiar);
         bloco.append(ferramentas, pre, resultado);
     } else bloco.append(pre);
     return bloco;
@@ -237,7 +254,30 @@ function selecionarAssunto(indice, focar = true) {
         leitura.insertBefore(conteudoLeitura, navegacaoAssuntos);
     }
     conteudoLeitura.replaceChildren();
-    if (documentacaoCSS) {
+    if (documentacaoProgramacao) {
+        conteudoLeitura.append(blocoLeitura("O que é", assunto.explicacao), blocoLeitura("Quando usar", assunto.aplicacaoReal));
+        if (assunto.mapeamento) conteudoLeitura.append(blocoLeitura("Mapa de raciocínio", assunto.mapeamento));
+        conteudoLeitura.append(blocoLeitura("Onde reproduzir", assunto.ambiente));
+        if (assunto.exemploHTML) conteudoLeitura.append(blocoCodigo(assunto.exemploHTML, "HTML de apoio", "html"));
+        conteudoLeitura.append(blocoLeitura("Exemplo de código", assunto.exemploCodigo, true),
+            blocoLeitura("Entenda o código", assunto.responsabilidadeCodigo), blocoLeitura("Resultado esperado · não executado aqui", assunto.resultadoEsperado));
+        const cuidados = blocoLeitura("Cuidados e erros comuns", assunto.boasPraticas);
+        cuidados.className = "biblioteca-observacao";
+        conteudoLeitura.append(cuidados);
+        if (assunto.relacionados.length) {
+            const relacionados = document.createElement("section"); relacionados.className = "biblioteca-programacao-relacionados";
+            const titulo = document.createElement("h2"); titulo.textContent = "Veja também"; relacionados.append(titulo);
+            for (const id of assunto.relacionados) {
+                const i = assuntosOrdenados.findIndex(item => item.assunto.id === id);
+                if (i < 0 || i === indice) continue;
+                const link = document.createElement("button"); link.type = "button"; link.textContent = assuntosOrdenados[i].assunto.titulo;
+                link.addEventListener("click", () => selecionarAssunto(i)); relacionados.append(link);
+            }
+            conteudoLeitura.append(relacionados);
+        }
+        const fonte = document.createElement("a"); fonte.href = assunto.fonte; fonte.textContent = "Consultar documentação de referência"; fonte.className = "biblioteca-fonte";
+        conteudoLeitura.append(fonte);
+    } else if (documentacaoCSS) {
         conteudoLeitura.append(blocoLeitura("O que é", assunto.explicacao), blocoLeitura("Quando usar", assunto.aplicacaoReal));
         const exemplo = document.createElement("section");
         exemplo.className = modulo.id === "responsividade" ? "biblioteca-css-exemplo biblioteca-css-exemplo-amplo" : "biblioteca-css-exemplo";
@@ -448,7 +488,7 @@ function iniciarPesquisa() {
         resultados = pesquisarAssuntos(campo.value);
         lista.replaceChildren();
         const mensagem = !normalizarPesquisa(campo.value)
-            ? (documentacaoCSS ? "Digite uma propriedade, conceito ou intenção. Exemplos: centralizar, padding ou cor de fundo." : "Digite uma tag, conceito ou intenção. Exemplos: parágrafo, senha ou imagem.")
+            ? (documentacaoProgramacao ? "Digite um conceito ou intenção: eventos, tipos, estado ou mapear lógica." : documentacaoCSS ? "Digite uma propriedade, conceito ou intenção. Exemplos: centralizar, padding ou cor de fundo." : "Digite uma tag, conceito ou intenção. Exemplos: parágrafo, senha ou imagem.")
             : !resultados.length ? "Nenhum assunto encontrado. Tente outra tag ou palavra."
                 : resultados.length + (resultados.length === 1 ? " assunto encontrado." : " assuntos encontrados. Escolha um resultado.");
         // Aguarda uma pausa na digitação antes de anunciar a contagem.
