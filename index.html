@@ -27,10 +27,11 @@
 
         <!-- Identidade DevClub — Navegação - reservar espaço para logo da plataforma -->
         <div class="logo-devclub">
-          <img src="./assets/images/devLogo.png" alt="Logo DevClub">
+          <img src="./assets/images/mascote-voxel-azul.png" alt="Mascote TaskFlow" width="48" height="48">
+          <span class="menu-marca">Task<span>Flow</span></span>
         </div>
 
-        <button class="botao-recolher-menu" type="button">
+        <button class="botao-recolher-menu" type="button" aria-label="Recolher menu">
           &lt;&lt;
         </button>
 
@@ -38,6 +39,7 @@
 
       <!-- Pesquisa lateral — Navegação - disponibilizar campo visual de pesquisa -->
       <div class="pesquisa-menu">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
 
         <input type="search" placeholder="Pesquisar..." aria-label="Pesquisar">
 
@@ -48,40 +50,49 @@
 
         <!-- Home — Navegação - permitir retorno à página inicial -->
         <a href="#" id="abrir-home" class="item-menu item-menu-ativo">
+          <i class="fa-solid fa-house" aria-hidden="true"></i>
           <span>Home Dev Club</span>
         </a>
 
 
         <!-- TaskFlow — Navegação - acessar ambiente de estudos -->
         <a href="#" id="abrir-taskflow" class="item-menu">
+          <i class="fa-solid fa-cube" aria-hidden="true"></i>
           <span>TaskFlow</span>
         </a>
 
         <a href="#" class="item-menu">
+          <i class="fa-solid fa-server" aria-hidden="true"></i>
           <span>Hostinger</span>
         </a>
 
         <a href="#" class="item-menu">
+          <i class="fa-solid fa-laptop-code" aria-hidden="true"></i>
           <span>DevClub Full Stack</span>
         </a>
 
         <a href="#" class="item-menu">
+          <i class="fa-solid fa-database" aria-hidden="true"></i>
           <span>Data Club</span>
         </a>
 
         <a href="#" class="item-menu">
+          <i class="fa-solid fa-window-maximize" aria-hidden="true"></i>
           <span>Front End Club</span>
         </a>
 
         <a href="#" class="item-menu">
+          <i class="fa-solid fa-robot" aria-hidden="true"></i>
           <span>Gestor de IA</span>
         </a>
 
         <a href="#" class="item-menu">
+          <i class="fa-solid fa-award" aria-hidden="true"></i>
           <span>DevClub ELITE</span>
         </a>
 
         <a href="#" class="item-menu">
+          <i class="fa-solid fa-headset" aria-hidden="true"></i>
           <span>Suporte Humano</span>
         </a>
 
@@ -147,23 +158,20 @@
             <div class="taskflow-boas-vindas">
               <span class="taskflow-identificador">DEVCLUB / TASKFLOW</span>
               <p class="taskflow-saudacao">Boas-vindas ao seu espaço de evolução.</p>
-              <!-- Título e logo — Layout - mantém a identidade à direita antes da descrição -->
-              <div class="taskflow-titulo-logo">
-                <h1 id="titulo-taskflow">Seu próximo passo<br>começa <span>aqui.</span></h1>
-                <div class="taskflow-identidade" aria-hidden="true">
-                  <div class="taskflow-anel"></div>
-                  <img src="./assets/images/TaskCentro.png" alt="">
-                  <span class="taskflow-legenda">APRENDA. EXPERIMENTE. EVOLUA.</span>
-                </div>
+              <!-- Apresentação — Composição - texto acessível e mascote separados do fundo -->
+              <h1 id="titulo-taskflow">Seu próximo<br>passo começa<br><span>aqui.</span></h1>
+              <p class="taskflow-descricao">Um ponto de encontro para seus estudos, suas ideias e seu futuro. Explore os assuntos que fazem parte da sua jornada como dev.</p>
+              <div class="taskflow-acoes">
+                <a class="taskflow-explorar" href="#taskflow-areas">Explore as áreas <span aria-hidden="true">↓</span></a>
+                <!-- Laboratório — Navegação - oferece um acesso próprio ao ambiente de programação -->
+                <a id="abrir-laboratorio" class="taskflow-explorar" href="./pages/studio.html"><i class="fa-solid fa-code" aria-hidden="true"></i> Laboratório TaskFlow <span
+                    aria-hidden="true">↗</span></a>
+                <button id="abrir-agenda" class="agenda-botao agenda-acesso" type="button" aria-haspopup="dialog"><i class="fa-regular fa-calendar-days" aria-hidden="true"></i> Minha
+                  Agenda</button>
               </div>
-              <p class="taskflow-descricao">Um ponto de encontro para seus estudos, suas ideias e seu futuro. Explore os
-                assuntos que fazem parte da sua jornada como dev.</p>
-              <a class="taskflow-explorar" href="#taskflow-areas">Explore as áreas <span aria-hidden="true">↓</span></a>
-              <!-- Laboratório — Navegação - oferece um acesso próprio ao ambiente de programação -->
-              <a id="abrir-laboratorio" class="taskflow-explorar" href="./pages/studio.html">Laboratório TaskFlow <span
-                  aria-hidden="true">↗</span></a>
-              <button id="abrir-agenda" class="agenda-botao agenda-acesso" type="button" aria-haspopup="dialog">Minha
-                Agenda</button>
+            </div>
+            <div class="taskflow-identidade" aria-hidden="true">
+              <img src="./assets/images/mascote-voxel-azul.png" width="500" height="500" alt="">
             </div>
           </header>
           <!-- Áreas de estudo — Estrutura - apresenta os tópicos sem antecipar páginas individuais -->
@@ -184,6 +192,7 @@
                     <h3 id="titulo-frontend">Front-end</h3>
                     <p>Dê forma às suas ideias na web.</p>
                   </div>
+                  <i class="fa-solid fa-window-maximize area-ilustracao" aria-hidden="true"></i>
                 </header>
                 <div class="area-topicos">
                   <a class="topico-taskflow topico-frontend" href="./pages/biblioteca/html.html"
@@ -223,6 +232,7 @@
                     <h3 id="titulo-backend">Back-end</h3>
                     <p>Conheça o que faz tudo acontecer.</p>
                   </div>
+                  <i class="fa-solid fa-server area-ilustracao" aria-hidden="true"></i>
                 </header>
                 <div class="area-topicos">
                   <button class="topico-taskflow topico-backend" type="button" data-categoria="backend"
@@ -270,6 +280,7 @@
                     <h3 id="titulo-mobile">Mobile</h3>
                     <p>Leve suas ideias para outras telas.</p>
                   </div>
+                  <i class="fa-solid fa-mobile-screen-button area-ilustracao" aria-hidden="true"></i>
                 </header>
                 <div class="area-topicos">
                   <button class="topico-taskflow topico-mobile" type="button" data-categoria="mobile"
@@ -301,6 +312,7 @@
                     <h3 id="titulo-carreira">Carreira</h3>
                     <p>Prepare seu próximo passo profissional.</p>
                   </div>
+                  <i class="fa-solid fa-briefcase area-ilustracao" aria-hidden="true"></i>
                 </header>
                 <div class="area-topicos">
                   <button class="topico-taskflow topico-carreira" type="button" data-categoria="carreira"

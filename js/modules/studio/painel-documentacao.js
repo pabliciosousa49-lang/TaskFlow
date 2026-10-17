@@ -1,8 +1,33 @@
 const modelos = {
     html: () => import("../../../data/biblioteca/html/conteudos.js"),
     css: () => import("../../../data/biblioteca/css/conteudos.js"),
-    javascript: () => import("../../../data/biblioteca/javascript/conteudos.js")
+    javascript: () => import("../../../data/biblioteca/javascript/conteudos.js"),
+    typescript: () => import("../../../data/biblioteca/typescript/conteudos.js"),
+    react: () => import("../../../data/biblioteca/react/conteudos.js")
 };
+
+// Somente imagens conhecidas do produto entram no documento, sem liberar rede no iframe.
+const imagensLocais = new Map();
+async function incorporarImagens(doc, paginaURL) {
+    const permitidas = new Map([
+        [new URL("../../../assets/images/TaskCentro.png", import.meta.url).href, "image/png"],
+        ...Object.keys(modelos).map(id => [new URL(`../../../assets/images/biblioteca-${id}.svg`, import.meta.url).href, "image/svg+xml"])
+    ]);
+    await Promise.all(Array.from(doc.querySelectorAll("img[src]"), async imagem => {
+        const url = new URL(imagem.getAttribute("src"), paginaURL).href;
+        imagem.removeAttribute("srcset");
+        if (!permitidas.has(url)) { imagem.removeAttribute("src"); return; }
+        if (!imagensLocais.has(url)) imagensLocais.set(url, (async () => {
+            const resposta = await fetch(url, { credentials: "omit" });
+            if (!resposta.ok) throw new Error("Imagem da documentação indisponível.");
+            const bytes = new Uint8Array(await resposta.arrayBuffer());
+            let binario = "";
+            for (let n = 0; n < bytes.length; n += 8192) binario += String.fromCharCode(...bytes.subarray(n, n + 8192));
+            return `data:${permitidas.get(url)};base64,${btoa(binario)}`;
+        })().catch(erro => { imagensLocais.delete(url); throw erro; }));
+        imagem.setAttribute("src", await imagensLocais.get(url));
+    }));
+}
 
 // Documentação — Integração - reutiliza arquivos reais em um iframe de origem opaca.
 // O script é embutido para ES Modules não dependerem de CORS no iframe isolado.
@@ -14,6 +39,7 @@ async function documentoIsolado(id, conteudos, canal) {
         return resposta.text();
     }));
     const doc = new DOMParser().parseFromString(pagina, "text/html");
+    await incorporarImagens(doc, new URL(recursos[0], import.meta.url));
     doc.querySelectorAll("script, link, base, meta[http-equiv]").forEach((el) => el.remove());
     doc.querySelector(".biblioteca-retorno")?.remove();
     doc.querySelector(".biblioteca-tecnologias")?.remove();
@@ -25,7 +51,7 @@ async function documentoIsolado(id, conteudos, canal) {
     const nonce = Array.from(crypto.getRandomValues(new Uint8Array(16)), (n) => n.toString(16).padStart(2, "0")).join("");
     const politica = doc.createElement("meta");
     politica.httpEquiv = "Content-Security-Policy";
-    politica.content = `default-src 'none'; script-src 'nonce-${nonce}'; style-src 'unsafe-inline'; frame-src about:; img-src 'none'; media-src 'none'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'`;
+    politica.content = `default-src 'none'; script-src 'nonce-${nonce}'; style-src 'unsafe-inline'; frame-src about:; img-src data:; media-src 'none'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'`;
     doc.head.prepend(politica);
     const estilo = doc.createElement("style");
     estilo.textContent = css;
@@ -34,7 +60,7 @@ async function documentoIsolado(id, conteudos, canal) {
     const codigo = doc.createElement("script");
     codigo.type = "module";
     codigo.setAttribute("nonce", nonce);
-    codigo.textContent = `window.addEventListener('keydown', (event) => { if (event.key === 'Escape') { event.preventDefault(); parent.postMessage({tipo:'fechar-documentacao',canal:${JSON.stringify(canal)}}, '*'); } });\n` + script.replace(/import\("\.\.\/\.\.\/data\/biblioteca\/(html|css|javascript)\/conteudos\.js"\)/g,
+    codigo.textContent = `window.addEventListener('keydown', (event) => { if (event.key === 'Escape') { event.preventDefault(); parent.postMessage({tipo:'fechar-documentacao',canal:${JSON.stringify(canal)}}, '*'); } });\n` + script.replace(/import\("\.\.\/\.\.\/data\/biblioteca\/(html|css|javascript|typescript|react)\/conteudos\.js"\)/g,
         (_, tecnologia) => tecnologia === id ? `Promise.resolve({conteudos:${dados}})` : "Promise.reject(new Error('Use a roleta para trocar de tecnologia.'))")
         .replace(/<\/script/gi, "<\\/script");
     doc.head.append(codigo);
@@ -57,7 +83,7 @@ export function criarPainelDocumentacao(dialogo) {
     dialogo.addEventListener("cancel", (event) => { event.preventDefault(); encerrar(); });
     dialogo.addEventListener("click", (event) => { if (event.target === dialogo) encerrar(); });
     window.addEventListener("message", (event) => {
-        if (iframeAtivo && event.source === iframeAtivo.contentWindow && event.data?.tipo === "fechar-documentacao" && event.data.canal === canal) encerrar();
+        if (iframeAtivo && event.origin === "null" && event.source === iframeAtivo.contentWindow && event.data?.tipo === "fechar-documentacao" && event.data.canal === canal) encerrar();
     });
     dialogo.addEventListener("close", () => {
         pedido++; clearTimeout(fechamento); fechamento = undefined; iframeAtivo = undefined;

@@ -43,7 +43,7 @@
   <!-- Studio — Cabeçalho - identifica o ambiente e permite retornar à página principal -->
   <header class="studio-cabecalho">
     <div class="studio-identidade">
-      <img src="../assets/images/devLogo.png" width="40" height="40" alt="">
+      <img src="../assets/images/mascote-voxel-azul.png" width="60" height="60" alt="Mascote TaskFlow">
       <div>
         <span class="studio-marca">TaskFlow <span>Studio</span></span>
         <p id="studio-projeto" hidden></p>
@@ -52,12 +52,12 @@
     <div id="studio-acoes-projeto" class="studio-projeto-acoes" hidden>
       <span id="studio-salvamento" role="status" aria-live="polite"></span>
       <button id="studio-meus-projetos" class="studio-retorno" type="button">Meus projetos</button>
-      <button id="studio-salvar-projeto" class="studio-retorno studio-acao-principal" type="button" disabled>Salvar
+      <button id="studio-salvar-projeto" class="studio-retorno studio-acao-principal" type="button" title="Salvar e retornar a Meus projetos" disabled>Salvar
         projeto</button>
     </div>
     <nav class="studio-navegacao" aria-label="Retorno do Studio">
-      <button id="studio-voltar" class="studio-retorno" type="button">← Voltar</button>
-      <a class="studio-retorno" href="../index.html">Voltar ao TaskFlow</a>
+      <button id="studio-voltar" class="studio-retorno" type="button" title="Voltar à tela anterior do Laboratório">← Voltar</button>
+      <a class="studio-retorno" href="../index.html" title="Sair do Laboratório e abrir a página principal">Voltar ao TaskFlow</a>
     </nav>
   </header>
 
@@ -66,7 +66,7 @@
     <div id="studio-gerenciamento">
       <!-- Projeto — Criação - solicita o título antes de apresentar o ambiente -->
       <section id="studio-inicio" class="studio-inicio" aria-labelledby="titulo-inicio">
-        <span class="studio-etiqueta">SEU LABORATÓRIO DE HTML</span>
+        <span class="studio-etiqueta">SEU LABORATÓRIO WEB</span>
         <h1 id="titulo-inicio">Uma ideia.<br>Seu próximo projeto.</h1>
         <p>Escreva, experimente e veja sua página ganhar forma. Comece dando um nome à sua ideia.</p>
         <form id="studio-formulario">
@@ -93,7 +93,7 @@
       </section>
     </div>
 
-    <!-- Ambiente — Estrutura - reserva os painéis para as próximas fases -->
+    <!-- Ambiente — Layout - reúne edição, experimentação e materiais de apoio -->
     <section id="studio-ambiente" hidden aria-labelledby="titulo-ambiente">
       <div class="studio-contexto">
         <!-- Mentor — Componente - mantém o personagem e a mensagem no topo esquerdo -->
@@ -118,7 +118,7 @@
           <div>
             <span class="studio-etiqueta">ESCREVA. EXPERIMENTE. EVOLUA.</span>
             <h1 id="titulo-ambiente" tabindex="-1">Seu código ganha vida aqui.</h1>
-            <p>Edite à esquerda. Acompanhe o resultado à direita.</p>
+            <p>HTML, CSS e JavaScript. Escreva, execute e investigue o resultado.</p>
           </div>
         </div>
       </div>

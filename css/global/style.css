@@ -10,16 +10,19 @@
 }
 
 :root {
-    --cor-fundo: #080808;
-    --cor-superficie: #111111;
-    --cor-card: #171717;
-    --cor-borda: #292929;
+    --cor-fundo: #050d20;
+    --cor-superficie: #0b182d;
+    --cor-card: #11243d;
+    --cor-borda: #284765;
 
-    --cor-principal: #7c3aed;
-    --cor-principal-hover: #8b5cf6;
+    /* Marca voxel — azul e ciano do mascote, laranja do rastro */
+    --cor-destaque: #6ce5ff;
+    --cor-acento: #ffad5c;
+    --cor-principal: #1260c4;
+    --cor-principal-hover: #166fd0;
 
-    --cor-texto: #f5f5f5;
-    --cor-texto-secundario: #a3a3a3;
+    --cor-texto: #eef7ff;
+    --cor-texto-secundario: #b5c9df;
 
     --cor-sucesso: #22c55e;
     --cor-alerta: #f59e0b;
@@ -29,7 +32,7 @@
     --raio-medio: 10px;
     --raio-grande: 16px;
 
-    --menu-largura: 250px;
+    --menu-largura: clamp(224px, 16vw, 272px);
 }
 
 html {
@@ -72,51 +75,61 @@ a {
 ======================================== */
 
 .menu-lateral {
+    flex: 0 0 var(--menu-largura);
     width: var(--menu-largura);
-    min-height: 100vh;
-    padding: 24px 16px;
-
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 18px 14px;
     display: flex;
     flex-direction: column;
-
-    background-color: var(--cor-superficie);
-    border-right: 1px solid var(--cor-borda);
+    gap: 0;
+    background: linear-gradient(160deg, #071425, #040b17);
+    border: 1px solid #244b72;
+    border-left: 0;
+    border-radius: 0 20px 20px 0;
+    scrollbar-width: thin;
 }
 
 .menu-topo {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
+    gap: 8px;
     min-height: 48px;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
 }
 
 .logo-devclub {
     display: flex;
     align-items: center;
+    gap: 6px;
+    min-width: 0;
 }
 
-/* Logo DevClub — Apresentação - controlar tamanho da logo do menu */
+/* Marca — Apresentação - reutiliza o mascote transparente na sidebar */
 .logo-devclub img {
-    width: 42px;
-    height: 42px;
-
+    flex-shrink: 0;
+    width: 40px;
+    height: 44px;
     display: block;
     object-fit: contain;
 }
 
+.menu-marca { color: var(--cor-texto); font-size: clamp(19px, 1.5vw, 25px); font-weight: 800; letter-spacing: -.8px; white-space: nowrap; }
+.menu-marca > span { color: var(--cor-acento); }
+
 .botao-recolher-menu {
-    width: 32px;
-    height: 32px;
-
-    border: 1px solid var(--cor-borda);
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border: 1px solid #275579;
     border-radius: var(--raio-pequeno);
-
-    background-color: transparent;
-    color: var(--cor-texto-secundario);
-
-    transition: 0.2s;
+    background: #08182b;
+    color: var(--cor-destaque);
+    transition: background-color .18s, border-color .18s, scale .18s;
 }
 
 .botao-recolher-menu:hover {
@@ -125,12 +138,15 @@ a {
 }
 
 .pesquisa-menu {
-    margin-bottom: 24px;
+    position: relative;
+    margin-bottom: 20px;
 }
+
+.pesquisa-menu > i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--cor-destaque); pointer-events: none; }
 
 .pesquisa-menu input {
     width: 100%;
-    padding: 11px 12px;
+    padding: 11px 12px 11px 36px;
 
     border: 1px solid var(--cor-borda);
     border-radius: var(--raio-medio);
@@ -145,6 +161,8 @@ a {
     color: var(--cor-texto-secundario);
 }
 
+:is(.item-menu, .botao-recolher-menu):focus-visible { outline: 2px solid var(--cor-destaque); outline-offset: 2px; }
+
 .pesquisa-menu input:focus {
     border-color: var(--cor-principal);
 }
@@ -153,24 +171,26 @@ a {
     display: flex;
     flex-direction: column;
     gap: 6px;
+    padding-bottom: 20px;
 }
 
 .item-menu {
     display: flex;
     align-items: center;
-
-    min-height: 42px;
-    padding: 0 12px;
-
+    gap: 12px;
+    min-height: 44px;
+    padding: 9px 10px;
+    border: 1px solid transparent;
     border-radius: var(--raio-medio);
-
     color: var(--cor-texto-secundario);
-
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
-
-    transition: 0.2s;
+    transition: background-color .18s, border-color .18s, color .18s, scale .18s;
 }
+
+.item-menu > i { flex: 0 0 24px; width: 24px; color: #78d8ff; font-size: 18px; text-align: center; }
+.item-menu > span { min-width: 0; overflow-wrap: anywhere; }
+.item-menu-ativo > i { color: var(--cor-destaque); }
 
 .item-menu:hover {
     background-color: var(--cor-card);
@@ -178,7 +198,9 @@ a {
 }
 
 .item-menu-ativo {
-    background-color: var(--cor-principal);
+    background: linear-gradient(110deg, #073964, #0b1b37);
+    border-color: #39b9f2;
+    box-shadow: inset 3px 0 #33d2ff, inset -2px 0 #ffad5c, 0 0 10px #1c9de51f;
     color: #ffffff;
 }
 
@@ -299,49 +321,53 @@ a {
 /* Recepção TaskFlow — Visual - estabelece uma apresentação editorial com identidade escura */
 .taskflow-recepcao {
     min-height: 100vh;
-    padding: clamp(24px, 4vw, 64px);
-    background: radial-gradient(ellipse at 85% 10%, rgba(124, 58, 237, .18), transparent 45%), var(--cor-fundo);
+    padding: 22px clamp(20px, 2.6vw, 48px) 40px;
+    /* Cenário único, restrito à recepção para não cobrir a sidebar. */
+    background: linear-gradient(#020a1880, #020a18ba), url("../../assets/images/laboratorio-fundo-voxel.png") center top / cover no-repeat;
 }
 
 .taskflow-apresentacao {
-    max-width: 1200px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, .9fr);
+    align-items: center;
+    gap: clamp(16px, 2vw, 32px);
+    width: 100%;
+    max-width: 1440px;
     margin: 0 auto;
-    display: block;
-    padding: 24px 0 56px;
+    padding: 12px 0 28px;
 }
 
 /* Acessos superiores — Visual - alinha os botões com a identidade atual do TaskFlow */
 .taskflow-acessos {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 8px;
+    gap: 6px;
     width: 100%;
     min-width: 0;
-    max-width: 1200px;
-    margin: 0 auto 24px;
-    padding: 12px;
-    border: 1px solid var(--cor-borda);
-    border-bottom-color: color-mix(in srgb, var(--cor-principal-hover) 35%, var(--cor-borda));
-    border-radius: var(--raio-medio);
-   
+    max-width: 1440px;
+    margin: 0 auto 22px;
+    padding: 5px;
+    border: 1px solid #32618a;
+    border-bottom-color: #99734f;
+    background: #041124ed;
+    border-radius: 12px;
 }
 .taskflow-acesso {
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 10px;
     min-width: 0;
-    min-height: 72px;
-    padding: 10px 6px;
+    min-height: 48px;
+    padding: 8px 6px;
     border: 1px solid transparent;
-    border-radius: var(--raio-pequeno);
+    border-radius: 8px;
     background: transparent;
     color: var(--cor-texto-secundario);
-    font-size: 14px;
+    font-size: 13px;
     line-height: 1.4;
     text-align: center;
-    transition: background-color .18s, border-color .18s, color .18s, scale .18s ease;
+    transition: background-color .18s, border-color .18s, color .18s, scale .18s;
 }
 .taskflow-acesso i { font-size: 21px; }
 .taskflow-acesso:hover, .taskflow-acesso:active {
@@ -352,93 +378,75 @@ a {
 .taskflow-acesso:focus-visible { outline: 2px solid var(--cor-principal-hover); outline-offset: 2px; }
 
 .taskflow-identificador {
-    display: block;
-    color: #b99af8;
-    font-size: px;
+    display: inline-block;
+    color: var(--cor-destaque);
+    font-size: 10px;
     font-weight: 700;
-    letter-spacing: 2px;
+    letter-spacing: 1.5px;
     line-height: 1.6;
 }
 
+.taskflow-boas-vindas { min-width: 0; }
+.taskflow-boas-vindas > .taskflow-identificador { padding: 4px 10px; border: 1px solid #31597b; border-radius: 8px; background: #06162be6; }
+
 .taskflow-saudacao {
-    margin-top: 32px;
+    margin-top: 12px;
     color: var(--cor-texto-secundario);
-    font-size: 14px;
+    font-size: 12px;
     line-height: 1.6;
 }
 
 .taskflow-boas-vindas h1 {
-    margin: 12px 0 20px;
-    font-size: clamp(36px, 4.5vw, 64px);
-    line-height: 1.08;
-    letter-spacing: -2px;
+    margin: 14px 0 18px;
+    font: 900 clamp(32px, 3.3vw, 58px)/1.08 ui-monospace, Consolas, monospace;
+    letter-spacing: -1.8px;
+    text-shadow: 2px 2px 0 #07172c;
 }
 
 .taskflow-boas-vindas h1 span {
-    color: #b99af8;
+    color: var(--cor-acento);
 }
 
 .taskflow-descricao {
-    max-width: 490px;
-    color: var(--cor-texto-secundario);
-    font-size: 16px;
-    line-height: 1.8;
+    max-width: 580px;
+    color: #c4d9ec;
+    font-size: 14px;
+    line-height: 1.65;
 }
 
 .taskflow-explorar {
     display: inline-flex;
     align-items: center;
-    gap: 28px;
-    min-height: 48px;
-    margin-top: 28px;
-    padding: 12px 20px;
-    border: 1px solid var(--cor-principal-hover);
-    border-radius: var(--raio-medio);
-    background: var(--cor-principal);
-    font-size: 14px;
+    justify-content: center;
+    gap: 12px;
+    min-height: 46px;
+    padding: 10px 16px;
+    border: 1px solid #36cfff;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #0d50c6, #087cb1);
+    color: #ffffff;
+    box-shadow: 0 0 10px #078dce26;
+    font-size: 13px;
     font-weight: 700;
-    transition: background-color .2s, scale .18s ease;
+    transition: background-color .18s, border-color .18s, scale .18s;
 }
 
 .taskflow-explorar:hover {
     background: var(--cor-principal-hover);
 }
 
-/* Logo TaskFlow — Layout - alinha a identidade à direita do título no fluxo da apresentação */
-.taskflow-titulo-logo {
-    display: grid;
-    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-    align-items: center;
-    gap: 32px;
-}
-.taskflow-titulo-logo h1 { min-width: 0; }
-.taskflow-identidade {
-    position: relative;
-    min-width: 0;
-    min-height: 0;
-    display: grid;
-    place-items: center;
-}
-
-.taskflow-identidade img {
-    position: relative;
-    width: 100%;
-    max-width: 380px;
-    height: auto;
-    object-fit: contain;
-}
-
-.taskflow-legenda {
-    color: white;
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-align: center;
-    line-height: 1.6;
-}
+/* Apresentação — Integração - o mascote transparente compartilha o cenário com o texto */
+.taskflow-identidade { min-width: 0; display: grid; place-items: center; }
+.taskflow-identidade img { display: block; width: 100%; max-width: 480px; height: auto; object-fit: contain; }
+.taskflow-acoes { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
+.taskflow-acoes > * { flex: 0 1 auto; min-width: 0; max-width: 100%; }
+#abrir-laboratorio { border-color: #ffd181; background: linear-gradient(135deg, #ffb452, #ff8e38); color: #251304; box-shadow: 0 0 10px #ff951e26; }
+.taskflow-acoes .agenda-acesso { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; margin: 0; padding: 10px 16px; border: 1px solid #3e9ac4; border-radius: 8px; background: #081c31; color: #eef7ff; font-size: 13px; }
 
 /* Áreas e tópicos — Visual - organiza o mapa de estudos em grupos identificáveis */
 .taskflow-areas {
-    max-width: 1200px;
+    width: 100%;
+    max-width: 1440px;
     margin: 0 auto;
     scroll-margin-top: 24px;
 }
@@ -448,13 +456,13 @@ a {
     justify-content: space-between;
     align-items: end;
     gap: 24px;
-    padding-top: 28px;
-    border-top: 1px solid var(--cor-borda);
+    padding-top: 22px;
+    border-top: 1px solid #31597b;
 }
 
 .taskflow-areas-cabecalho h2 {
     margin-top: 10px;
-    font-size: clamp(24px, 3vw, 32px);
+    font: 800 clamp(24px, 2.5vw, 32px)/1.25 ui-monospace, Consolas, monospace;
     letter-spacing: -.7px;
 }
 
@@ -468,27 +476,33 @@ a {
 .taskflow-mapa {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
-    margin-top: 28px;
+    gap: 18px;
+    margin-top: 22px;
 }
 
 .area-tecnologia {
     min-width: 0;
-    padding: 24px;
-    border: 1px solid var(--cor-borda);
-    border-radius: var(--raio-grande);
-    background: linear-gradient(135deg, rgba(124, 58, 237, .06), transparent), var(--cor-superficie);
+    padding: clamp(18px, 2vw, 26px);
+    border: 1px solid #35678b;
+    border-radius: 14px;
+    background: linear-gradient(145deg, #0b1b37, #050e20);
+    box-shadow: inset 0 1px #7bd4ff12;
+    transition: border-color .18s, box-shadow .18s, transform .18s;
 }
 
 .area-cabecalho {
     display: flex;
     align-items: start;
-    gap: 16px;
-    margin-bottom: 20px;
+    gap: 12px;
+    margin-bottom: 18px;
 }
 
+.area-cabecalho > div { min-width: 0; }
+.area-ilustracao { margin-left: auto; padding: 12px; border: 1px solid #285382; border-radius: 10px; background: linear-gradient(135deg, #143a71, #09223e); color: #4bd6ff; font-size: 32px; transform: rotate(-6deg); }
+.area-tecnologia:last-child .area-ilustracao { background: #322015; color: #ffad5c; border-color: #8f6036; }
+
 .area-numero {
-    color: #b99af8;
+    color: var(--cor-destaque);
     font-size: 12px;
     line-height: 28px;
 }
@@ -520,7 +534,7 @@ a {
     padding: 10px 12px;
     border: 1px solid var(--cor-borda);
     border-radius: var(--raio-pequeno);
-    background: var(--cor-card);
+    background: #061326;
     color: var(--cor-texto);
     text-align: left;
     transition: border-color .2s, background-color .2s, scale .18s ease;
@@ -528,7 +542,7 @@ a {
 
 .topico-taskflow:hover {
     border-color: var(--cor-principal-hover);
-    background: #24202e;
+    background: #193452;
 }
 
 .topico-icone {
@@ -555,12 +569,12 @@ a {
 
 .taskflow-explorar:focus-visible,
 .topico-taskflow:focus-visible {
-    outline: 2px solid #b99af8;
+    outline: 2px solid var(--cor-destaque);
     outline-offset: 4px;
 }
 
 /* Tópicos — Cores - mantém os grupos compatíveis com suas identidades existentes. */
-.topico-taskflow { --topico-destaque: #c4a0ff; --topico-fundo: #2c203e; }
+.topico-taskflow { --topico-destaque: var(--cor-acento); --topico-fundo: #382517; }
 .topico-backend { --topico-destaque: #8fd69a; --topico-fundo: #182c1d; }
 .topico-mobile { --topico-destaque: #71e6f6; --topico-fundo: #17373e; }
 
@@ -631,6 +645,8 @@ a {
     --agenda-fundo: #15181a;
     --agenda-superficie: #1c2123;
     --agenda-borda: #343c3f;
+    --agenda-roxo-borda: var(--cor-borda);
+    --agenda-roxo-claro: var(--cor-destaque);
     --agenda-verde: var(--cor-sucesso);
     --agenda-verde-fundo: #243127;
     --agenda-verde-borda: var(--cor-sucesso);
@@ -666,7 +682,7 @@ html.agenda-aberta body {
 }
 
 .agenda-painel::backdrop {
-    background: rgba(52, 17, 134, 0.158);
+    background: rgba(5, 13, 32, .158);
 }
 
 .agenda-painel[open],
@@ -1075,14 +1091,6 @@ html.agenda-aberta body {
 
 /* Recepção compacta — Responsividade - adapta o conteúdo sem depender da largura do desktop */
 @media (max-width: 1100px) {
-    .taskflow-titulo-logo {
-        gap: 16px;
-    }
-
-    .taskflow-mapa {
-        grid-template-columns: minmax(0, 1fr);
-    }
-
     .taskflow-areas-cabecalho {
         align-items: start;
         flex-direction: column;
@@ -1091,6 +1099,12 @@ html.agenda-aberta body {
 }
 
 @media (max-width: 768px) {
+    .taskflow-apresentacao { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+    .taskflow-identidade img { width: min(62vw, 280px); }
+    .taskflow-mapa { grid-template-columns: minmax(0, 1fr); }
+    .taskflow-acoes > * { flex: 1 1 150px; }
+    .taskflow-acoes .agenda-acesso { width: 100%; }
+    .area-ilustracao { padding: 10px; font-size: 25px; }
     /* Navegação — Responsividade - mantém cinco acessos em uma linha sem abreviar os nomes */
     .taskflow-acessos {
         grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -1100,6 +1114,7 @@ html.agenda-aberta body {
     }
     .taskflow-acesso {
         padding: 8px 0;
+        flex-direction: column;
         min-height: 60px;
         gap: 6px;
         font-size: clamp(10px, 2.8vw, 12px);
@@ -1108,7 +1123,7 @@ html.agenda-aberta body {
     .taskflow-acesso span { letter-spacing: -.35px; }
     .taskflow-acesso i { font-size: 18px; }
     .taskflow-recepcao {
-        padding: 28px 20px;
+        padding: 18px 14px 28px;
     }
 
     .taskflow-apresentacao {
@@ -1116,7 +1131,7 @@ html.agenda-aberta body {
     }
 
     .taskflow-saudacao {
-        margin-top: 24px;
+        margin-top: 10px;
     }
 
     .taskflow-boas-vindas h1 {
@@ -1125,19 +1140,6 @@ html.agenda-aberta body {
 
     .taskflow-descricao {
         font-size: 14px;
-    }
-
-    /* Logo TaskFlow — Responsividade - reserva espaço ao lado do título mesmo em 320px */
-    .taskflow-titulo-logo {
-        grid-template-columns: minmax(0, 1fr) clamp(80px, 24vw, 120px);
-        gap: 12px;
-    }
-    .taskflow-identidade {
-        width: 100%;
-    }
-
-    .taskflow-identidade img {
-        width: 100%;
     }
 
     .taskflow-boas-vindas,
@@ -1157,7 +1159,7 @@ html.agenda-aberta body {
         width: 100%;
         min-width: 0;
         max-width: 100%;
-        margin: 16px 0 0;
+        margin: 0;
         overflow-wrap: anywhere;
     }
 
@@ -1176,7 +1178,8 @@ html.agenda-aberta body {
 
 /* Movimento reduzido — Acessibilidade - respeita a preferência do dispositivo */
 @media (prefers-reduced-motion: reduce) {
-    .taskflow-acesso { transition: none; }
+    .taskflow-acesso, .area-tecnologia, .item-menu, .botao-recolher-menu { transition: none; }
+    .area-tecnologia:hover { transform: none; }
     html {
         scroll-behavior: auto;
     }
@@ -1222,6 +1225,10 @@ html.agenda-aberta body {
 
     /* Menu — Layout - transformar menu lateral em cabeçalho */
     .menu-lateral {
+        position: static;
+        height: auto;
+        overflow: visible;
+        border-radius: 0;
         width: 100%;
         min-height: auto;
 
@@ -1253,7 +1260,7 @@ html.agenda-aberta body {
 
 
     .pesquisa-menu input {
-        padding: 9px 10px;
+        padding: 9px 10px 9px 36px;
         font-size: 13px;
     }
 
@@ -1422,14 +1429,17 @@ html.agenda-aberta body {
 }
 
 @media (hover: hover) and (pointer: fine) {
+    .area-tecnologia:hover { border-color: #50bfe7; box-shadow: 0 6px 18px #00102255; transform: translateY(-2px); }
+    #abrir-laboratorio:hover { background: #ffc475; border-color: #ffe1a3; }
+    .taskflow-acoes .agenda-acesso:not(:disabled):hover { background: #123858; border-color: #6ce5ff; }
     /* Botões — Hover - crescimento discreto sem deslocar os elementos vizinhos. */
     :is(.botao-recolher-menu, .item-menu, .taskflow-acesso, .taskflow-explorar, .topico-taskflow, .agenda-botao, .agenda-dia):not(:disabled):not([aria-disabled="true"]):hover {
-        scale: 1.035;
+        scale: 1.02;
     }
     .botao-recolher-menu:not(:disabled):hover,
     .item-menu:not(.item-menu-ativo):hover,
     .taskflow-acesso:hover {
-        background-color: #2c203e;
+        background-color: #102d48;
         border-color: var(--cor-principal-hover);
         color: var(--cor-texto);
     }
@@ -1474,6 +1484,7 @@ html.agenda-aberta body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+    .area-tecnologia:hover { transform: none; }
     :is(.botao-recolher-menu, .item-menu, .taskflow-acesso, .taskflow-explorar, .topico-taskflow, .agenda-botao, .agenda-dia) {
         scale: none;
         transition: none;
