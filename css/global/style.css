@@ -489,10 +489,20 @@ a {
     padding: 18px;
     border: 1px solid #35678b;
     border-radius: 14px;
-    background: linear-gradient(145deg, #08142d, #030c1d);
+    background-color: #030c1d;
+    background-image: linear-gradient(90deg, #02091de6, #02091d66), var(--area-imagem, none);
+    background-size: cover;
+    background-position: center, right center;
+    background-repeat: no-repeat;
     box-shadow: 0 0 12px #087ec61c, inset 0 1px #7bd4ff12;
     transition: border-color .18s, box-shadow .18s, transform .18s;
 }
+
+/* Categorias — Fundos - imagens fornecidas na ordem Front-end, Back-end, Mobile e Carreira. */
+.area-tecnologia[aria-labelledby="titulo-frontend"] { --area-imagem: url("../../assets/images/area-frontend-voxel.png"); }
+.area-tecnologia[aria-labelledby="titulo-backend"] { --area-imagem: url("../../assets/images/area-backend-voxel.png"); }
+.area-tecnologia[aria-labelledby="titulo-mobile"] { --area-imagem: url("../../assets/images/area-mobile-voxel.png"); }
+.area-tecnologia[aria-labelledby="titulo-carreira"] { --area-imagem: url("../../assets/images/area-carreira-voxel.png"); }
 
 .area-cabecalho {
     display: grid;
