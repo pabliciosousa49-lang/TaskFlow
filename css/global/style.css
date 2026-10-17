@@ -320,21 +320,19 @@ a {
 
 /* Recepção TaskFlow — Visual - estabelece uma apresentação editorial com identidade escura */
 .taskflow-recepcao {
+    --recepcao-respiro: clamp(20px, 2.6vw, 48px);
     min-height: 100vh;
-    padding: 22px clamp(20px, 2.6vw, 48px) 40px;
+    padding: 22px var(--recepcao-respiro) 40px;
     /* Cenário único, restrito à recepção para não cobrir a sidebar. */
     background: linear-gradient(#020a1880, #020a18ba), url("../../assets/images/laboratorio-fundo-voxel.png") center top / cover no-repeat;
 }
 
 .taskflow-apresentacao {
-    display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, .9fr);
-    align-items: center;
-    gap: clamp(16px, 2vw, 32px);
-    width: 100%;
-    max-width: 1440px;
-    margin: 0 auto;
-    padding: 12px 0 28px;
+    /* Expande até as bordas da área principal, sem avançar sobre a sidebar. */
+    width: calc(100% + var(--recepcao-respiro) + var(--recepcao-respiro));
+    max-width: none;
+    margin-inline: calc(0px - var(--recepcao-respiro));
+    padding: 0 0 28px;
 }
 
 /* Acessos superiores — Visual - alinha os botões com a identidade atual do TaskFlow */
@@ -386,62 +384,65 @@ a {
     line-height: 1.6;
 }
 
+/* Banner — Proporção - preserva integralmente o texto e o mascote da arte original */
 .taskflow-boas-vindas { min-width: 0; }
-.taskflow-boas-vindas > .taskflow-identificador { padding: 4px 10px; border: 1px solid #31597b; border-radius: 8px; background: #06162be6; }
-
-.taskflow-saudacao {
-    margin-top: 12px;
-    color: var(--cor-texto-secundario);
-    font-size: 12px;
-    line-height: 1.6;
-}
-
-.taskflow-boas-vindas h1 {
-    margin: 14px 0 18px;
-    font: 900 clamp(32px, 3.3vw, 58px)/1.08 ui-monospace, Consolas, monospace;
-    letter-spacing: -1.8px;
-    text-shadow: 2px 2px 0 #07172c;
-}
-
-.taskflow-boas-vindas h1 span {
-    color: var(--cor-acento);
-}
-
-.taskflow-descricao {
-    max-width: 580px;
-    color: #c4d9ec;
-    font-size: 14px;
-    line-height: 1.65;
-}
+.taskflow-banner { margin: 0; line-height: 0; }
+.taskflow-banner img { display: block; width: 100%; max-width: 100%; height: auto; }
 
 .taskflow-explorar {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 12px;
-    min-height: 46px;
-    padding: 10px 16px;
-    border: 1px solid #36cfff;
+    min-height: 48px;
+    padding: 12px 20px;
+    border: 1px solid #36d9ff;
     border-radius: 8px;
-    background: linear-gradient(135deg, #0d50c6, #087cb1);
+    background: linear-gradient(135deg, #124fda, #0066b5);
     color: #ffffff;
-    box-shadow: 0 0 10px #078dce26;
-    font-size: 13px;
+    box-shadow: 0 0 14px #008dff55, inset 0 0 8px #28cbff22;
+    font-size: 14px;
     font-weight: 700;
-    transition: background-color .18s, border-color .18s, scale .18s;
+    transition: background-color .18s, border-color .18s, box-shadow .18s, scale .18s;
 }
 
 .taskflow-explorar:hover {
     background: var(--cor-principal-hover);
 }
 
-/* Apresentação — Integração - o mascote transparente compartilha o cenário com o texto */
-.taskflow-identidade { min-width: 0; display: grid; place-items: center; }
-.taskflow-identidade img { display: block; width: 100%; max-width: 480px; height: auto; object-fit: contain; }
-.taskflow-acoes { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
+/* Ações — Iluminação - controles reais alinhados ao início do texto do banner */
+.taskflow-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+    padding-inline: 11.5% 0;
+}
 .taskflow-acoes > * { flex: 0 1 auto; min-width: 0; max-width: 100%; }
-#abrir-laboratorio { border-color: #ffd181; background: linear-gradient(135deg, #ffb452, #ff8e38); color: #251304; box-shadow: 0 0 10px #ff951e26; }
-.taskflow-acoes .agenda-acesso { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; margin: 0; padding: 10px 16px; border: 1px solid #3e9ac4; border-radius: 8px; background: #081c31; color: #eef7ff; font-size: 13px; }
+.taskflow-acoes > :is(a, button):active { box-shadow: inset 0 2px 8px #00102266; }
+#abrir-laboratorio {
+    border-color: #ffd77b;
+    background: linear-gradient(135deg, #ffad35, #ff8526);
+    color: #251304;
+    box-shadow: 0 0 18px #ff951e66, inset 0 0 8px #ffe8ac44;
+}
+.taskflow-acoes .agenda-acesso {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 48px;
+    margin: 0;
+    padding: 12px 20px;
+    border: 1px solid #3bbfe9;
+    border-radius: 8px;
+    background: #06162e;
+    color: #eef7ff;
+    box-shadow: 0 0 9px #1394db33;
+    font-size: 14px;
+    transition: background-color .18s, border-color .18s, box-shadow .18s, scale .18s;
+}
 
 /* Áreas e tópicos — Visual - organiza o mapa de estudos em grupos identificáveis */
 .taskflow-areas {
@@ -475,41 +476,60 @@ a {
 
 .taskflow-mapa {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 18px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 16px;
     margin-top: 22px;
 }
 
 .area-tecnologia {
+    display: flex;
+    flex-direction: column;
     min-width: 0;
-    padding: clamp(18px, 2vw, 26px);
+    padding: 18px;
     border: 1px solid #35678b;
     border-radius: 14px;
-    background: linear-gradient(145deg, #0b1b37, #050e20);
-    box-shadow: inset 0 1px #7bd4ff12;
+    background: linear-gradient(145deg, #08142d, #030c1d);
+    box-shadow: 0 0 12px #087ec61c, inset 0 1px #7bd4ff12;
     transition: border-color .18s, box-shadow .18s, transform .18s;
 }
 
 .area-cabecalho {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 2px 10px;
     align-items: start;
-    gap: 12px;
-    margin-bottom: 18px;
+    margin-bottom: 16px;
 }
 
-.area-cabecalho > div { min-width: 0; }
-.area-ilustracao { margin-left: auto; padding: 12px; border: 1px solid #285382; border-radius: 10px; background: linear-gradient(135deg, #143a71, #09223e); color: #4bd6ff; font-size: 32px; transform: rotate(-6deg); }
+.area-cabecalho > div { grid-column: 1; min-width: 0; }
+.area-ilustracao {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    align-self: center;
+    margin-left: 0;
+    padding: 10px;
+    border: 1px solid #285382;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #143a71, #09223e);
+    color: #4bd6ff;
+    font-size: 30px;
+    transform: rotate(-6deg);
+}
 .area-tecnologia:last-child .area-ilustracao { background: #322015; color: #ffad5c; border-color: #8f6036; }
 
 .area-numero {
+    grid-column: 1;
     color: var(--cor-destaque);
-    font-size: 12px;
-    line-height: 28px;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.5;
 }
 
 .area-cabecalho h3 {
     font-size: 20px;
-    line-height: 28px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
 }
 
 .area-cabecalho p {
@@ -539,6 +559,8 @@ a {
     text-align: left;
     transition: border-color .2s, background-color .2s, scale .18s ease;
 }
+
+.area-topicos .topico-taskflow { gap: 6px; padding: 7px 8px; }
 
 .topico-taskflow:hover {
     border-color: var(--cor-principal-hover);
@@ -589,17 +611,10 @@ a {
 
 /* Entrada da recepção — Animação - apresenta a mensagem antes das áreas sem bloquear a interação */
 .taskflow-entrada .taskflow-boas-vindas,
-.taskflow-entrada .taskflow-identidade,
 .taskflow-entrada .taskflow-areas-cabecalho,
 .taskflow-entrada .area-tecnologia,
 .taskflow-entrada .taskflow-nota {
     animation: entrada-recepcao .55s ease both;
-}
-
-.taskflow-entrada .taskflow-identidade {
-    /* Logo TaskFlow — Animação - apresenta a imagem em 700ms sem movimento contínuo */
-    animation-duration: .7s;
-    animation-delay: .1s;
 }
 
 .taskflow-entrada .taskflow-areas-cabecalho {
@@ -1090,6 +1105,10 @@ html.agenda-aberta body {
 }
 
 /* Recepção compacta — Responsividade - adapta o conteúdo sem depender da largura do desktop */
+@media (max-width: 1399px) {
+    .taskflow-mapa { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 @media (max-width: 1100px) {
     .taskflow-areas-cabecalho {
         align-items: start;
@@ -1099,9 +1118,8 @@ html.agenda-aberta body {
 }
 
 @media (max-width: 768px) {
-    .taskflow-apresentacao { grid-template-columns: minmax(0, 1fr); gap: 18px; }
-    .taskflow-identidade img { width: min(62vw, 280px); }
     .taskflow-mapa { grid-template-columns: minmax(0, 1fr); }
+    .taskflow-acoes { padding-inline: 0; gap: 10px; margin-top: 12px; }
     .taskflow-acoes > * { flex: 1 1 150px; }
     .taskflow-acoes .agenda-acesso { width: 100%; }
     .area-ilustracao { padding: 10px; font-size: 25px; }
@@ -1123,23 +1141,12 @@ html.agenda-aberta body {
     .taskflow-acesso span { letter-spacing: -.35px; }
     .taskflow-acesso i { font-size: 18px; }
     .taskflow-recepcao {
-        padding: 18px 14px 28px;
+        --recepcao-respiro: 14px;
+        padding: 18px var(--recepcao-respiro) 28px;
     }
 
     .taskflow-apresentacao {
         padding: 0 0 28px;
-    }
-
-    .taskflow-saudacao {
-        margin-top: 10px;
-    }
-
-    .taskflow-boas-vindas h1 {
-        letter-spacing: -1px;
-    }
-
-    .taskflow-descricao {
-        font-size: 14px;
     }
 
     .taskflow-boas-vindas,
@@ -1185,8 +1192,7 @@ html.agenda-aberta body {
     }
 
     .taskflow-entrada .taskflow-boas-vindas,
-    .taskflow-entrada .taskflow-identidade,
-    .taskflow-entrada .taskflow-areas-cabecalho,
+        .taskflow-entrada .taskflow-areas-cabecalho,
     .taskflow-entrada .area-tecnologia,
     .taskflow-entrada .taskflow-nota {
         animation: none;
@@ -1430,8 +1436,9 @@ html.agenda-aberta body {
 
 @media (hover: hover) and (pointer: fine) {
     .area-tecnologia:hover { border-color: #50bfe7; box-shadow: 0 6px 18px #00102255; transform: translateY(-2px); }
-    #abrir-laboratorio:hover { background: #ffc475; border-color: #ffe1a3; }
-    .taskflow-acoes .agenda-acesso:not(:disabled):hover { background: #123858; border-color: #6ce5ff; }
+    .taskflow-acoes > #abrir-laboratorio:hover { background: #ffc475; border-color: #ffe1a3; box-shadow: 0 0 23px #ff951e88; }
+    .taskflow-acoes > .taskflow-explorar:not(#abrir-laboratorio):hover { box-shadow: 0 0 20px #008dff77; }
+    .taskflow-acoes .agenda-acesso:not(:disabled):hover { background: #123858; border-color: #6ce5ff; box-shadow: 0 0 14px #1394db55; }
     /* Botões — Hover - crescimento discreto sem deslocar os elementos vizinhos. */
     :is(.botao-recolher-menu, .item-menu, .taskflow-acesso, .taskflow-explorar, .topico-taskflow, .agenda-botao, .agenda-dia):not(:disabled):not([aria-disabled="true"]):hover {
         scale: 1.02;
