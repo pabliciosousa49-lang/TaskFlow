@@ -33,6 +33,15 @@ botaoHome.addEventListener("click", function (event) {
     botaoHome.classList.add("item-menu-ativo");
 });
 
+// Tópicos Front-end — Escuta - destaque visual em memória, sem interferir na navegação.
+const topicosFrontend = document.querySelectorAll(".area-topicos .topico-frontend");
+for (const topico of topicosFrontend) {
+    topico.addEventListener("click", () => {
+        for (const outro of topicosFrontend) outro.classList.remove("topico-selecionado");
+        topico.classList.add("topico-selecionado");
+    });
+}
+
 // Elementos da agenda — Seleção - reúne controles do calendário, formulário e próximos eventos
 const painelAgenda = document.querySelector("#painel-agenda");
 const formularioCompromisso = document.querySelector("#formulario-compromisso");
