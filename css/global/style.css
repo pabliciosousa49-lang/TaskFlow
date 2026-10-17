@@ -109,17 +109,15 @@ a {
     min-width: 0;
 }
 
-/* Marca — Apresentação - reutiliza o mascote transparente na sidebar */
+/* Marca — Apresentação - logo completa fornecida, sem texto duplicado */
 .logo-devclub img {
     flex-shrink: 0;
-    width: 40px;
-    height: 44px;
+    width: 128px;
+    max-width: 100%;
+    height: auto;
     display: block;
     object-fit: contain;
 }
-
-.menu-marca { color: var(--cor-texto); font-size: clamp(19px, 1.5vw, 25px); font-weight: 800; letter-spacing: -.8px; white-space: nowrap; }
-.menu-marca > span { color: var(--cor-acento); }
 
 .botao-recolher-menu {
     flex-shrink: 0;
@@ -321,29 +319,40 @@ a {
 /* Recepção TaskFlow — Visual - estabelece uma apresentação editorial com identidade escura */
 .taskflow-recepcao {
     --recepcao-respiro: clamp(20px, 2.6vw, 48px);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
     min-height: 100vh;
-    padding: 22px var(--recepcao-respiro) 40px;
+    padding: 0 var(--recepcao-respiro) 40px;
     /* Cenário único, restrito à recepção para não cobrir a sidebar. */
     background: linear-gradient(#020a1880, #020a18ba), url("../../assets/images/laboratorio-fundo-voxel.png") center top / cover no-repeat;
 }
 
 .taskflow-apresentacao {
+    grid-column: 1;
+    grid-row: 1;
     /* Expande até as bordas da área principal, sem avançar sobre a sidebar. */
     width: calc(100% + var(--recepcao-respiro) + var(--recepcao-respiro));
     max-width: none;
     margin-inline: calc(0px - var(--recepcao-respiro));
-    padding: 0 0 28px;
+    padding: 0 0 12px;
 }
 
 /* Acessos superiores — Visual - alinha os botões com a identidade atual do TaskFlow */
 .taskflow-acessos {
+    /* Navegação acima da imagem, sem retirar os controles do fluxo. */
+    grid-column: 1;
+    grid-row: 1;
+    align-self: start;
+    position: relative;
+    z-index: 1;
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 6px;
     width: 100%;
     min-width: 0;
     max-width: 1440px;
-    margin: 0 auto 22px;
+    margin: 20px auto 22px;
     padding: 5px;
     border: 1px solid #32618a;
     border-bottom-color: #99734f;
@@ -410,14 +419,16 @@ a {
     background: var(--cor-principal-hover);
 }
 
-/* Ações — Iluminação - controles reais alinhados ao início do texto do banner */
+/* Ações — Sobreposição - controles sobre o piso da arte em telas amplas, antes da divisória */
 .taskflow-acoes {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 12px;
-    margin-top: 8px;
-    padding-inline: 11.5% 0;
+    position: relative;
+    z-index: 1;
+    margin-top: -68px;
+    padding: 0 0 20px 11.5%;
 }
 .taskflow-acoes > * { flex: 0 1 auto; min-width: 0; max-width: 100%; }
 .taskflow-acoes > :is(a, button):active { box-shadow: inset 0 2px 8px #00102266; }
@@ -446,6 +457,8 @@ a {
 
 /* Áreas e tópicos — Visual - organiza o mapa de estudos em grupos identificáveis */
 .taskflow-areas {
+    grid-column: 1;
+    grid-row: 2;
     width: 100%;
     max-width: 1440px;
     margin: 0 auto;
@@ -1120,6 +1133,12 @@ html.agenda-aberta body {
 }
 
 @media (max-width: 1100px) {
+    /* Sem espaço acima do texto da arte, separa a navegação para manter a leitura. */
+    .taskflow-acessos { grid-row: 1; }
+    .taskflow-apresentacao { grid-row: 2; }
+    /* Preserva a leitura da imagem quando os três controles precisam quebrar linha. */
+    .taskflow-acoes { margin-top: 8px; padding-bottom: 0; }
+    .taskflow-areas { grid-row: 3; }
     .taskflow-areas-cabecalho {
         align-items: start;
         flex-direction: column;
@@ -1152,11 +1171,11 @@ html.agenda-aberta body {
     .taskflow-acesso i { font-size: 18px; }
     .taskflow-recepcao {
         --recepcao-respiro: 14px;
-        padding: 18px var(--recepcao-respiro) 28px;
+        padding: 0 var(--recepcao-respiro) 28px;
     }
 
     .taskflow-apresentacao {
-        padding: 0 0 28px;
+        padding: 0 0 12px;
     }
 
     .taskflow-boas-vindas,
@@ -1264,8 +1283,8 @@ html.agenda-aberta body {
 
     /* Logo — Apresentação - reduzir logo no smartphone */
     .logo-devclub img {
-        width: 36px;
-        height: 36px;
+        width: 88px;
+        height: auto;
     }
 
 
