@@ -168,6 +168,7 @@ export function criarExplorador(raiz, acoes) {
     renomear.addEventListener("click", () => {
         const item = itemSelecionado();
         if (!item) return;
+        if (!window.confirm("Renomear pode quebrar links, imports e referências CSS. Os caminhos no código não serão atualizados automaticamente. Continuar?")) return;
         const nome = window.prompt(`Novo nome de ${item.nome}:`, item.nome);
         if (nome !== null) acoes.renomear(item, nome.trim());
     });

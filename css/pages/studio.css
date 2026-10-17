@@ -89,7 +89,7 @@ button:disabled { opacity: .55; cursor: default; }
 .studio-abertura { min-width: 0; }
 .studio-abertura h1 { margin: 6px 0 8px; font-size: clamp(22px, 2.5vw, 30px); letter-spacing: -.8px; line-height: 1.2; }
 .studio-abertura p { color: var(--studio-secundario); font-size: 13px; }
-.studio-paineis { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: start; gap: 16px; }
+.studio-paineis { display: grid; grid-template-columns: minmax(0, var(--studio-fracao-editor, 1.4fr)) minmax(0, 1fr); align-items: start; gap: 16px; }
 .studio-painel { min-width: 0; border: 1px solid var(--studio-borda); border-radius: var(--studio-raio); background: var(--studio-superficie); }
 .studio-painel-cabecalho { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; min-height: 54px; padding: 10px 16px; border-bottom: 1px solid var(--studio-borda); }
 .studio-painel h2 { color: var(--studio-secundario); font-size: 12px; font-weight: 600; }
@@ -259,7 +259,35 @@ body.studio-roleta-aberta .studio-conteudo { padding-right: calc(clamp(320px, ca
 @keyframes studio-documentacao-saida { to { opacity: 0; transform: translateY(6px); } }
 
 /* Studio — Responsividade - adapta proporções e alterna painéis sem recriar o editor */
+/* Ferramentas — MVP - controles locais, console textual e status do documento. */
+.studio-ferramentas { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--studio-borda); }
+.studio-ferramentas label { min-width: 0; font-size: 12px; }
+.studio-ferramentas input:not([type="checkbox"]), .studio-localizar input { display: block; width: 100%; min-width: 0; min-height: 38px; padding: 6px 8px; border: 1px solid var(--studio-borda); border-radius: 5px; background: var(--studio-editor-fundo); color: var(--studio-texto); font: inherit; }
+.studio-ferramentas button, .studio-localizar button, .studio-console button { min-height: 38px; padding: 6px 10px; border: 1px solid var(--studio-borda); border-radius: 5px; background: var(--studio-editor-fundo); color: var(--studio-texto); cursor: pointer; }
+.studio-ferramentas p { flex-basis: 100%; }
+.studio-divisor { display: flex; align-items: center; gap: 10px; margin: 12px 0; font-size: 12px; }
+.studio-divisor input { width: min(220px, 45%); }
+.studio-status-editor { padding: 10px 12px; font: 12px/1.6 Consolas, monospace; overflow-wrap: anywhere; border: 1px solid var(--studio-borda); }
+.studio-console { margin-top: 16px; padding: 12px; border: 1px solid var(--studio-borda); border-radius: 8px; background: var(--studio-editor-fundo); }
+.studio-console summary { min-height: 44px; cursor: pointer; }
+#studio-console-saida { max-height: 240px; overflow: auto; margin: 12px 0 0; padding-left: 28px; font: 12px/1.7 Consolas, monospace; }
+#studio-console-saida li { padding: 4px; white-space: pre-wrap; overflow-wrap: anywhere; }
+#studio-console-saida li[data-nivel="warn"] { color: #f1d487; }
+#studio-console-saida li[data-nivel="error"] { color: #ffaaa6; }
+#studio-console-saida li[data-nivel="info"] { color: #9ccfff; }
+#studio-console-saida button { display: block; font-size: 11px; }
+.studio-localizar { width: min(600px, calc(100% - 32px)); max-height: calc(100dvh - 32px); padding: 20px; border: 1px solid var(--studio-borda); border-radius: 10px; background: var(--studio-editor-fundo); color: var(--studio-texto); }
+.studio-localizar::backdrop { background: #000a; }
+#studio-localizar-resultados { max-height: 50dvh; overflow-y: auto; padding: 0; list-style: none; }
+#studio-localizar-resultados button { width: 100%; margin-block: 4px; text-align: left; overflow-wrap: anywhere; }
+.studio-importacao { display: block; margin-block: 12px; }
+.studio-importacao input { display: block; max-width: 100%; margin-top: 8px; }
+
+@media (min-width: 1101px) {
+    .studio-paineis { grid-template-columns: minmax(240px, var(--studio-fracao-editor, 1.4fr)) minmax(220px, 1fr); }
+}
 @media (max-width: 1100px) {
+    .studio-divisor { display: none; }
     .studio-cabecalho { padding: 16px 24px; }
     .studio-conteudo { padding: 24px; }
     #studio-gerenciamento { grid-template-columns: minmax(260px, 320px) minmax(0, 1fr); gap: 24px; }
@@ -311,6 +339,7 @@ body.studio-roleta-aberta .studio-conteudo { padding-right: calc(clamp(320px, ca
     #studio-roleta-painel { position: absolute; right: 0; bottom: 50px; max-height: calc(100dvh - 90px); }
 }
 @media (pointer: coarse) {
+    .studio-ferramentas button, .studio-localizar button, .studio-console button { min-height: 44px; }
     .explorador-cabecalho-raiz { flex-wrap: wrap; }
     #explorador-raiz { flex-basis: 100%; }
     .explorador-acoes { margin-left: auto; }

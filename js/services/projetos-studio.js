@@ -80,6 +80,41 @@ function gravarProjetos(projetos) {
     }
 }
 
+// Backup — Contrato - somente dados textuais; importação sempre cria outra identidade.
+export const limiteBackupBytes = 2 * 1024 * 1024;
+export function exportarProjeto(id) {
+    const projeto = buscarProjeto(id);
+    if (!projeto) throw new Error("Projeto não encontrado.");
+    const texto = JSON.stringify({ formato: "taskflow.studio.backup", versao: 1, projeto }, null, 2);
+    if (new TextEncoder().encode(texto).length > limiteBackupBytes) throw new Error("O backup excede o limite de 2 MiB.");
+    return texto;
+}
+
+export function importarProjeto(texto) {
+    if (typeof texto !== "string" || new TextEncoder().encode(texto).length > limiteBackupBytes) throw new Error("Selecione um backup JSON de até 2 MiB.");
+    let backup;
+    try { backup = JSON.parse(texto); } catch { throw new Error("O arquivo não contém JSON válido."); }
+    if (backup?.formato !== "taskflow.studio.backup" || backup.versao !== 1 || !Array.isArray(backup.projeto?.arquivos) || backup.projeto.arquivos.length > 1000) throw new Error("Backup incompatível. Limite: 1.000 arquivos e pastas.");
+    validarProjetos([backup.projeto]);
+    const projetos = lerProjetos();
+    const ids = new Set(projetos.flatMap(p => [p.id, ...p.arquivos.map(a => a.id)]));
+    const novoId = () => { const id = criarId(ids); ids.add(id); return id; };
+    const mapa = new Map(backup.projeto.arquivos.map(item => [item.id, novoId()]));
+    const agora = new Date().toISOString();
+    const projeto = {
+        id: novoId(), titulo: backup.projeto.titulo.slice(0, 112) + " (cópia)", linguagem: "html",
+        criadoEm: agora, atualizadoEm: agora, formatoArquivos: 1,
+        arquivoEditorId: mapa.get(backup.projeto.arquivoEditorId) || null,
+        arquivos: backup.projeto.arquivos.map(item => ({
+            id: mapa.get(item.id), nome: item.nome, caminho: item.caminho, tipo: item.tipo,
+            parentId: item.parentId === null ? null : mapa.get(item.parentId),
+            ...(item.tipo === "arquivo" ? { conteudo: item.conteudo } : {})
+        }))
+    };
+    gravarProjetos([...projetos, projeto]);
+    return projeto;
+}
+
 // Persistência — Leitura - migra somente depois de validar todos os registros
 function lerProjetos() {
     let texto;

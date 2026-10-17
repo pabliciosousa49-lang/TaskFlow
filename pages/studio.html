@@ -83,6 +83,8 @@
         <div class="studio-biblioteca-cabecalho">
           <span class="studio-etiqueta">CONTINUE DE ONDE PAROU</span>
           <h2 id="titulo-projetos" tabindex="-1">Meus projetos</h2>
+          <label class="studio-retorno studio-importacao">Restaurar backup JSON <input id="studio-importar-backup" type="file" disabled accept=".json,application/json"></label>
+          <p class="studio-ajuda">Backup textual: até 2 MiB e 1.000 arquivos/pastas. A restauração cria uma cópia.</p>
           <p>Seus projetos ficam neste navegador, prontos para o próximo passo.</p>
         </div>
         <ul id="studio-lista-projetos" class="studio-lista-projetos">
@@ -126,6 +128,7 @@
         <button id="studio-abrir-previa" type="button" aria-controls="studio-previa-painel"
           aria-pressed="false">Pré-visualização</button>
       </div>
+      <label class="studio-divisor">Largura do editor <input id="studio-largura-editor" type="range" min="30" max="75" value="58" step="1"> <output id="studio-largura-valor">58%</output></label>
       <div class="studio-area-trabalho">
         <details id="studio-explorador" class="studio-explorador" open>
           <summary><span>EXPLORADOR</span><span class="explorador-reticencias" aria-hidden="true">⋯</span></summary>
@@ -154,6 +157,17 @@
               <span class="studio-arquivo"><span aria-hidden="true">&lt;/&gt;</span> <span
                   id="studio-nome-arquivo">Nenhum arquivo</span></span>
             </header>
+            <div class="studio-ferramentas">
+              <button id="studio-buscar" class="studio-retorno" type="button">Buscar / substituir</button>
+              <button id="studio-localizar-abrir" class="studio-retorno" type="button">Localizar arquivo</button>
+            </div>
+            <div id="studio-busca" class="studio-ferramentas" hidden>
+              <label>Buscar <input id="studio-busca-texto" type="search" maxlength="500"></label>
+              <label>Substituir por <input id="studio-busca-substituicao" type="text" maxlength="10000"></label>
+              <button id="studio-busca-anterior" type="button">Anterior</button><button id="studio-busca-proximo" type="button">Próxima</button>
+              <button id="studio-substituir" type="button">Substituir</button><button id="studio-substituir-todos" type="button">Substituir todas</button>
+              <button id="studio-busca-fechar" type="button">Fechar busca</button><p id="studio-busca-status" role="status"></p>
+            </div>
             <div id="studio-abas" class="studio-abas" role="group" aria-label="Arquivos abertos"></div>
             <div id="studio-arquivo-aviso" class="studio-reserva">
               <h3 id="studio-arquivo-titulo">Seu projeto começa vazio</h3>
@@ -173,7 +187,7 @@
               <div id="studio-editor" aria-busy="true"></div>
               <p id="studio-editor-ajuda" class="studio-editor-ajuda">Seu código é salvo automaticamente neste
                 navegador. Use Ctrl+Espaço para sugestões; Tab aceita a sugestão e Esc a descarta. Use Esc e depois Tab
-                para sair do editor se a tecla Tab estiver indentando.</p>
+                para sair do editor se a tecla Tab estiver indentando. Ctrl+S/⌘S salva sem sair; Ctrl+F/⌘F busca; Ctrl+P/⌘P localiza arquivos.</p>
             </div>
           </section>
           <section id="studio-previa-painel" class="studio-painel studio-previa-painel" aria-labelledby="titulo-previa">
@@ -182,6 +196,12 @@
               <h2 id="titulo-previa">Pré-visualização</h2>
               <span class="studio-browser-endereco" aria-hidden="true">index.html</span>
             </header>
+            <div class="studio-ferramentas">
+              <button id="studio-atualizar-previa" class="studio-retorno" type="button">Atualizar prévia</button>
+              <label><input id="studio-previa-automatica" type="checkbox" checked> Atualização automática</label>
+              <span id="studio-previa-estado" role="status"></span>
+              <p class="studio-ajuda">Atualizar reinicia o JavaScript da prévia. No modo manual, salvar não reinicia a execução.</p>
+            </div>
             <div id="studio-previa">
               <div id="studio-previa-diagnosticos" class="studio-previa-diagnosticos" role="status" aria-live="polite"
                 hidden></div>
@@ -195,9 +215,22 @@
           </section>
         </div>
       </div>
-
+      <p id="studio-status-editor" class="studio-status-editor">Nenhum arquivo aberto.</p>
+      <details class="studio-console" open>
+        <summary>Console da prévia · últimas 200 mensagens</summary>
+        <button id="studio-console-limpar" class="studio-retorno" type="button">Limpar console</button>
+        <p class="studio-ajuda">Saída textual, sem execução de comandos. Limite de 500 mensagens por execução; logs antigos permanecem até limpar.</p>
+        <ol id="studio-console-saida" aria-label="Mensagens da prévia"></ol>
+      </details>
     </section>
   </main>
+  <dialog id="studio-localizar" class="studio-localizar" aria-labelledby="studio-localizar-titulo">
+    <h2 id="studio-localizar-titulo">Localizar arquivo</h2>
+    <label>Nome ou caminho <input id="studio-localizar-texto" type="search" maxlength="200"></label>
+    <p id="studio-localizar-status" role="status"></p>
+    <ul id="studio-localizar-resultados"></ul>
+    <button id="studio-localizar-fechar" type="button">Fechar</button>
+  </dialog>
       <!-- Tecnologias — Consulta - permanece recolhida para liberar a área de trabalho -->
       <aside id="studio-roleta" class="studio-roleta" hidden aria-label="Materiais de apoio">
         <button id="studio-roleta-alternar" class="studio-retorno" type="button" aria-controls="studio-roleta-painel" aria-expanded="false">Tecnologias ◐</button>

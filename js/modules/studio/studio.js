@@ -27,6 +27,48 @@ let arquivoEditorAbertoId = null;
 let projetoEditorAbertoId = null;
 let trocandoDocumento = false;
 let abasStudio;
+let sessaoStudio, ferramentasStudio, consoleStudio, temporizadorSessao;
+
+function registrarInterface() {
+    if (!projetoAtivo || !editorStudio || abrindoProjeto) return;
+    sessaoStudio?.gravarSessao(projetoAtivo.id, {
+        abas: abasStudio?.ids() || [], ativo: arquivoEditorAbertoId,
+        documentos: componentesStudio?.capturarContextoEditor(editorStudio) || [],
+        painel: document.querySelector("#studio-paineis").dataset.painel,
+        automatica: document.querySelector("#studio-previa-automatica").checked,
+        largura: Number(document.querySelector("#studio-largura-editor").value)
+    });
+}
+function atualizarStatusEditor() {
+    const item = projetoAtivo?.arquivos.find(a => a.id === arquivoEditorAbertoId);
+    const status = document.querySelector("#studio-status-editor");
+    if (!item || !editorStudio) { status.textContent = "Nenhum arquivo aberto."; return; }
+    const pos = editorStudio.state.selection.main.head;
+    const linha = editorStudio.state.doc.lineAt(pos);
+    status.textContent = `${item.caminho} · ${componentesStudio.linguagemArquivo(item.nome)} · Linha ${linha.number}, coluna ${pos - linha.from + 1} · ${estadoSalvamentoStudio.textContent}`;
+    ferramentasStudio?.atualizar();
+}
+function acompanharEditor() {
+    if (trocandoDocumento || abrindoProjeto) return;
+    atualizarStatusEditor(); clearTimeout(temporizadorSessao);
+    temporizadorSessao = setTimeout(registrarInterface, 250);
+}
+function abrirLocalConsole(mensagem) {
+    const item = projetoAtivo?.arquivos.find(a => a.tipo === "arquivo" && a.caminho === mensagem.caminho);
+    if (!item || !selecionarArquivo(item)) return;
+    if (mensagem.linha && mensagem.linha <= editorStudio.state.doc.lines) {
+        const linha = editorStudio.state.doc.line(mensagem.linha);
+        const pos = Math.min(linha.to, linha.from + Math.max(0, (mensagem.coluna || 1) - 1));
+        editorStudio.dispatch({ selection: { anchor: pos }, scrollIntoView: true });
+    }
+    selecionarPainel("editor"); editorStudio.focus();
+}
+function ajustarLargura() {
+    const valor = Math.max(30, Math.min(75, Number(document.querySelector("#studio-largura-editor").value) || 58));
+    document.querySelector("#studio-paineis").style.setProperty("--studio-fracao-editor", `${valor / (100 - valor)}fr`);
+    document.querySelector("#studio-largura-valor").textContent = `${valor}%`;
+    editorStudio?.requestMeasure(); registrarInterface();
+}
 
 function mostrarAviso(mensagem = "") {
     avisoProjetosStudio.textContent = mensagem;
@@ -38,6 +80,7 @@ function indicarSalvamento(estado) {
     estadoSalvamentoStudio.textContent = { salvando: "Salvando...", salvo: "Salvo", erro: "Erro ao salvar" }[estado];
     if (estado === "erro") mentorStudio?.erro();
     abasStudio?.atualizar(projetoAtivo?.arquivos || [], arquivoSelecionadoId, alteracoesPendentes);
+    atualizarStatusEditor();
 }
 
 // Interface — Painéis - alterna a apresentação no mobile sem recriar o documento
@@ -46,6 +89,7 @@ function selecionarPainel(nome) {
     document.querySelector("#studio-abrir-editor").setAttribute("aria-pressed", String(nome === "editor"));
     document.querySelector("#studio-abrir-previa").setAttribute("aria-pressed", String(nome === "previa"));
     if (nome === "editor") editorStudio?.requestMeasure();
+    registrarInterface();
 }
 
 function registrarProjetoAtivo(id) {
@@ -76,7 +120,7 @@ function atualizarListaProjetos() {
             data.textContent = `Atualizado em ${new Date(projeto.atualizadoEm).toLocaleString("pt-BR")}`;
             const acoes = document.createElement("div");
             acoes.className = "studio-lista-acoes";
-            for (const [acao, texto] of [["continuar", "Continuar"], ["renomear", "Renomear"], ["excluir", "Excluir"]]) {
+            for (const [acao, texto] of [["continuar", "Continuar"], ["exportar", "Exportar backup"], ["renomear", "Renomear"], ["excluir", "Excluir"]]) {
                 const botao = document.createElement("button");
                 botao.type = "button";
                 botao.className = "studio-retorno";
@@ -188,7 +232,7 @@ function atualizarApresentacaoArquivo(item) {
 
 // Arquivos — Alternância - confirma o salvamento e restaura o estado do documento escolhido
 function selecionarArquivo(item, primeiraAbertura = false) {
-    if (!projetoAtivo || !salvarProjetoAtual()) return false;
+    if (!projetoAtivo || !item || !salvarProjetoAtual()) return false;
     const atual = projetoAtivo.arquivos.find((entrada) => entrada.id === item.id);
     if (!arquivoEditavel(atual)) return false;
     trocandoDocumento = true;
@@ -207,6 +251,7 @@ function selecionarArquivo(item, primeiraAbertura = false) {
     atualizarPrevia();
     exploradorStudio?.atualizar(projetoAtivo, atual.id, atual.id);
     editorStudio.requestMeasure();
+    atualizarStatusEditor(); registrarInterface();
     return true;
 }
 
@@ -227,6 +272,7 @@ function fecharArquivo(id) {
     atualizarPrevia();
     if (arquivoEditorAbertoId) editorStudio.focus();
     else document.querySelector("#explorador-novo-arquivo").focus();
+    atualizarStatusEditor(); registrarInterface();
 }
 
 // Explorador — Operações - mantém a persistência e o documento aberto coerentes
@@ -294,21 +340,36 @@ async function abrirProjeto(id, novo = false) {
     try {
         componentesStudio = await carregarComponentes();
         const projeto = servicoProjetos.buscarProjeto(id);
+        const sessao = sessaoStudio?.lerSessao(id);
         if (!projeto) throw new Error("O projeto selecionado não foi encontrado.");
         clearTimeout(temporizadorSalvamento);
+        consoleStudio?.limpar();
         previaStudio ||= componentesStudio.criarPreviaHTML(
             document.querySelector("#studio-previa-iframe"), document.querySelector("#studio-previa-vazia"),
-            document.querySelector("#studio-previa-diagnosticos")
+            document.querySelector("#studio-previa-diagnosticos"), {
+                aoMensagem: mensagem => consoleStudio?.adicionar(mensagem),
+                aoEstado: estado => {
+                    document.querySelector("#studio-previa-estado").textContent = estado.pendente ? "Alterações ainda não aplicadas" : "Prévia atualizada";
+                    if (estado.executando) consoleStudio?.adicionar({ nivel: "info", texto: "Nova execução da prévia. O estado JavaScript foi reiniciado." });
+                }
+            }
         );
-        if (!editorStudio) editorStudio = componentesStudio.criarEditorHTML(container, aoAlterarCodigo, { somenteLeitura: true });
+        document.querySelector("#studio-previa-automatica").checked = sessao?.automatica !== false;
+        previaStudio.definirAutomatica(sessao?.automatica !== false);
+        if (!editorStudio) {
+            editorStudio = componentesStudio.criarEditorHTML(container, aoAlterarCodigo, { somenteLeitura: true });
+            componentesStudio.observarEditor(editorStudio, acompanharEditor);
+            editorStudio.scrollDOM.addEventListener("scroll", acompanharEditor, { passive: true });
+        }
         else carregarArquivoNoEditor("", { somenteLeitura: true });
-        componentesStudio.limparDocumentosEditor(editorStudio);
+        componentesStudio.limparDocumentosEditor(editorStudio, sessao?.documentos || []);
         if (!abasStudio) abasStudio = componentesStudio.criarAbas(document.querySelector("#studio-abas"), {
             abrir: (id) => {
                 if (selecionarArquivo(projetoAtivo.arquivos.find((item) => item.id === id))) editorStudio.focus();
             }, fechar: fecharArquivo
         });
         abasStudio.limpar();
+        for (const aberto of sessao?.abas || []) if (projeto.arquivos.some(a => a.id === aberto && a.tipo === "arquivo")) abasStudio.abrir(aberto);
         projetoAtivo = projeto;
         arquivoSelecionadoId = arquivoEditorAbertoId = projetoEditorAbertoId = null;
         codigoSalvo = "";
@@ -326,12 +387,15 @@ async function abrirProjeto(id, novo = false) {
             renomear: (item, nome) => operarEstrutura("renomear", item, nome),
             excluir: (item) => operarEstrutura("excluir", item)
         });
-        const principal = documentoPrincipal() || projeto.arquivos.find((item) => item.tipo === "arquivo");
+        const semAbas = sessao?.existente && sessao.ativo === null && !sessao.abas.length;
+        const principal = semAbas ? null : projeto.arquivos.find(a => a.id === sessao?.ativo && a.tipo === "arquivo") || projeto.arquivos.find(a => a.id === sessao?.abas[0] && a.tipo === "arquivo") || documentoPrincipal() || projeto.arquivos.find(item => item.tipo === "arquivo");
         if (principal) selecionarArquivo(principal);
         else atualizarApresentacaoArquivo(null);
         exploradorStudio.atualizar(projetoAtivo, arquivoSelecionadoId);
         atualizarApresentacaoArquivo(principal);
         atualizarPrevia();
+        selecionarPainel(sessao?.painel || "editor");
+        document.querySelector("#studio-largura-editor").value = String(sessao?.largura || 58); ajustarLargura();
         botaoSalvarStudio.disabled = false;
         indicarSalvamento("salvo");
         registrarProjetoAtivo(projeto.id);
@@ -347,11 +411,13 @@ async function abrirProjeto(id, novo = false) {
     } finally {
         container.setAttribute("aria-busy", "false");
         abrindoProjeto = false;
+        registrarInterface();
     }
 }
 
 function mostrarGerenciamento() {
     if (abrindoProjeto || !salvarProjetoAtual()) return;
+    registrarInterface();
     projetoAtivo = null;
     registrarProjetoAtivo(null);
     document.querySelector("#studio-gerenciamento").hidden = false;
@@ -393,6 +459,13 @@ listaProjetosStudio.addEventListener("click", async (event) => {
     try {
         const projeto = servicoProjetos.buscarProjeto(id);
         if (!projeto) throw new Error("O projeto selecionado não foi encontrado.");
+        if (acao === "exportar") {
+            if (projetoAtivo?.id === id && !salvarProjetoAtual()) return;
+            const url = URL.createObjectURL(new Blob([servicoProjetos.exportarProjeto(id)], { type: "application/json" }));
+            const link = document.createElement("a"); link.href = url; link.download = "taskflow-" + id + ".json";
+            document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+            mostrarAviso("Backup preparado para download."); return;
+        }
         if (acao === "continuar") {
             await abrirProjeto(id);
             return;
@@ -432,9 +505,10 @@ document.querySelector("#studio-editor-repetir").addEventListener("click", () =>
 
 // Saída — Proteção - grava mudanças pendentes antes de ocultar ou sair da página
 document.addEventListener("visibilitychange", () => {
-    if (document.hidden && alteracoesPendentes) salvarProjetoAtual();
+    if (document.hidden) { registrarInterface(); if (alteracoesPendentes) salvarProjetoAtual(); }
 });
 window.addEventListener("beforeunload", (event) => {
+    registrarInterface();
     if (alteracoesPendentes && !salvarProjetoAtual()) {
         event.preventDefault();
         event.returnValue = "";
@@ -443,6 +517,20 @@ window.addEventListener("beforeunload", (event) => {
 
 // Studio — Inicialização - carrega registros sem criar projetos durante uma recarga
 async function iniciarStudio() {
+    try {
+        sessaoStudio = await import("./sessao.js");
+        const { criarConsolePrevia } = await import("./console-previa.js");
+        const { criarFerramentasEditor } = await import("./ferramentas-editor.js");
+        consoleStudio = criarConsolePrevia(document.querySelector("#studio-console-saida"), document.querySelector("#studio-console-limpar"), abrirLocalConsole);
+        ferramentasStudio = criarFerramentasEditor({
+            ativo: () => Boolean(projetoAtivo) && !abrindoProjeto && !criandoProjeto,
+            editor: () => arquivoEditorAbertoId ? editorStudio : null,
+            arquivos: () => projetoAtivo?.arquivos || [],
+            abrir: item => { const aberto = selecionarArquivo(item); if (aberto) { selecionarPainel("editor"); editorStudio.focus(); } return aberto; },
+            salvar: () => { if (salvarProjetoAtual()) { mostrarAviso("Projeto salvo."); registrarInterface(); } },
+            aplicar: (view, changes, selection) => componentesStudio.alterarComHistorico(view, changes, selection)
+        });
+    } catch (erro) { mostrarAviso("Ferramentas auxiliares indisponíveis: " + erro.message); }
     try {
         const { iniciarRoleta } = await import("./roleta.js");
         iniciarRoleta(document.querySelector("#studio-roleta"), document.querySelector("#studio-documentacao"));
@@ -464,6 +552,7 @@ async function iniciarStudio() {
             return;
         }
         botaoCriarStudio.disabled = false;
+        document.querySelector("#studio-importar-backup").disabled = false;
         let id;
         try { id = sessionStorage.getItem(chaveProjetoAtivo); } catch { /* Sessão opcional. */ }
         if (id && servicoProjetos.buscarProjeto(id)) await abrirProjeto(id);
@@ -471,5 +560,19 @@ async function iniciarStudio() {
         mostrarAviso(erro.message);
     }
 }
+
+document.querySelector("#studio-importar-backup").addEventListener("change", async event => {
+    const campo = event.target; const arquivo = campo.files?.[0]; if (!arquivo || !servicoProjetos) return;
+    campo.disabled = true;
+    try {
+        if (arquivo.size > servicoProjetos.limiteBackupBytes) throw new Error("Selecione um backup de até 2 MiB.");
+        const projeto = servicoProjetos.importarProjeto(await arquivo.text());
+        atualizarListaProjetos(); mostrarAviso(`Backup restaurado como “${projeto.titulo}”.`);
+    } catch (erro) { mostrarAviso(erro.message); }
+    finally { campo.disabled = false; campo.value = ""; }
+});
+document.querySelector("#studio-atualizar-previa").addEventListener("click", () => { atualizarPrevia(); previaStudio?.atualizar(); });
+document.querySelector("#studio-previa-automatica").addEventListener("change", event => { previaStudio?.definirAutomatica(event.target.checked); registrarInterface(); });
+document.querySelector("#studio-largura-editor").addEventListener("input", ajustarLargura);
 
 iniciarStudio();

@@ -97,7 +97,7 @@ export function criarRecursosPrevia(arquivos, diagnosticos) {
                     if (ancestrais.has(arquivo.caminho)) throw new Error(`Import CSS circular: ${arquivo.caminho}.`);
                     destino = urlDados(css(arquivo.conteudo, arquivo.caminho, new Set([...ancestrais, arquivo.caminho])), "text/css");
                 } else destino = imagem(referencia, origem);
-            } catch (erro) { diagnosticos.push(erro.message); }
+            } catch (erro) { diagnosticos.push(`${origem}: ${erro.message} (${referencia})`); }
             alteracoes.push({ from: node.from, to: node.to, texto: chamada ? `url("${destino}")` : JSON.stringify(destino) });
         }
         return aplicarAlteracoes(codigo, alteracoes);

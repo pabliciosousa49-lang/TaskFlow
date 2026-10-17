@@ -183,7 +183,7 @@ test("ponte: API explícita, clique e respeito a submit já cancelado", () => {
     const handlers = {}, enviados = [];
     const contexto = vm.createContext({ parent: { postMessage: msg => enviados.push(msg) }, window: {},
         document: { addEventListener: (tipo, fn) => handlers[tipo] = fn },
-        URLSearchParams, FormData, console });
+        URLSearchParams, FormData, console: { ...console } });
     contexto.window.addEventListener = () => {};
     vm.runInContext(codigoNavegacaoPrevia("canal", "pages/login.html?usuario=1#titulo"), contexto);
     contexto.window.TaskFlow.navegar("./dashboard.html");
@@ -267,3 +267,63 @@ for (const codigo of ['@import "./ba\\73 e.css";', '@import url("./ba\\73 e.css"
         assert.equal(erros.length, 0);
     });
 }
+
+test("MVP: preserva dataset, autocomplete e acessibilidade, sem aceitar atributos internos ou inline", async () => {
+    const { api } = await carregar();
+    const { documento } = api.montarDocumentoPrevia('<button data-acao="salvar" data-taskflow-destino="/falso.html" aria-label="Salvar" onclick="alert(1)">Salvar</button><input autocomplete="name" inputmode="text" tabindex="0">', [], 'index.html', 'teste');
+    assert(documento.includes('data-acao="salvar"'));
+    assert(documento.includes('autocomplete="name"'));
+    assert(documento.includes('aria-label="Salvar"'));
+    assert(!documento.includes('data-taskflow-destino="/falso.html"'));
+    assert(!documento.includes('onclick="alert'));
+    assert(documento.includes("script-src-attr 'none'"));
+});
+test("MVP: prévia manual mantém a execução aplicada e usa os dados mais recentes ao atualizar", async () => {
+    const { api, contexto, eventos } = await carregar();
+    const frame = new Elemento('iframe'); frame.contentWindow = {};
+    const estados = [];
+    const previa = api.criarPreviaHTML(frame, new Elemento('div'), new Elemento('div'), { aoEstado: e => estados.push(e) });
+    previa.agendar(arquivos[0].conteudo, arquivos, 'index.html', 'a'); contexto.timer();
+    const inicial = frame.srcdoc;
+    previa.definirAutomatica(false);
+    const novos = arquivos.map(a => a.caminho === 'css/style.css' ? { ...a, conteudo: 'body{color:magenta}' } : a);
+    previa.agendar(arquivos[0].conteudo, novos, 'index.html', 'a');
+    assert.equal(frame.srcdoc, inicial);
+    assert.equal(estados.at(-1).pendente, true);
+    previa.atualizar(); assert(frame.srcdoc.includes('body{color:magenta}'));
+    assert.equal(estados.at(-1).pendente, false);
+    const canal = frame.srcdoc.match(/nonce-([^']+)/)[1];
+    eventos.get('message')({ source: frame.contentWindow, origin: 'null', data: { tipo: 'navegar', referencia: 'pages/login.html', canal } });
+    assert(frame.srcdoc.includes('Login de teste'));
+    previa.agendar(arquivos[0].conteudo, arquivos, 'index.html', 'a'); previa.atualizar();
+    assert(frame.srcdoc.includes('Login de teste'), 'atualizar conserva a página navegada');
+});
+test("MVP: console valida remetente, canal, nível e limites, e resolve localizações conhecidas", async () => {
+    const { api, contexto, eventos } = await carregar();
+    const frame = new Elemento('iframe'); frame.contentWindow = {}; const logs = [];
+    const previa = api.criarPreviaHTML(frame, new Elemento('div'), null, { aoMensagem: m => logs.push(m) });
+    const itens = [{ tipo: 'arquivo', caminho: 'index.html', conteudo: '<script src="app.js"></script>' }, { tipo: 'arquivo', caminho: 'app.js', conteudo: 'console.log(1)' }];
+    previa.agendar(itens[0].conteudo, itens, 'index.html', 'a'); contexto.timer();
+    const canal = frame.srcdoc.match(/nonce-([^']+)/)[1];
+    const enviar = (dados, extra = {}) => eventos.get('message')({ source: frame.contentWindow, origin: 'null', data: { tipo: 'console', canal, nivel: 'log', texto: 'ok', ...dados }, ...extra });
+    enviar({}, { source: {} }); enviar({}, { origin: 'https://outro.test' }); enviar({ canal: 'antigo' });
+    enviar({ nivel: 'eval' }); enviar({ texto: 'x'.repeat(4097) }); assert.equal(logs.length, 0);
+    enviar({ origem: 'taskflow:/app.js', linha: 1, coluna: 2 }); assert.equal(logs[0].caminho, 'app.js'); assert.equal(logs[0].linha, 1);
+    enviar({ origem: 'taskflow:/fora.js', linha: -1 }); assert.equal(logs[1].caminho, undefined); assert.equal(logs[1].linha, undefined);
+    for (let i = 0; i < 600; i++) enviar({});
+    assert(logs.length <= 500);
+});
+test("MVP: ponte serializa circular, BigInt e getters sem executar getters", () => {
+    const enviados = [], handlers = {}; let lido = false;
+    const contexto = vm.createContext({ parent: { postMessage: msg => enviados.push(msg) }, window: { addEventListener: (tipo, fn) => handlers[tipo] = fn }, document: { addEventListener() {} }, console: { log() {}, info() {}, warn() {}, error() {} } });
+    vm.runInContext(codigoNavegacaoPrevia('teste', 'index.html'), contexto);
+    const circular = { n: 1n }; circular.circular = circular;
+    Object.defineProperty(circular, 'segredo', { enumerable: true, get() { lido = true; throw new Error('não ler'); } });
+    contexto.console.log(circular);
+    assert.equal(lido, false); assert(enviados[0].texto.includes('[Circular]')); assert(enviados[0].texto.includes('[Getter]'));
+    handlers.error({ message: 'Falha', filename: 'data:text/javascript;base64,eA==#taskflow%3A%2Fapp.js', lineno: 2, colno: 3 });
+    assert.equal(enviados.at(-1).origem, 'taskflow:/app.js');
+    handlers.unhandledrejection({ reason: new Error('Promise rejeitada') }); assert.equal(enviados.at(-1).nivel, 'error');
+    for (let i = 0; i < 600; i++) contexto.console.log('x'.repeat(6000));
+    assert(enviados.length <= 500); assert(enviados.every(e => e.texto.length <= 4096));
+});

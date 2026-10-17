@@ -10,18 +10,32 @@ export function iniciarRoleta(raiz, dialogo) {
     const movimento = window.matchMedia("(prefers-reduced-motion: reduce)");
     const passo = 360 / tecnologias.length;
     let angulo = 0, quadro = 0, ponteiro, ultimo = 0, instante = 0, velocidade = 0, arrastou = false, ignorarClique = false;
+    let limiteGesto;
+    // Recorte fixo em porcentagens: durante o giro, apenas transform é atualizado.
+    const metade = passo * .47;
+    const pontos = [];
+    const ponto = (raio, graus) => {
+        const rad = graus * Math.PI / 180;
+        return `${50 - raio * Math.cos(rad)}% ${50 + raio * Math.sin(rad)}%`;
+    };
+    for (let n = 0; n <= 8; n++) pontos.push(ponto(49.2, -metade + 2 * metade * n / 8));
+    for (let n = 8; n >= 0; n--) pontos.push(ponto(28, -metade + 2 * metade * n / 8));
     const normalizar = (valor) => ((valor + 180) % 360 + 360) % 360 - 180;
     const ativo = () => ((Math.round(-angulo / passo) % tecnologias.length) + tecnologias.length) % tecnologias.length;
     const botoes = tecnologias.map((tecnologia, indice) => {
         const botao = document.createElement("button");
         botao.type = "button";
         botao.className = "studio-roleta-tecnologia";
+        botao.style.clipPath = `polygon(${pontos.join(",")})`;
         botao.dataset.tecnologia = tecnologia.id;
         botao.setAttribute("aria-label", `${tecnologia.nome} — ${tecnologia.grupo}: abrir documentação`);
         botao.setAttribute("aria-describedby", "studio-roleta-ajuda");
         botao.title = `${tecnologia.nome} — ${tecnologia.grupo}`;
         const conteudo = document.createElement("span");
         conteudo.className = "studio-roleta-rotulo";
+        conteudo.style.left = "11.5%";
+        conteudo.style.top = "50%";
+        conteudo.style.transform = "translate(-50%, -50%)";
         const icone = document.createElement("i");
         icone.className = `${tecnologia.icone} studio-roleta-icone`;
         icone.setAttribute("aria-hidden", "true");
@@ -36,26 +50,9 @@ export function iniciarRoleta(raiz, dialogo) {
     });
     function renderizar() {
         const selecionado = ativo();
-        const tamanho = circulo.getBoundingClientRect().width || 480;
-        const centro = tamanho / 2;
-        const interno = tamanho * .28, externo = tamanho * .492, raioRotulo = tamanho * .385;
-        const ponto = (raio, graus) => {
-            const rad = graus * Math.PI / 180;
-            return `${(centro - raio * Math.cos(rad)).toFixed(2)}px ${(centro + raio * Math.sin(rad)).toFixed(2)}px`;
-        };
         botoes.forEach((botao, indice) => {
             const theta = normalizar(angulo + indice * passo);
-            const rad = theta * Math.PI / 180;
-            // Setor anular: arcos interno/externo e intervalo entre tecnologias.
-            const metade = passo * .47;
-            const pontos = [];
-            for (let n = 0; n <= 8; n++) pontos.push(ponto(externo, theta - metade + 2 * metade * n / 8));
-            for (let n = 8; n >= 0; n--) pontos.push(ponto(interno, theta - metade + 2 * metade * n / 8));
-            botao.style.clipPath = `polygon(${pontos.join(",")})`;
-            const rotulo = botao.querySelector(".studio-roleta-rotulo");
-            rotulo.style.left = `${centro - raioRotulo * Math.cos(rad)}px`;
-            rotulo.style.top = `${centro + raioRotulo * Math.sin(rad)}px`;
-            rotulo.style.transform = `translate(-50%, -50%) rotate(${-theta}deg)`;
+            botao.style.transform = `rotate(${-theta}deg)`;
             // A entrada/saída visual depende somente do recorte do contêiner.
             // Os setores fora do semicírculo são omitidos apenas da árvore acessível.
             botao.setAttribute("aria-hidden", String(Math.abs(theta) > 90 + metade));
@@ -83,7 +80,7 @@ export function iniciarRoleta(raiz, dialogo) {
         quadro = requestAnimationFrame(animar);
     }
     function recolher() {
-        parar(); painel.hidden = true;
+        parar(); ponteiro = undefined; velocidade = 0; painel.hidden = true;
         alternar.setAttribute("aria-expanded", "false");
         alternar.textContent = "Tecnologias ◐";
         document.body.classList.remove("studio-roleta-aberta");
@@ -100,12 +97,14 @@ export function iniciarRoleta(raiz, dialogo) {
         } else if (event.key === "Escape") { recolher(); alternar.focus(); }
     });
     function posicao(event) {
-        const rect = circulo.getBoundingClientRect();
+        const rect = limiteGesto;
         const centro = rect.width / 2;
         return Math.atan2(event.clientY - rect.top - centro, centro - (event.clientX - rect.left)) * 180 / Math.PI;
     }
     circulo.addEventListener("pointerdown", (event) => {
         if (!event.isPrimary || (event.pointerType === "mouse" && event.button !== 0)) return;
+        if (ponteiro !== undefined) return;
+        limiteGesto = circulo.getBoundingClientRect();
         parar(); ponteiro = event.pointerId; ultimo = posicao(event); instante = event.timeStamp; velocidade = 0; arrastou = false; ignorarClique = false;
     });
     circulo.addEventListener("pointermove", (event) => {
@@ -117,14 +116,17 @@ export function iniciarRoleta(raiz, dialogo) {
         angulo += diferenca;
         velocidade = Math.max(-.8, Math.min(.8, diferenca / Math.max(1, event.timeStamp - instante)));
         ultimo = atual; instante = event.timeStamp;
-        renderizar();
+        // Agrupa eventos rápidos de toque em uma única atualização por quadro.
+        if (!quadro) quadro = requestAnimationFrame(() => { quadro = 0; renderizar(); });
     });
     function soltar(event) {
         if (event.pointerId !== ponteiro) return;
+        parar();
         ponteiro = undefined;
         ignorarClique = arrastou;
         if (!arrastou) return;
         if (movimento.matches || event.type === "pointercancel") { alinhar(); return; }
+        if (event.timeStamp - instante > 80) velocidade = 0;
         let anterior = performance.now();
         function desacelerar(agora) {
             const dt = Math.min(32, agora - anterior); anterior = agora;
@@ -136,10 +138,10 @@ export function iniciarRoleta(raiz, dialogo) {
         }
         quadro = requestAnimationFrame(desacelerar);
     }
-    circulo.addEventListener("pointerup", soltar);
-    circulo.addEventListener("pointercancel", soltar);
+    window.addEventListener("pointerup", soltar);
+    window.addEventListener("pointercancel", soltar);
     circulo.addEventListener("lostpointercapture", (event) => {
-        if (event.pointerId === ponteiro) { ponteiro = undefined; alinhar(); }
+        if (event.pointerId === ponteiro) { ignorarClique = arrastou; ponteiro = undefined; velocidade = 0; alinhar(); }
     });
     circulo.addEventListener("click", (event) => {
         if (ignorarClique && event.detail) { event.preventDefault(); event.stopImmediatePropagation(); ignorarClique = false; }

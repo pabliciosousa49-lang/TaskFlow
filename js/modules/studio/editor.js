@@ -1,6 +1,6 @@
 import { EditorState } from "@codemirror/state";
 import { EditorView, keymap, lineNumbers, highlightActiveLine, highlightActiveLineGutter, drawSelection } from "@codemirror/view";
-import { history, historyKeymap, defaultKeymap, indentWithTab } from "@codemirror/commands";
+import { history, historyKeymap, defaultKeymap, indentWithTab, isolateHistory } from "@codemirror/commands";
 import { indentOnInput, indentUnit, syntaxHighlighting, HighlightStyle } from "@codemirror/language";
 import { html } from "@codemirror/lang-html";
 import { css } from "@codemirror/lang-css";
@@ -13,6 +13,11 @@ import { criarSugestoesInline } from "./sugestoes-inline.js";
 import { criarFormatacao } from "./formatacao.js";
 export { atualizarContextoCaminhos } from "./autocompletar.js";
 export { criarEstruturaInicialHTML } from "./documento-html.js";
+const observadores = new WeakMap();
+export function observarEditor(editor, callback) { observadores.set(editor, callback); }
+export function alterarComHistorico(editor, changes, selection) {
+    editor.dispatch({ changes, selection, annotations: isolateHistory.of("full"), scrollIntoView: true });
+}
 
 // Editor — Aparência - distingue tags, atributos e valores no tema escuro
 const coresHTML = HighlightStyle.define([
@@ -80,6 +85,7 @@ function criarEstadoHTML(codigo, cursor, aoAlterarCodigo, somenteLeitura, lingua
                 temaEditor,
                 linguagem === "html" ? criarValidacaoHTML() : [],
                 EditorView.updateListener.of((atualizacao) => {
+                    if (atualizacao.docChanged || atualizacao.selectionSet) observadores.get(atualizacao.view)?.(atualizacao.view);
                     if (atualizacao.docChanged) {
                         aoAlterarCodigo(atualizacao.state.doc.toString());
                     }
@@ -102,8 +108,8 @@ export function linguagemArquivo(nome) {
 // Documentos — Estado - conserva histórico, cursor e rolagem por arquivo na mesma view
 const documentos = new WeakMap();
 
-export function limparDocumentosEditor(editor) {
-    documentos.set(editor, { ativo: null, arquivos: new Map() });
+export function limparDocumentosEditor(editor, posicoes = []) {
+    documentos.set(editor, { ativo: null, arquivos: new Map(), posicoes: new Map(posicoes.map(p => [p.id, p])) });
 }
 
 export function abrirDocumentoEditor(editor, item, aoAlterarCodigo, posicaoCursor = 0) {
@@ -118,8 +124,9 @@ export function abrirDocumentoEditor(editor, item, aoAlterarCodigo, posicaoCurso
     const linguagem = linguagemArquivo(item.nome);
     let documento = memoria.arquivos.get(item.id);
     if (!documento || documento.linguagem !== linguagem || documento.estado.doc.toString() !== item.conteudo) {
-        const cursor = documento?.estado.selection.main.head ?? posicaoCursor;
-        documento = { linguagem, estado: criarEstadoHTML(item.conteudo, Math.min(cursor, item.conteudo.length), aoAlterarCodigo, false, linguagem), top: documento?.top || 0, left: documento?.left || 0 };
+        const salvo = memoria.posicoes.get(item.id);
+        const cursor = documento?.estado.selection.main.head ?? salvo?.cursor ?? posicaoCursor;
+        documento = { linguagem, estado: criarEstadoHTML(item.conteudo, Math.min(cursor, item.conteudo.length), aoAlterarCodigo, false, linguagem), top: documento?.top ?? salvo?.top ?? 0, left: documento?.left ?? salvo?.left ?? 0 };
         memoria.arquivos.set(item.id, documento);
     }
     if (memoria.ativo !== item.id || editor.state !== documento.estado) {
@@ -138,4 +145,13 @@ export function descartarDocumentoEditor(editor, id) {
     const memoria = documentos.get(editor);
     memoria?.arquivos.delete(id);
     if (memoria?.ativo === id) memoria.ativo = null;
+}
+
+export function capturarContextoEditor(editor) {
+    const memoria = documentos.get(editor);
+    if (!memoria) return [];
+    const posicoes = new Map(memoria.posicoes);
+    for (const [id, item] of memoria.arquivos) posicoes.set(id, { id, cursor: item.estado.selection.main.head, top: item.top, left: item.left });
+    if (memoria.ativo) posicoes.set(memoria.ativo, { id: memoria.ativo, cursor: editor.state.selection.main.head, top: editor.scrollDOM.scrollTop, left: editor.scrollDOM.scrollLeft });
+    return [...posicoes.values()];
 }
