@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CSS | Biblioteca Técnica TaskFlow</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
   <link rel="stylesheet" href="../../css/biblioteca/biblioteca.css">
   <script type="module" src="../../js/biblioteca/biblioteca.js"></script>
 </head>
@@ -11,17 +12,54 @@
   <a class="biblioteca-pular" href="#biblioteca-leitura">Ir para o conteúdo</a>
   <header class="biblioteca-cabecalho">
     <div class="biblioteca-identidade">
-      <span class="biblioteca-simbolo" aria-hidden="true">&lt;/&gt;</span>
-      <div><strong>TaskFlow</strong><p>Biblioteca Técnica</p></div>
+      <img class="biblioteca-logo-taskflow" src="../../assets/images/TaskCentro.png" alt="TaskFlow" width="1536" height="1024">
+      <p>Biblioteca Técnica</p>
     </div>
     <span class="biblioteca-tecnologia" data-identidade="css">CSS</span>
     <button id="biblioteca-pesquisar" class="biblioteca-pesquisa-botao" type="button" aria-haspopup="dialog" aria-controls="biblioteca-pesquisa" disabled>Pesquisar</button>
     <a class="biblioteca-retorno" href="../../index.html">← Voltar ao TaskFlow</a>
   </header>
-  <nav class="biblioteca-tecnologias" aria-label="Tecnologias da Biblioteca">
-    <a href="./html.html" data-tecnologia-link="html">HTML</a>
-    <a href="./css.html" data-tecnologia-link="css" aria-current="page">CSS</a>
-    <a href="./javascript.html" data-tecnologia-link="javascript">JavaScript</a>
+  <section class="biblioteca-apresentacao" aria-label="Biblioteca de CSS">
+    <div>
+      <span class="biblioteca-etiqueta">BIBLIOTECA TÉCNICA / CSS</span>
+      <strong>Dê forma às suas ideias.</strong>
+      <p>Cores, espaçamentos e layouts: explore os estilos que transformam a apresentação da web.</p>
+    </div>
+    <img src="../../assets/images/biblioteca-css.svg" alt="Logo CSS3" width="128" height="128">
+  </section>
+  <nav class="biblioteca-tecnologias biblioteca-catalogo" aria-label="Tecnologias da Biblioteca">
+    <section class="biblioteca-tecnologias-grupo" aria-labelledby="biblioteca-area-frontend">
+      <h2 id="biblioteca-area-frontend">Front-end</h2>
+      <div class="biblioteca-tecnologias-itens">
+        <a href="./html.html" data-tecnologia-link="html"><i class="devicon-html5-plain colored topico-icone" aria-hidden="true"></i><span>HTML</span></a>
+        <a href="./css.html" data-tecnologia-link="css" aria-current="page"><i class="devicon-css3-plain colored topico-icone" aria-hidden="true"></i><span>CSS</span></a>
+        <a href="./javascript.html" data-tecnologia-link="javascript"><i class="devicon-javascript-plain colored topico-icone" aria-hidden="true"></i><span>JavaScript</span></a>
+        <button type="button" disabled title="Conteúdo em preparação"><i class="devicon-typescript-plain colored topico-icone" aria-hidden="true"></i><span>TypeScript</span></button>
+        <button type="button" disabled title="Conteúdo em preparação"><i class="devicon-react-plain colored topico-icone" aria-hidden="true"></i><span>React</span></button>
+        <button type="button" disabled title="Conteúdo em preparação"><i class="devicon-vitejs-plain colored topico-icone" aria-hidden="true"></i><span>Vite</span></button>
+      </div>
+    </section>
+    <section class="biblioteca-tecnologias-grupo" aria-labelledby="biblioteca-area-backend">
+      <h2 id="biblioteca-area-backend">Back-end</h2>
+      <div class="biblioteca-tecnologias-itens">
+        <button type="button" disabled title="Conteúdo em preparação"><i class="devicon-nodejs-plain colored topico-icone" aria-hidden="true"></i><span>Node</span></button>
+        <button type="button" disabled title="Conteúdo em preparação"><i class="devicon-express-plain colored topico-icone" aria-hidden="true"></i><span>Express</span></button>
+        <button type="button" disabled title="Conteúdo em preparação"><i class="devicon-fastify-plain colored topico-icone" aria-hidden="true"></i><span>Fastify</span></button>
+        <button type="button" disabled title="Conteúdo em preparação"><i class="devicon-prisma-plain colored topico-icone" aria-hidden="true"></i><span>Prisma</span></button>
+        <button type="button" disabled title="Conteúdo em preparação"><i class="devicon-postgresql-plain colored topico-icone" aria-hidden="true"></i><span>PostgreSQL</span></button>
+        <button type="button" disabled title="Conteúdo em preparação"><i class="devicon-mongodb-plain colored topico-icone" aria-hidden="true"></i><span>MongoDB</span></button>
+        <button type="button" disabled title="Conteúdo em preparação"><i class="devicon-docker-plain colored topico-icone" aria-hidden="true"></i><span>Docker</span></button>
+      </div>
+    </section>
+    <section class="biblioteca-tecnologias-grupo" aria-labelledby="biblioteca-area-mobile">
+      <h2 id="biblioteca-area-mobile">Mobile</h2>
+      <div class="biblioteca-tecnologias-itens">
+        <button type="button" disabled title="Conteúdo em preparação"><i class="devicon-react-plain colored topico-icone" aria-hidden="true"></i><span>React Native</span></button>
+        <button type="button" disabled title="Conteúdo em preparação"><i class="devicon-expo-plain colored topico-icone" aria-hidden="true"></i><span>Expo</span></button>
+        <button type="button" disabled title="Conteúdo em preparação"><i class="devicon-android-plain colored topico-icone" aria-hidden="true"></i><span>Android</span></button>
+        <button type="button" disabled title="Conteúdo em preparação"><i class="devicon-ios-plain colored topico-icone" aria-hidden="true"></i><span>iOS</span></button>
+      </div>
+    </section>
   </nav>
   <dialog id="biblioteca-pesquisa" class="biblioteca-pesquisa" aria-labelledby="biblioteca-pesquisa-titulo">
     <div class="biblioteca-pesquisa-cabecalho">

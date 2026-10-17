@@ -559,6 +559,27 @@ a {
     outline-offset: 4px;
 }
 
+/* Biblioteca — Acessos - identifica HTML e CSS sem alterar os demais tópicos. */
+.topico-taskflow[data-topico="html"] {
+    --topico-destaque: #ffad83;
+    border-color: #70412b;
+    background: linear-gradient(135deg, #2b1b14, var(--cor-card));
+}
+
+.topico-taskflow[data-topico="css"] {
+    --topico-destaque: #86c7ff;
+    border-color: #345a7c;
+    background: linear-gradient(135deg, #142539, var(--cor-card));
+}
+
+.topico-taskflow:is([data-topico="html"], [data-topico="css"]):hover {
+    border-color: var(--topico-destaque);
+}
+
+.topico-taskflow:is([data-topico="html"], [data-topico="css"]):focus-visible {
+    outline-color: var(--topico-destaque);
+}
+
 /* Entrada da recepção — Animação - apresenta a mensagem antes das áreas sem bloquear a interação */
 .taskflow-entrada .taskflow-boas-vindas,
 .taskflow-entrada .taskflow-identidade,
