@@ -355,8 +355,8 @@ function selecionarAssunto(indice, focar = true) {
     if (focar) {
         menuAberto = false;
         atualizarMenu();
-        if (documentacaoHTML) {
-            // HTML — Leitura - retorna ao título sem deslocar a rolagem interna do guia.
+        if (documentacaoHTML || documentacaoCSS) {
+            // HTML/CSS — Leitura - retorna ao título sem deslocar a rolagem interna do guia.
             const posicaoMenu = menu.scrollTop;
             leitura.focus({ preventScroll: true });
             if (mudouAssunto) {

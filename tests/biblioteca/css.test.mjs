@@ -153,8 +153,8 @@ test("HTML conserva a sequência de leitura e não recebe componentes exclusivos
 });
 
 
-test("HTML: troca de tópico reposiciona leitura, preserva menu e mantém um único ativo", () => {
-    const { api, elementos } = iniciar("html");
+for (const linguagem of ["html", "css"]) test(`${linguagem}: troca de tópico reposiciona leitura, preserva menu e mantém um único ativo`, () => {
+    const { api, elementos } = iniciar(linguagem);
     const leitura = elementos["#biblioteca-leitura"], menu = elementos["#biblioteca-menu"];
     api.selecionarAssunto(0, false);
     leitura.scrollTop = 500; menu.scrollTop = 170;
@@ -169,12 +169,26 @@ test("HTML: troca de tópico reposiciona leitura, preserva menu e mantém um ún
     assert.equal(leitura.scrollTop, 200); assert.equal(leitura.rolagens, rolagens);
 });
 
-test("HTML: carga inicial não força rolagem; CSS mantém comportamento anterior", () => {
-    const h = iniciar('html'), c = iniciar('css');
+test("carga inicial não força rolagem; JavaScript mantém comportamento anterior", () => {
+    const h = iniciar('html'), c = iniciar('javascript');
     h.api.selecionarAssunto(0, false);
     assert.equal(h.elementos['#biblioteca-leitura'].rolagens, undefined);
     c.elementos['#biblioteca-leitura'].scrollTop = 380;
     c.api.selecionarAssunto(1);
     assert.equal(c.elementos['#biblioteca-leitura'].scrollTop, 380);
     assert.equal(c.elementos['#biblioteca-leitura'].rolagens, undefined);
+});
+
+
+test("CSS: anterior e próximo retornam ao início sem fechar o módulo selecionado", () => {
+    const { api, elementos, nav } = iniciar('css');
+    api.selecionarAssunto(0, false);
+    const leitura = elementos['#biblioteca-leitura'], menu = elementos['#biblioteca-menu'];
+    menu.scrollTop = 120; leitura.scrollTop = 650;
+    nav.children[1].disparar('click');
+    assert.equal(leitura.scrollTop, 0); assert.equal(menu.scrollTop, 120);
+    assert(elementos['#biblioteca-niveis'].querySelectorAll('details').some(d => d.open));
+    leitura.scrollTop = 350;
+    nav.children[0].disparar('click');
+    assert.equal(leitura.scrollTop, 0); assert.equal(leitura.rolagens, 2);
 });

@@ -369,7 +369,7 @@ body.biblioteca-react::after { background-image: url("data:image/svg+xml,%3Csvg%
 .biblioteca-fonte { display: inline-flex; align-items: center; min-height: 44px; margin-top: 24px; color: var(--biblioteca-foco); text-decoration: underline; text-underline-offset: 4px; }
 
 /* Biblioteca — Responsividade - mantém menu recolhível e blocos dentro da largura */
-/* Biblioteca HTML — Identidade voxel - escopo exclusivo, sem alterar as demais linguagens. */
+/* Bibliotecas HTML/CSS — Identidade voxel - composição compartilhada, paletas específicas. */
 body.biblioteca-html {
     --biblioteca-fundo: #030e22;
     --biblioteca-superficie: #071a32;
@@ -388,17 +388,17 @@ body.biblioteca-html {
     --biblioteca-barra: #0a213b;
     background: var(--biblioteca-fundo);
 }
-body.biblioteca-html::before {
+body:is(.biblioteca-html, .biblioteca-css)::before {
     background-image: linear-gradient(#030e2233, #030e2266), url("../../assets/images/laboratorio-fundo-voxel.png");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     animation: none;
 }
-body.biblioteca-html::after { content: none; }
-body.biblioteca-html .biblioteca-cabecalho { background: #04142bea; border-bottom: 1px solid #28618b; }
-body.biblioteca-html .biblioteca-logo-taskflow { width: 88px; height: 88px; object-fit: contain; }
-body.biblioteca-html .biblioteca-apresentacao {
+body:is(.biblioteca-html, .biblioteca-css)::after { content: none; }
+body:is(.biblioteca-html, .biblioteca-css) .biblioteca-cabecalho { background: #04142bea; border-bottom: 1px solid #28618b; }
+body:is(.biblioteca-html, .biblioteca-css) .biblioteca-logo-taskflow { width: 88px; height: 88px; object-fit: contain; }
+body:is(.biblioteca-html, .biblioteca-css) .biblioteca-apresentacao {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: 0;
@@ -408,28 +408,54 @@ body.biblioteca-html .biblioteca-apresentacao {
     box-shadow: none;
     overflow: hidden;
 }
-body.biblioteca-html .biblioteca-apresentacao > div { grid-area: 1 / 1; align-self: center; z-index: 1; width: 65%; padding: 7% 0 2% 10%; }
-body.biblioteca-html .biblioteca-apresentacao strong { font-size: clamp(24px, 2.5vw, 36px); }
-body.biblioteca-html .biblioteca-apresentacao p { color: #d0e1f1; line-height: 1.7; }
-body.biblioteca-html .biblioteca-apresentacao > img { grid-area: 1 / 1; display: block; width: 100%; max-width: none; height: auto; }
-body.biblioteca-html .biblioteca-tecnologias-grupo { background: #06172ded; border-color: #2677a3; box-shadow: 0 0 10px #008bca22; }
-body.biblioteca-html .biblioteca-catalogo .biblioteca-tecnologias-itens > :is(a, button) { background: #06162a; border-color: #284e71; }
-body.biblioteca-html .biblioteca-catalogo .biblioteca-tecnologias-itens > a[aria-current="page"] { background: #422418de; border-color: #ffad5c; box-shadow: 0 0 10px #ff8c3033; }
-body.biblioteca-html #biblioteca-html .biblioteca-menu { background: #06162cef; border: 1px solid #2d658d; border-top: 3px solid #ffad5c; }
-body.biblioteca-html .biblioteca-modulo summary::marker { color: #ffad5c; }
-body.biblioteca-html .biblioteca-categoria[aria-expanded="true"] { color: var(--biblioteca-texto); border-color: #315a7c; background: #0b223c; }
-body.biblioteca-html .biblioteca-grupo:has(.biblioteca-assunto[aria-current="true"]) > .biblioteca-categoria { color: #ffbd82; border-color: #a3653f; background: #352419; }
-body.biblioteca-html .biblioteca-assunto { display: flex; align-items: center; gap: 10px; padding: 9px 8px; }
-body.biblioteca-html .biblioteca-assunto::before { content: ""; flex: 0 0 9px; width: 9px; height: 9px; border: 1px solid #6c93b4; border-radius: 50%; background: transparent; }
-body.biblioteca-html .biblioteca-assunto[aria-current="true"] { border-color: #d98b4d; background: #3b261bd9; color: #ffe1c4; box-shadow: 0 0 8px #ff9d2720; }
-body.biblioteca-html .biblioteca-assunto[aria-current="true"]::before { background: #ffad5c; border-color: #ffad5c; box-shadow: 0 0 6px #ff8a3a66; }
-body.biblioteca-html #biblioteca-leitura { background: #06162cf5; border-color: #2c628a; scroll-margin-top: 20px; }
-body.biblioteca-html #biblioteca-html .biblioteca-leitura-cabecalho { position: relative; isolation: isolate; overflow: hidden; max-width: none; padding-right: 35%; background: #06162c; }
-body.biblioteca-html .biblioteca-html-ilustracao { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; object-fit: cover; object-position: right center; pointer-events: none; }
-body.biblioteca-html #biblioteca-html .biblioteca-conteudo .biblioteca-observacao { background: #231e1a; border-color: #ba783e; box-shadow: 0 0 10px #ff9d2717; }
-body.biblioteca-html .biblioteca-pesquisa { background: #06162c; }
-body.biblioteca-html :is(.biblioteca-assunto, .biblioteca-tecnologias a, .biblioteca-pesquisa-botao) { transition: background-color .18s, border-color .18s, box-shadow .18s; }
+body:is(.biblioteca-html, .biblioteca-css) .biblioteca-apresentacao > div { grid-area: 1 / 1; align-self: center; z-index: 1; width: 65%; padding: 7% 0 2% 10%; }
+body:is(.biblioteca-html, .biblioteca-css) .biblioteca-apresentacao strong { font-size: clamp(24px, 2.5vw, 36px); }
+body:is(.biblioteca-html, .biblioteca-css) .biblioteca-apresentacao p { color: #d0e1f1; line-height: 1.7; }
+body:is(.biblioteca-html, .biblioteca-css) .biblioteca-apresentacao > img { grid-area: 1 / 1; display: block; width: 100%; max-width: none; height: auto; }
+body:is(.biblioteca-html, .biblioteca-css) .biblioteca-tecnologias-grupo { background: #06172ded; border-color: #2677a3; box-shadow: 0 0 10px #008bca22; }
+body:is(.biblioteca-html, .biblioteca-css) .biblioteca-catalogo .biblioteca-tecnologias-itens > :is(a, button) { background: #06162a; border-color: #284e71; }
+body:is(.biblioteca-html, .biblioteca-css) .biblioteca-catalogo .biblioteca-tecnologias-itens > a[aria-current="page"] { background: #422418de; border-color: #ffad5c; box-shadow: 0 0 10px #ff8c3033; }
+body:is(.biblioteca-html, .biblioteca-css) :is(#biblioteca-html, #biblioteca-css) .biblioteca-menu { background: #06162cef; border: 1px solid #2d658d; border-top: 3px solid #ffad5c; }
+body:is(.biblioteca-html, .biblioteca-css) .biblioteca-modulo summary::marker { color: #ffad5c; }
+body:is(.biblioteca-html, .biblioteca-css) .biblioteca-categoria[aria-expanded="true"] { color: var(--biblioteca-texto); border-color: #315a7c; background: #0b223c; }
+body:is(.biblioteca-html, .biblioteca-css) .biblioteca-grupo:has(.biblioteca-assunto[aria-current="true"]) > .biblioteca-categoria { color: #ffbd82; border-color: #a3653f; background: #352419; }
+body:is(.biblioteca-html, .biblioteca-css) .biblioteca-assunto { display: flex; align-items: center; gap: 10px; padding: 9px 8px; }
+body:is(.biblioteca-html, .biblioteca-css) .biblioteca-assunto::before { content: ""; flex: 0 0 9px; width: 9px; height: 9px; border: 1px solid #6c93b4; border-radius: 50%; background: transparent; }
+body:is(.biblioteca-html, .biblioteca-css) .biblioteca-assunto[aria-current="true"] { border-color: #d98b4d; background: #3b261bd9; color: #ffe1c4; box-shadow: 0 0 8px #ff9d2720; }
+body:is(.biblioteca-html, .biblioteca-css) .biblioteca-assunto[aria-current="true"]::before { background: #ffad5c; border-color: #ffad5c; box-shadow: 0 0 6px #ff8a3a66; }
+body:is(.biblioteca-html, .biblioteca-css) #biblioteca-leitura { background: #06162cf5; border-color: #2c628a; scroll-margin-top: 20px; }
+body:is(.biblioteca-html, .biblioteca-css) :is(#biblioteca-html, #biblioteca-css) .biblioteca-leitura-cabecalho { position: relative; isolation: isolate; overflow: hidden; max-width: none; padding-right: 35%; background: #06162c; }
+body:is(.biblioteca-html, .biblioteca-css) :is(.biblioteca-html-ilustracao, .biblioteca-css-ilustracao) { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; object-fit: cover; object-position: right center; pointer-events: none; }
+body:is(.biblioteca-html, .biblioteca-css) :is(#biblioteca-html, #biblioteca-css) .biblioteca-conteudo .biblioteca-observacao { background: #231e1a; border-color: #ba783e; box-shadow: 0 0 10px #ff9d2717; }
+body:is(.biblioteca-html, .biblioteca-css) .biblioteca-pesquisa { background: #06162c; }
+body:is(.biblioteca-html, .biblioteca-css) :is(.biblioteca-assunto, .biblioteca-tecnologias a, .biblioteca-pesquisa-botao) { transition: background-color .18s, border-color .18s, box-shadow .18s; }
 
+/* Biblioteca CSS — Paleta - seleções azuis; o tema laranja do HTML permanece intacto. */
+body.biblioteca-css {
+    --biblioteca-fundo: #061327;
+    --biblioteca-superficie: #081b35;
+    --biblioteca-borda: #284e71;
+    --biblioteca-texto: #f5f8ff;
+    --biblioteca-secundario: #afc2d9;
+    --biblioteca-foco: #00c8ff;
+    --biblioteca-simbolo-borda: #287dc4;
+    --biblioteca-simbolo-fundo: #0b3155;
+    --biblioteca-hover: #123453;
+    --biblioteca-ativo-borda: #007bff;
+    --biblioteca-ativo-fundo: #0a3760;
+    --biblioteca-realce-borda: #2584c5;
+    --biblioteca-realce-fundo: #0b2c4e;
+    --biblioteca-observacao: #0a213b;
+    --biblioteca-barra: #0a213b;
+    background: var(--biblioteca-fundo);
+}
+body.biblioteca-css #biblioteca-css .biblioteca-menu { border-top-color: #00c8ff; }
+body.biblioteca-css .biblioteca-modulo summary::marker { color: #4dafff; }
+body.biblioteca-css .biblioteca-grupo:has(.biblioteca-assunto[aria-current="true"]) > .biblioteca-categoria { color: #f5f8ff; border-color: #007bff; background: #0b3155; box-shadow: 0 0 8px #00c8ff26; }
+body.biblioteca-css .biblioteca-assunto[aria-current="true"] { color: #e2f4ff; border-color: #007bff; background: #0b3155d9; box-shadow: 0 0 8px #00c8ff26; }
+body.biblioteca-css .biblioteca-assunto[aria-current="true"]::before { background: #00c8ff; border-color: #00c8ff; box-shadow: 0 0 6px #00c8ff66; }
+body.biblioteca-css .biblioteca-catalogo .biblioteca-tecnologias-itens > a[aria-current="page"] { background: #0b3155de; border-color: #007bff; box-shadow: 0 0 10px #00c8ff33; }
+body.biblioteca-css #biblioteca-css .biblioteca-conteudo .biblioteca-observacao { background: #0a213b; border-color: #2584c5; box-shadow: 0 0 10px #00c8ff17; }
 @media (min-width: 1200px) {
     #biblioteca-css .biblioteca-css-exemplo:not(.biblioteca-css-exemplo-amplo) { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
 }
@@ -482,18 +508,22 @@ body.biblioteca-html :is(.biblioteca-assunto, .biblioteca-tecnologias a, .biblio
     body:is(.biblioteca-html, .biblioteca-css, .biblioteca-javascript, .biblioteca-typescript, .biblioteca-react)::after { animation: none; background-position: 0 0; }
 }
 
-/* Biblioteca HTML — Responsividade - imagens completas e títulos livres de sobreposição. */
+/* Bibliotecas HTML/CSS — Responsividade - imagens completas e títulos livres de sobreposição. */
 @media (max-width: 760px) {
-    body.biblioteca-html::before { background-size: cover; animation: none; }
-    body.biblioteca-html .biblioteca-apresentacao > img { grid-area: 1 / 1; max-width: none; }
-    body.biblioteca-html .biblioteca-apresentacao > div { grid-area: 2 / 1; width: 100%; padding: 20px; background: #06162cef; }
-    body.biblioteca-html #biblioteca-html .biblioteca-leitura-cabecalho { padding: 24px 20px; }
-    body.biblioteca-html .biblioteca-html-ilustracao { position: static; display: block; width: min(100%, 300px); height: auto; margin-left: auto; }
+    body:is(.biblioteca-html, .biblioteca-css)::before { background-size: cover; animation: none; }
+    body:is(.biblioteca-html, .biblioteca-css) .biblioteca-apresentacao > img { grid-area: 1 / 1; max-width: none; }
+    body:is(.biblioteca-html, .biblioteca-css) .biblioteca-apresentacao > div { grid-area: 2 / 1; width: 100%; padding: 20px; background: #06162cef; }
+    body:is(.biblioteca-html, .biblioteca-css) :is(#biblioteca-html, #biblioteca-css) .biblioteca-leitura-cabecalho { padding: 24px 20px; }
+    body:is(.biblioteca-html, .biblioteca-css) :is(.biblioteca-html-ilustracao, .biblioteca-css-ilustracao) { position: static; display: block; width: min(100%, 300px); height: auto; margin-left: auto; }
 }
 @media (hover: hover) and (pointer: fine) {
-    body.biblioteca-html .biblioteca-tecnologias a:hover { border-color: #6ce5ff; background: #113453; }
-    body.biblioteca-html .biblioteca-catalogo .biblioteca-tecnologias-itens > a[aria-current="page"]:hover { border-color: #ffc48e; background: #51301e; }
+    body:is(.biblioteca-html, .biblioteca-css) .biblioteca-tecnologias a:hover { border-color: #6ce5ff; background: #113453; }
+    body:is(.biblioteca-html, .biblioteca-css) .biblioteca-catalogo .biblioteca-tecnologias-itens > a[aria-current="page"]:hover { border-color: #ffc48e; background: #51301e; }
 }
 @media (prefers-reduced-motion: reduce) {
-    body.biblioteca-html :is(.biblioteca-assunto, .biblioteca-tecnologias a, .biblioteca-pesquisa-botao) { transition: none; }
+    body:is(.biblioteca-html, .biblioteca-css) :is(.biblioteca-assunto, .biblioteca-tecnologias a, .biblioteca-pesquisa-botao) { transition: none; }
+}
+
+@media (hover: hover) and (pointer: fine) {
+    body.biblioteca-css .biblioteca-catalogo .biblioteca-tecnologias-itens > a[aria-current="page"]:hover { border-color: #4dafff; background: #124879; }
 }

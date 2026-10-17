@@ -9,10 +9,11 @@ const modelos = {
 // Somente imagens conhecidas do produto entram no documento, sem liberar rede no iframe.
 const imagensLocais = new Map();
 const assetsHTML = ["taskflow-logo-voxel.png", "biblioteca-html-banner-voxel.png", "biblioteca-html-codigo-voxel.png", "laboratorio-fundo-voxel.png"];
+const assetsCSS = ["biblioteca-css-banner-voxel.png", "biblioteca-css-codigo-voxel.png"];
 const permitidas = new Map([
     [new URL("../../../assets/images/TaskCentro.png", import.meta.url).href, "image/png"],
     ...Object.keys(modelos).map(id => [new URL(`../../../assets/images/biblioteca-${id}.svg`, import.meta.url).href, "image/svg+xml"]),
-    ...assetsHTML.map(nome => [new URL(`../../../assets/images/${nome}`, import.meta.url).href, "image/png"])
+    ...assetsHTML.concat(assetsCSS).map(nome => [new URL(`../../../assets/images/${nome}`, import.meta.url).href, "image/png"])
 ]);
 async function imagemLocal(url) {
     if (!permitidas.has(url)) throw new Error("Imagem não autorizada na documentação.");
@@ -61,8 +62,9 @@ async function documentoIsolado(id, conteudos, canal) {
     doc.head.prepend(politica);
     const estilo = doc.createElement("style");
     let estilos = css;
-    // Somente URLs estáticas conhecidas do tema HTML são incorporadas; a CSP permanece restrita.
-    if (id === "html") for (const nome of assetsHTML) {
+    // Somente URLs estáticas conhecidas do tema são incorporadas; a CSP permanece restrita.
+    const assetsTema = id === "html" ? assetsHTML : id === "css" ? assetsCSS.concat("laboratorio-fundo-voxel.png") : [];
+    for (const nome of assetsTema) {
         const referencia = `url("../../assets/images/${nome}")`;
         if (estilos.includes(referencia)) estilos = estilos.replaceAll(referencia, `url("${await imagemLocal(new URL(`../../../assets/images/${nome}`, import.meta.url).href)}")`);
     }
