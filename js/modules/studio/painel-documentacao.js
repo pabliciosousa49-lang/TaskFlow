@@ -8,24 +8,30 @@ const modelos = {
 
 // Somente imagens conhecidas do produto entram no documento, sem liberar rede no iframe.
 const imagensLocais = new Map();
+const assetsHTML = ["taskflow-logo-voxel.png", "biblioteca-html-banner-voxel.png", "biblioteca-html-codigo-voxel.png", "laboratorio-fundo-voxel.png"];
+const permitidas = new Map([
+    [new URL("../../../assets/images/TaskCentro.png", import.meta.url).href, "image/png"],
+    ...Object.keys(modelos).map(id => [new URL(`../../../assets/images/biblioteca-${id}.svg`, import.meta.url).href, "image/svg+xml"]),
+    ...assetsHTML.map(nome => [new URL(`../../../assets/images/${nome}`, import.meta.url).href, "image/png"])
+]);
+async function imagemLocal(url) {
+    if (!permitidas.has(url)) throw new Error("Imagem não autorizada na documentação.");
+    if (!imagensLocais.has(url)) imagensLocais.set(url, (async () => {
+        const resposta = await fetch(url, { credentials: "omit" });
+        if (!resposta.ok) throw new Error("Imagem da documentação indisponível.");
+        const bytes = new Uint8Array(await resposta.arrayBuffer());
+        let binario = "";
+        for (let n = 0; n < bytes.length; n += 8192) binario += String.fromCharCode(...bytes.subarray(n, n + 8192));
+        return `data:${permitidas.get(url)};base64,${btoa(binario)}`;
+    })().catch(erro => { imagensLocais.delete(url); throw erro; }));
+    return imagensLocais.get(url);
+}
 async function incorporarImagens(doc, paginaURL) {
-    const permitidas = new Map([
-        [new URL("../../../assets/images/TaskCentro.png", import.meta.url).href, "image/png"],
-        ...Object.keys(modelos).map(id => [new URL(`../../../assets/images/biblioteca-${id}.svg`, import.meta.url).href, "image/svg+xml"])
-    ]);
     await Promise.all(Array.from(doc.querySelectorAll("img[src]"), async imagem => {
         const url = new URL(imagem.getAttribute("src"), paginaURL).href;
         imagem.removeAttribute("srcset");
         if (!permitidas.has(url)) { imagem.removeAttribute("src"); return; }
-        if (!imagensLocais.has(url)) imagensLocais.set(url, (async () => {
-            const resposta = await fetch(url, { credentials: "omit" });
-            if (!resposta.ok) throw new Error("Imagem da documentação indisponível.");
-            const bytes = new Uint8Array(await resposta.arrayBuffer());
-            let binario = "";
-            for (let n = 0; n < bytes.length; n += 8192) binario += String.fromCharCode(...bytes.subarray(n, n + 8192));
-            return `data:${permitidas.get(url)};base64,${btoa(binario)}`;
-        })().catch(erro => { imagensLocais.delete(url); throw erro; }));
-        imagem.setAttribute("src", await imagensLocais.get(url));
+        imagem.setAttribute("src", await imagemLocal(url));
     }));
 }
 
@@ -54,7 +60,13 @@ async function documentoIsolado(id, conteudos, canal) {
     politica.content = `default-src 'none'; script-src 'nonce-${nonce}'; style-src 'unsafe-inline'; frame-src about:; img-src data:; media-src 'none'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'`;
     doc.head.prepend(politica);
     const estilo = doc.createElement("style");
-    estilo.textContent = css;
+    let estilos = css;
+    // Somente URLs estáticas conhecidas do tema HTML são incorporadas; a CSP permanece restrita.
+    if (id === "html") for (const nome of assetsHTML) {
+        const referencia = `url("../../assets/images/${nome}")`;
+        if (estilos.includes(referencia)) estilos = estilos.replaceAll(referencia, `url("${await imagemLocal(new URL(`../../../assets/images/${nome}`, import.meta.url).href)}")`);
+    }
+    estilo.textContent = estilos;
     doc.head.append(estilo);
     const dados = JSON.stringify(conteudos).replace(/</g, "\\u003c");
     const codigo = doc.createElement("script");

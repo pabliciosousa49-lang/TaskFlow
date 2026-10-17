@@ -239,6 +239,7 @@ function blocoLeitura(titulo, valor, codigo = false) {
 function selecionarAssunto(indice, focar = true) {
     const registro = assuntosOrdenados[indice];
     if (!registro) return;
+    const mudouAssunto = assuntoAtual !== indice;
     assuntoAtual = indice;
     const { assunto, nivel, modulo, botao, painel, categoria, detalhes } = registro;
     document.querySelector("#biblioteca-titulo").textContent = assunto.titulo;
@@ -354,7 +355,16 @@ function selecionarAssunto(indice, focar = true) {
     if (focar) {
         menuAberto = false;
         atualizarMenu();
-        leitura.focus();
+        if (documentacaoHTML) {
+            // HTML — Leitura - retorna ao título sem deslocar a rolagem interna do guia.
+            const posicaoMenu = menu.scrollTop;
+            leitura.focus({ preventScroll: true });
+            if (mudouAssunto) {
+                leitura.scrollTop = 0;
+                leitura.scrollIntoView({ block: "start", behavior: "instant" });
+            }
+            menu.scrollTop = posicaoMenu;
+        } else leitura.focus();
     }
 }
 

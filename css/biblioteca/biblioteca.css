@@ -369,6 +369,67 @@ body.biblioteca-react::after { background-image: url("data:image/svg+xml,%3Csvg%
 .biblioteca-fonte { display: inline-flex; align-items: center; min-height: 44px; margin-top: 24px; color: var(--biblioteca-foco); text-decoration: underline; text-underline-offset: 4px; }
 
 /* Biblioteca — Responsividade - mantém menu recolhível e blocos dentro da largura */
+/* Biblioteca HTML — Identidade voxel - escopo exclusivo, sem alterar as demais linguagens. */
+body.biblioteca-html {
+    --biblioteca-fundo: #030e22;
+    --biblioteca-superficie: #071a32;
+    --biblioteca-borda: #284e71;
+    --biblioteca-texto: #eef7ff;
+    --biblioteca-secundario: #b9cfe3;
+    --biblioteca-foco: #ffb16c;
+    --biblioteca-simbolo-borda: #a56336;
+    --biblioteca-simbolo-fundo: #392315;
+    --biblioteca-hover: #12304d;
+    --biblioteca-ativo-borda: #ffad5c;
+    --biblioteca-ativo-fundo: #442719;
+    --biblioteca-realce-borda: #a3653f;
+    --biblioteca-realce-fundo: #352419;
+    --biblioteca-observacao: #241e1a;
+    --biblioteca-barra: #0a213b;
+    background: var(--biblioteca-fundo);
+}
+body.biblioteca-html::before {
+    background-image: linear-gradient(#030e2233, #030e2266), url("../../assets/images/laboratorio-fundo-voxel.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    animation: none;
+}
+body.biblioteca-html::after { content: none; }
+body.biblioteca-html .biblioteca-cabecalho { background: #04142bea; border-bottom: 1px solid #28618b; }
+body.biblioteca-html .biblioteca-logo-taskflow { width: 88px; height: 88px; object-fit: contain; }
+body.biblioteca-html .biblioteca-apresentacao {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+    overflow: hidden;
+}
+body.biblioteca-html .biblioteca-apresentacao > div { grid-area: 1 / 1; align-self: center; z-index: 1; width: 65%; padding: 7% 0 2% 10%; }
+body.biblioteca-html .biblioteca-apresentacao strong { font-size: clamp(24px, 2.5vw, 36px); }
+body.biblioteca-html .biblioteca-apresentacao p { color: #d0e1f1; line-height: 1.7; }
+body.biblioteca-html .biblioteca-apresentacao > img { grid-area: 1 / 1; display: block; width: 100%; max-width: none; height: auto; }
+body.biblioteca-html .biblioteca-tecnologias-grupo { background: #06172ded; border-color: #2677a3; box-shadow: 0 0 10px #008bca22; }
+body.biblioteca-html .biblioteca-catalogo .biblioteca-tecnologias-itens > :is(a, button) { background: #06162a; border-color: #284e71; }
+body.biblioteca-html .biblioteca-catalogo .biblioteca-tecnologias-itens > a[aria-current="page"] { background: #422418de; border-color: #ffad5c; box-shadow: 0 0 10px #ff8c3033; }
+body.biblioteca-html #biblioteca-html .biblioteca-menu { background: #06162cef; border: 1px solid #2d658d; border-top: 3px solid #ffad5c; }
+body.biblioteca-html .biblioteca-modulo summary::marker { color: #ffad5c; }
+body.biblioteca-html .biblioteca-categoria[aria-expanded="true"] { color: var(--biblioteca-texto); border-color: #315a7c; background: #0b223c; }
+body.biblioteca-html .biblioteca-grupo:has(.biblioteca-assunto[aria-current="true"]) > .biblioteca-categoria { color: #ffbd82; border-color: #a3653f; background: #352419; }
+body.biblioteca-html .biblioteca-assunto { display: flex; align-items: center; gap: 10px; padding: 9px 8px; }
+body.biblioteca-html .biblioteca-assunto::before { content: ""; flex: 0 0 9px; width: 9px; height: 9px; border: 1px solid #6c93b4; border-radius: 50%; background: transparent; }
+body.biblioteca-html .biblioteca-assunto[aria-current="true"] { border-color: #d98b4d; background: #3b261bd9; color: #ffe1c4; box-shadow: 0 0 8px #ff9d2720; }
+body.biblioteca-html .biblioteca-assunto[aria-current="true"]::before { background: #ffad5c; border-color: #ffad5c; box-shadow: 0 0 6px #ff8a3a66; }
+body.biblioteca-html #biblioteca-leitura { background: #06162cf5; border-color: #2c628a; scroll-margin-top: 20px; }
+body.biblioteca-html #biblioteca-html .biblioteca-leitura-cabecalho { position: relative; isolation: isolate; overflow: hidden; max-width: none; padding-right: 35%; background: #06162c; }
+body.biblioteca-html .biblioteca-html-ilustracao { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; object-fit: cover; object-position: right center; pointer-events: none; }
+body.biblioteca-html #biblioteca-html .biblioteca-conteudo .biblioteca-observacao { background: #231e1a; border-color: #ba783e; box-shadow: 0 0 10px #ff9d2717; }
+body.biblioteca-html .biblioteca-pesquisa { background: #06162c; }
+body.biblioteca-html :is(.biblioteca-assunto, .biblioteca-tecnologias a, .biblioteca-pesquisa-botao) { transition: background-color .18s, border-color .18s, box-shadow .18s; }
+
 @media (min-width: 1200px) {
     #biblioteca-css .biblioteca-css-exemplo:not(.biblioteca-css-exemplo-amplo) { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
 }
@@ -419,4 +480,20 @@ body.biblioteca-react::after { background-image: url("data:image/svg+xml,%3Csvg%
 @media (prefers-reduced-motion: reduce) {
     body:is(.biblioteca-html, .biblioteca-css, .biblioteca-javascript, .biblioteca-typescript, .biblioteca-react)::before,
     body:is(.biblioteca-html, .biblioteca-css, .biblioteca-javascript, .biblioteca-typescript, .biblioteca-react)::after { animation: none; background-position: 0 0; }
+}
+
+/* Biblioteca HTML — Responsividade - imagens completas e títulos livres de sobreposição. */
+@media (max-width: 760px) {
+    body.biblioteca-html::before { background-size: cover; animation: none; }
+    body.biblioteca-html .biblioteca-apresentacao > img { grid-area: 1 / 1; max-width: none; }
+    body.biblioteca-html .biblioteca-apresentacao > div { grid-area: 2 / 1; width: 100%; padding: 20px; background: #06162cef; }
+    body.biblioteca-html #biblioteca-html .biblioteca-leitura-cabecalho { padding: 24px 20px; }
+    body.biblioteca-html .biblioteca-html-ilustracao { position: static; display: block; width: min(100%, 300px); height: auto; margin-left: auto; }
+}
+@media (hover: hover) and (pointer: fine) {
+    body.biblioteca-html .biblioteca-tecnologias a:hover { border-color: #6ce5ff; background: #113453; }
+    body.biblioteca-html .biblioteca-catalogo .biblioteca-tecnologias-itens > a[aria-current="page"]:hover { border-color: #ffc48e; background: #51301e; }
+}
+@media (prefers-reduced-motion: reduce) {
+    body.biblioteca-html :is(.biblioteca-assunto, .biblioteca-tecnologias a, .biblioteca-pesquisa-botao) { transition: none; }
 }

@@ -58,9 +58,14 @@ for (const id of ['html', 'css', 'javascript', 'typescript', 'react']) test(`doc
     const p = await preparar();
     const html = await p.api.documentoIsolado(id, { niveis: [] }, 'canal');
     const imagens = [...html.matchAll(/<img[^>]*src="(data:[^"]+)"/g)].map(m => m[1]);
-    assert.equal(imagens.length, 2);
-    assert.deepEqual(Buffer.from(imagens[0].split(',')[1], 'base64'), readFileSync(new URL('../../assets/images/TaskCentro.png', import.meta.url)));
-    assert.deepEqual(Buffer.from(imagens[1].split(',')[1], 'base64'), readFileSync(new URL(`../../assets/images/biblioteca-${id}.svg`, import.meta.url)));
+    assert.equal(imagens.length, id === 'html' ? 3 : 2);
+    assert.deepEqual(Buffer.from(imagens[0].split(',')[1], 'base64'), readFileSync(new URL(`../../assets/images/${id === 'html' ? 'taskflow-logo-voxel.png' : 'TaskCentro.png'}`, import.meta.url)));
+    assert.deepEqual(Buffer.from(imagens[1].split(',')[1], 'base64'), readFileSync(new URL(`../../assets/images/${id === 'html' ? 'biblioteca-html-banner-voxel.png' : `biblioteca-${id}.svg`}`, import.meta.url)));
+    if (id === 'html') {
+        assert.deepEqual(Buffer.from(imagens[2].split(',')[1], 'base64'), readFileSync(new URL('../../assets/images/biblioteca-html-codigo-voxel.png', import.meta.url)));
+        assert(html.includes('url("data:image/png;base64,'), 'fundo HTML também embutido');
+        assert(!html.includes('url("../../assets/images/laboratorio-fundo-voxel.png")'));
+    }
     assert.match(html, /img-src data:;/);
     for (const regra of ["connect-src 'none'", "base-uri 'none'", "default-src 'none'"]) assert(html.includes(regra));
     assert(!html.includes('import("../../data/biblioteca/'));

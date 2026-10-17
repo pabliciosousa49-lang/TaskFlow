@@ -19,7 +19,8 @@ export class Elemento {
     get attributes() { return Object.entries(this.attrs).map(([name, value]) => ({ name, value })); }
     addEventListener(k, fn) { (this.eventos[k] ??= []).push(fn); }
     disparar(k, e = {}) { for (const fn of this.eventos[k] || []) fn(e); }
-    focus() { this.focado = true; }
+    focus(opcoes) { this.focado = true; this.opcoesFoco = opcoes; }
+    scrollIntoView(opcoes) { this.ultimaRolagem = opcoes; this.rolagens = (this.rolagens || 0) + 1; }
     showModal() { this.open = true; }
     close() { this.open = false; this.disparar("close"); }
     set textContent(texto) { this.texto = texto; this.children = []; }

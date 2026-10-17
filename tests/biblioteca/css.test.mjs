@@ -151,3 +151,30 @@ test("HTML conserva a sequência de leitura e não recebe componentes exclusivos
     assert.equal(conteudo.querySelector(".biblioteca-css-exemplo"), null);
     assert.equal(conteudo.querySelector(".biblioteca-css-relacionados"), null);
 });
+
+
+test("HTML: troca de tópico reposiciona leitura, preserva menu e mantém um único ativo", () => {
+    const { api, elementos } = iniciar("html");
+    const leitura = elementos["#biblioteca-leitura"], menu = elementos["#biblioteca-menu"];
+    api.selecionarAssunto(0, false);
+    leitura.scrollTop = 500; menu.scrollTop = 170;
+    api.selecionarAssunto(1);
+    assert.equal(leitura.scrollTop, 0); assert.equal(menu.scrollTop, 170);
+    assert.equal(leitura.ultimaRolagem.block, 'start'); assert.equal(leitura.ultimaRolagem.behavior, 'instant');
+    assert.equal(leitura.opcoesFoco.preventScroll, true);
+    const botoes = elementos["#biblioteca-niveis"].querySelectorAll('button');
+    assert.equal(botoes.filter(b => b.getAttribute('aria-current') === 'true').length, 1);
+    leitura.scrollTop = 200; const rolagens = leitura.rolagens;
+    api.selecionarAssunto(1);
+    assert.equal(leitura.scrollTop, 200); assert.equal(leitura.rolagens, rolagens);
+});
+
+test("HTML: carga inicial não força rolagem; CSS mantém comportamento anterior", () => {
+    const h = iniciar('html'), c = iniciar('css');
+    h.api.selecionarAssunto(0, false);
+    assert.equal(h.elementos['#biblioteca-leitura'].rolagens, undefined);
+    c.elementos['#biblioteca-leitura'].scrollTop = 380;
+    c.api.selecionarAssunto(1);
+    assert.equal(c.elementos['#biblioteca-leitura'].scrollTop, 380);
+    assert.equal(c.elementos['#biblioteca-leitura'].rolagens, undefined);
+});
