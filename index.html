@@ -347,13 +347,13 @@
 
   <!-- Agenda pessoal — Estrutura - reúne calendário, consulta e edição em um painel -->
   <dialog id="painel-agenda" class="agenda-painel" aria-labelledby="titulo-agenda">
-    <div class="agenda-barra">
-      <div>
-        <h2 id="titulo-agenda">Minha Agenda</h2>
-        <img class="agenda-logo" src="./assets/images/TaskCentro.png" alt="TaskFlow">
-      </div>
+    <div class="agenda-fechar-barra">
       <button id="fechar-agenda" class="agenda-botao" type="button" aria-label="Fechar agenda">×</button>
     </div>
+    <header class="agenda-banner">
+      <h2 id="titulo-agenda"><img src="./assets/images/agenda-banner-voxel.png" width="1942" height="809"
+        alt="Minha Agenda — Organize seus estudos. Planeje suas metas, acompanhe seus compromissos e mantenha sua evolução em dia."></h2>
+    </header>
     <p id="agenda-aviso" class="agenda-aviso" role="status" aria-live="polite"></p>
     <div class="agenda-layout">
       <section class="agenda-calendario" aria-label="Calendário mensal">
@@ -366,28 +366,38 @@
           <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
         </div>
         <div id="agenda-dias" class="agenda-dias"></div>
-        <p class="agenda-legenda">● Dia com compromisso · Borda verde: hoje</p>
+        <div class="agenda-legenda">
+          <span><i class="agenda-legenda-selecao" aria-hidden="true"></i>Dia selecionado</span>
+          <span><i class="agenda-legenda-hoje" aria-hidden="true"></i>Hoje</span>
+          <span><i class="agenda-legenda-evento" aria-hidden="true"></i>Com compromisso</span>
+        </div>
         <h3 id="agenda-data-selecionada"></h3>
       </section>
-      <!-- Compromissos marcados — Estrutura - mantém todos os registros visíveis ao abrir a agenda -->
+      <!-- Compromissos do dia — Apresentação - acompanha a data selecionada -->
       <section class="agenda-registros" aria-labelledby="titulo-compromissos">
-        <h3 id="titulo-compromissos" tabindex="-1">Compromissos marcados</h3>
+        <h3 id="titulo-compromissos" tabindex="-1">Compromissos do dia</h3>
+        <p id="agenda-quantidade" class="agenda-quantidade" role="status" aria-live="polite"></p>
         <ul id="lista-compromissos" class="agenda-lista"></ul>
       </section>
       <!-- Formulário — Estrutura - aparece somente após selecionar uma data ou editar um registro -->
       <form id="formulario-compromisso" class="agenda-formulario" hidden>
-        <h3 id="titulo-formulario">Novo compromisso</h3>
-        <label for="compromisso-titulo">Título (obrigatório)</label>
-        <input id="compromisso-titulo" name="titulo" type="text" required maxlength="120">
-        <label for="compromisso-descricao">Descrição</label>
-        <textarea id="compromisso-descricao" name="descricao" rows="3" maxlength="2000"></textarea>
-        <label for="compromisso-data">Data (obrigatória)</label>
-        <input id="compromisso-data" name="data" type="date" min="0001-01-01" max="9999-12-31" required>
-        <label for="compromisso-hora">Hora (obrigatória)</label>
-        <input id="compromisso-hora" name="hora" type="time" required>
-        <div class="agenda-acoes"><button id="salvar-compromisso" class="agenda-botao agenda-primario"
-            type="submit">Salvar</button><button id="cancelar-compromisso" class="agenda-botao"
-            type="button">Cancelar</button></div>
+        <div class="agenda-formulario-campos">
+          <h3 id="titulo-formulario">Novo compromisso</h3>
+          <label for="compromisso-titulo">Título (obrigatório)</label>
+          <input id="compromisso-titulo" name="titulo" type="text" required maxlength="120">
+          <label for="compromisso-descricao">Descrição</label>
+          <textarea id="compromisso-descricao" name="descricao" rows="3" maxlength="2000"></textarea>
+          <label for="compromisso-data">Data (obrigatória)</label>
+          <input id="compromisso-data" name="data" type="date" min="0001-01-01" max="9999-12-31" required>
+          <label for="compromisso-hora">Hora (obrigatória)</label>
+          <input id="compromisso-hora" name="hora" type="time" required>
+          <div class="agenda-acoes"><button id="salvar-compromisso" class="agenda-botao agenda-primario"
+              type="submit"><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Salvar</button><button id="cancelar-compromisso" class="agenda-botao"
+              type="button">Cancelar</button></div>
+        </div>
+        <div class="agenda-formulario-arte" aria-hidden="true">
+          <img src="./assets/images/agenda-formulario-voxel.png" width="1448" height="1086" alt="" loading="lazy">
+        </div>
       </form>
     </div>
   </dialog>

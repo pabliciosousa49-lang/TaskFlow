@@ -1528,3 +1528,117 @@ html.agenda-aberta body {
         transform: none;
     }
 }
+/* Minha Agenda — Identidade voxel restrita ao modal, preservando Próximos eventos. */
+#painel-agenda {
+    --agenda-fundo: #061327;
+    --agenda-superficie: #081b35;
+    --agenda-borda: #254b72;
+    --agenda-roxo-borda: #00c8ff;
+    --agenda-roxo-claro: #ffd84d;
+    --agenda-verde: #ffcc33;
+    --agenda-verde-fundo: #ffcc3320;
+    --agenda-verde-borda: #ffcc33;
+    --agenda-texto-secundario: #afc2d9;
+    width: min(1160px, calc(100% - 32px));
+    padding: 0;
+    border: 1px solid #00c8ff;
+    border-top: 2px solid #ffcc33;
+    border-radius: 18px;
+    background: var(--agenda-fundo);
+    color: #f5f8ff;
+    box-shadow: 0 20px 70px #0009, 0 0 22px #00c8ff22;
+    scrollbar-color: #376991 #061327;
+}
+#painel-agenda::backdrop { background: #020917bf; }
+#painel-agenda .agenda-fechar-barra {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    justify-content: flex-end;
+    padding: 8px 12px;
+    background: #061327;
+    border-bottom: 1px solid #254b72;
+}
+#painel-agenda .agenda-banner h2 { margin: 0; line-height: 0; }
+#painel-agenda .agenda-banner img { display: block; width: 100%; height: auto; }
+#painel-agenda .agenda-aviso { margin: 0; padding-inline: 24px; }
+#painel-agenda .agenda-aviso:not(:empty) { padding-top: 16px; }
+#painel-agenda .agenda-layout { margin: 0; padding: 24px; gap: 20px; }
+#painel-agenda :is(.agenda-calendario, .agenda-registros, .agenda-formulario) {
+    border: 1px solid #254b72;
+    border-radius: 14px;
+    background: var(--agenda-superficie);
+    box-shadow: inset 0 1px 0 #00c8ff12;
+}
+#painel-agenda :is(.agenda-registros, .agenda-formulario-campos) > h3 { color: #ffd84d; }
+#painel-agenda .agenda-quantidade { margin-top: 8px; color: #afc2d9; font-size: 13px; }
+#painel-agenda .agenda-semana { color: #afc2d9; }
+#painel-agenda .agenda-dia {
+    background: #061327;
+    color: #f5f8ff;
+    border-color: #254b72;
+    min-height: 48px;
+    box-shadow: none;
+}
+#painel-agenda .agenda-dia[aria-current="date"]::before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 7px;
+    height: 7px;
+    border: 2px solid #ffcc33;
+    border-radius: 50%;
+}
+#painel-agenda .agenda-dia[aria-pressed="true"] {
+    background: #074b9c;
+    border-color: #ffcc33;
+    box-shadow: 0 0 9px #ffcc3330;
+    color: #fff;
+}
+#painel-agenda .agenda-dia.com-compromisso::after { background: #00c8ff; }
+#painel-agenda .agenda-legenda { display: flex; flex-wrap: wrap; gap: 8px 14px; }
+#painel-agenda .agenda-legenda span { display: inline-flex; align-items: center; gap: 6px; }
+#painel-agenda .agenda-legenda i { display: inline-block; width: 10px; height: 10px; flex-shrink: 0; }
+#painel-agenda .agenda-legenda-selecao { border: 1px solid #ffcc33; border-radius: 3px; background: #074b9c; }
+#painel-agenda .agenda-legenda-hoje { border: 2px solid #ffcc33; border-radius: 50%; }
+#painel-agenda .agenda-legenda-evento { background: #00c8ff; border-radius: 50%; }
+#painel-agenda .agenda-compromisso { background: #061327; border-left-color: #ffcc33; }
+#painel-agenda .agenda-compromisso strong { color: #f5f8ff; }
+#painel-agenda .agenda-compromisso time { color: #ffd84d; }
+#painel-agenda .agenda-compromisso:focus-within { border-color: #00c8ff; box-shadow: 0 0 10px #00c8ff20; }
+#painel-agenda .agenda-botao { color: #f5f8ff; background: #0b2341; border-color: #254b72; }
+#painel-agenda .agenda-botao[data-acao="editar"] { border-color: #00c8ff; }
+#painel-agenda .agenda-botao[data-acao="excluir"] { border-color: #ae5266; color: #ffc6cf; }
+#painel-agenda .agenda-botao[data-acao="editar"]::before { content: '✎'; margin-right: 6px; }
+#painel-agenda .agenda-botao[data-acao="excluir"]::before { content: '×'; margin-right: 6px; }
+#painel-agenda .agenda-formulario { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 24px; align-items: center; }
+#painel-agenda .agenda-formulario[hidden] { display: none; }
+#painel-agenda .agenda-formulario-campos { min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+#painel-agenda .agenda-formulario-campos h3 { font-size: 17px; line-height: 1.4; }
+#painel-agenda .agenda-formulario-arte { min-width: 0; }
+#painel-agenda .agenda-formulario-arte img { display: block; width: 100%; height: auto; border-radius: 12px; }
+#painel-agenda :is(input, textarea) { color: #f5f8ff; background: #061327; }
+#painel-agenda :is(input, textarea)::placeholder { color: #afc2d9; }
+#painel-agenda :is(input, textarea):focus { outline: 2px solid #ffcc3340; outline-offset: 1px; border-color: #ffcc33; box-shadow: 0 0 10px #ffcc3318; }
+#painel-agenda :is(button, [tabindex]):focus-visible { outline: 2px solid #ffd84d; outline-offset: 3px; }
+#painel-agenda .agenda-primario { background: #ffcc33; border-color: #ffd84d; color: #061327; font-weight: 700; }
+@media (hover: hover) and (pointer: fine) {
+    #painel-agenda .agenda-dia:hover { background: #123658; border-color: #00c8ff; }
+    #painel-agenda .agenda-dia[aria-pressed="true"]:hover { background: #0759b6; border-color: #ffcc33; }
+    #painel-agenda .agenda-botao:not(:disabled):hover { background: #123858; border-color: #00c8ff; box-shadow: 0 0 12px #00c8ff30; }
+    #painel-agenda .agenda-botao[data-acao="excluir"]:not(:disabled):hover { background: #411c2a; border-color: #e3788c; box-shadow: 0 0 10px #e3788c22; }
+    #painel-agenda .agenda-primario:not(:disabled):hover { background: #ffd84d; border-color: #ffcc33; color: #061327; box-shadow: 0 0 16px #ffcc3340; }
+}
+@media (max-width: 768px) {
+    #painel-agenda { width: calc(100% - 16px); max-height: calc(100dvh - 16px); border-radius: 12px; }
+    #painel-agenda .agenda-layout { grid-template-columns: minmax(0, 1fr); padding: 12px; gap: 14px; }
+    #painel-agenda .agenda-aviso { padding-inline: 12px; }
+    #painel-agenda .agenda-formulario { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+    #painel-agenda .agenda-formulario-arte { width: min(100%, 320px); justify-self: center; }
+    #painel-agenda .agenda-dia { min-height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    #painel-agenda, #painel-agenda * { animation: none; transition: none; scroll-behavior: auto; }
+}

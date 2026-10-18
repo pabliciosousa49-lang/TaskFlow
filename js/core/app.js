@@ -218,7 +218,9 @@ function atualizarProximosEventos() {
 function atualizarAgenda() {
     atualizarCalendario();
     document.querySelector("#agenda-data-selecionada").textContent = apresentarData(dataSelecionada);
-    preencherLista(listaCompromissos, ordenarCompromissos(compromissos), "Nenhum compromisso cadastrado.", true);
+    const compromissosDoDia = ordenarCompromissos(compromissos.filter(compromisso => compromisso.data === dataSelecionada));
+    document.querySelector("#agenda-quantidade").textContent = `${compromissosDoDia.length} ${compromissosDoDia.length === 1 ? "compromisso" : "compromissos"}`;
+    preencherLista(listaCompromissos, compromissosDoDia, "Nenhum compromisso para este dia.", true);
     atualizarProximosEventos();
 }
 
