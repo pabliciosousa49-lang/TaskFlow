@@ -66,33 +66,8 @@
         </a>
 
         <a href="#" class="item-menu">
-          <i class="fa-solid fa-laptop-code" aria-hidden="true"></i>
-          <span>DevClub Full Stack</span>
-        </a>
-
-        <a href="#" class="item-menu">
-          <i class="fa-solid fa-database" aria-hidden="true"></i>
-          <span>Data Club</span>
-        </a>
-
-        <a href="#" class="item-menu">
-          <i class="fa-solid fa-window-maximize" aria-hidden="true"></i>
-          <span>Front End Club</span>
-        </a>
-
-        <a href="#" class="item-menu">
-          <i class="fa-solid fa-robot" aria-hidden="true"></i>
-          <span>Gestor de IA</span>
-        </a>
-
-        <a href="#" class="item-menu">
-          <i class="fa-solid fa-award" aria-hidden="true"></i>
-          <span>DevClub ELITE</span>
-        </a>
-
-        <a href="#" class="item-menu">
-          <i class="fa-solid fa-headset" aria-hidden="true"></i>
-          <span>Suporte Humano</span>
+          <i class="fa-solid fa-user-group" aria-hidden="true"></i>
+          <span>Comunidade</span>
         </a>
 
       </nav>
@@ -162,11 +137,6 @@
               </h1>
               <div class="taskflow-acoes">
                 <a class="taskflow-explorar" href="#taskflow-areas">Explore as áreas <span aria-hidden="true">↓</span></a>
-                <!-- Laboratório — Navegação - oferece um acesso próprio ao ambiente de programação -->
-                <a id="abrir-laboratorio" class="taskflow-explorar" href="./pages/studio.html"><i class="fa-solid fa-code" aria-hidden="true"></i> Laboratório TaskFlow <span
-                    aria-hidden="true">↗</span></a>
-                <button id="abrir-agenda" class="agenda-botao agenda-acesso" type="button" aria-haspopup="dialog"><i class="fa-regular fa-calendar-days" aria-hidden="true"></i> Minha
-                  Agenda</button>
               </div>
             </div>
           </header>
@@ -179,7 +149,25 @@
               </div>
               <p>Quatro áreas para conhecer.<br>Novas experiências por tópico virão nas próximas etapas.</p>
             </div>
-            <div class="taskflow-mapa">
+            <nav class="taskflow-atalhos" aria-label="Recursos do TaskFlow">
+              <a class="taskflow-atalho" data-acesso="biblioteca" aria-label="Biblioteca Técnica" href="#taskflow-categorias">
+                <img src="./assets/images/acesso-biblioteca-voxel.png" width="286" height="720" alt="" loading="lazy">
+              </a>
+              <a class="taskflow-atalho" data-acesso="laboratorio" aria-label="Laboratório" id="abrir-laboratorio" href="./pages/studio.html">
+                <img src="./assets/images/acesso-laboratorio-voxel.png" width="285" height="717" alt="" loading="lazy">
+              </a>
+              <button class="taskflow-atalho" data-acesso="agenda" aria-label="Agenda" id="abrir-agenda" type="button" aria-haspopup="dialog">
+                <img src="./assets/images/acesso-agenda-voxel.png" width="279" height="716" alt="" loading="lazy">
+              </button>
+              <a class="taskflow-atalho" data-acesso="carreira" aria-label="Área de Carreira" href="#taskflow-carreira">
+                <img src="./assets/images/acesso-carreira-voxel.png" width="285" height="712" alt="" loading="lazy">
+              </a>
+              <button class="taskflow-atalho" data-acesso="ia" aria-label="Gestor de IA — indisponível" type="button" disabled>
+                <img src="./assets/images/acesso-ia-voxel.png" width="281" height="673" alt="" loading="lazy">
+                <span class="taskflow-atalho-status">Indisponível</span>
+              </button>
+            </nav>
+            <div id="taskflow-categorias" class="taskflow-mapa">
               <!-- Front-end — Estrutura - agrupa os tópicos desta área -->
               <article class="area-tecnologia" aria-labelledby="titulo-frontend">
                 <header class="area-cabecalho">
@@ -301,7 +289,7 @@
                 </div>
               </article>
               <!-- Carreira — Estrutura - agrupa os tópicos desta área -->
-              <article class="area-tecnologia" aria-labelledby="titulo-carreira">
+              <article id="taskflow-carreira" class="area-tecnologia" aria-labelledby="titulo-carreira">
                 <header class="area-cabecalho">
                   <span class="area-numero" aria-hidden="true">04</span>
                   <div>

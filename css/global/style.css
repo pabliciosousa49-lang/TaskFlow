@@ -319,9 +319,7 @@ a {
 /* Recepção TaskFlow — Visual - estabelece uma apresentação editorial com identidade escura */
 .taskflow-recepcao {
     --recepcao-respiro: clamp(20px, 2.6vw, 48px);
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    align-content: start;
+    display: flow-root;
     min-height: 100vh;
     padding: 0 var(--recepcao-respiro) 40px;
     /* Cenário único, restrito à recepção para não cobrir a sidebar. */
@@ -329,21 +327,15 @@ a {
 }
 
 .taskflow-apresentacao {
-    grid-column: 1;
-    grid-row: 1;
-    /* Expande até as bordas da área principal, sem avançar sobre a sidebar. */
-    width: calc(100% + var(--recepcao-respiro) + var(--recepcao-respiro));
-    max-width: none;
-    margin-inline: calc(0px - var(--recepcao-respiro));
-    padding: 0 0 12px;
+    /* Mesmo fluxo e limite dos demais blocos: acompanha janela e zoom sem expansão lateral. */
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 0 16px;
 }
 
 /* Acessos superiores — Visual - alinha os botões com a identidade atual do TaskFlow */
 .taskflow-acessos {
-    /* Navegação acima da imagem, sem retirar os controles do fluxo. */
-    grid-column: 1;
-    grid-row: 1;
-    align-self: start;
     position: relative;
     z-index: 1;
     display: grid;
@@ -419,46 +411,32 @@ a {
     background: var(--cor-principal-hover);
 }
 
-/* Ações — Sobreposição - controles sobre o piso da arte em telas amplas, antes da divisória */
+/* Apresentação — Ação - preserva Explore as áreas no fluxo normal do banner */
 .taskflow-acoes {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 12px;
-    position: relative;
-    z-index: 1;
-    margin-top: -68px;
-    padding: 0 0 20px 11.5%;
+    margin-top: 12px;
 }
 .taskflow-acoes > * { flex: 0 1 auto; min-width: 0; max-width: 100%; }
 .taskflow-acoes > :is(a, button):active { box-shadow: inset 0 2px 8px #00102266; }
-#abrir-laboratorio {
-    border-color: #ffd77b;
-    background: linear-gradient(135deg, #ffad35, #ff8526);
-    color: #251304;
-    box-shadow: 0 0 18px #ff951e66, inset 0 0 8px #ffe8ac44;
-}
-.taskflow-acoes .agenda-acesso {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    min-height: 48px;
-    margin: 0;
-    padding: 12px 20px;
-    border: 1px solid #3bbfe9;
-    border-radius: 8px;
-    background: #06162e;
-    color: #eef7ff;
-    box-shadow: 0 0 9px #1394db33;
-    font-size: 14px;
-    transition: background-color .18s, border-color .18s, box-shadow .18s, scale .18s;
-}
+/* Recursos — Cards visuais - imagens completas, com uma única área de interação. */
+.taskflow-atalhos { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; margin-top: 26px; }
+.taskflow-atalho { --acesso-destaque: #34c9ff; position: relative; display: block; width: 100%; min-width: 0; padding: 0; border: 1px solid #254768; border-radius: 14px; background: #020d1d; color: var(--cor-texto); text-decoration: none; aspect-ratio: 286 / 720; transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
+.taskflow-atalho img { display: block; width: 100%; height: 100%; object-fit: contain; border-radius: inherit; }
+.taskflow-atalho[data-acesso="biblioteca"] { --acesso-destaque: #ff963e; }
+.taskflow-atalho[data-acesso="agenda"] { --acesso-destaque: #ffc53e; }
+.taskflow-atalho[data-acesso="carreira"] { --acesso-destaque: #00dca4; }
+.taskflow-atalho[data-acesso="ia"] { --acesso-destaque: #ad6aff; }
+.taskflow-atalho:focus-visible { outline: 3px solid var(--acesso-destaque); outline-offset: 4px; border-color: var(--acesso-destaque); box-shadow: 0 0 16px color-mix(in srgb, var(--acesso-destaque) 30%, transparent); }
+
+.taskflow-atalho:disabled { cursor: not-allowed; }
+.taskflow-atalho-status { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); padding: 6px 10px; border: 1px solid #ad6aff; border-radius: 6px; background: #100b25; color: #f1eaff; font-size: 12px; font-weight: 700; }
+#taskflow-categorias, #taskflow-carreira { scroll-margin-top: 24px; }
 
 /* Áreas e tópicos — Visual - organiza o mapa de estudos em grupos identificáveis */
 .taskflow-areas {
-    grid-column: 1;
-    grid-row: 2;
     width: 100%;
     max-width: 1440px;
     margin: 0 auto;
@@ -1129,16 +1107,11 @@ html.agenda-aberta body {
 
 /* Recepção compacta — Responsividade - adapta o conteúdo sem depender da largura do desktop */
 @media (max-width: 1399px) {
+    .taskflow-atalhos { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .taskflow-mapa { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 1100px) {
-    /* Sem espaço acima do texto da arte, separa a navegação para manter a leitura. */
-    .taskflow-acessos { grid-row: 1; }
-    .taskflow-apresentacao { grid-row: 2; }
-    /* Preserva a leitura da imagem quando os três controles precisam quebrar linha. */
-    .taskflow-acoes { margin-top: 8px; padding-bottom: 0; }
-    .taskflow-areas { grid-row: 3; }
     .taskflow-areas-cabecalho {
         align-items: start;
         flex-direction: column;
@@ -1146,11 +1119,16 @@ html.agenda-aberta body {
     }
 }
 
+@media (max-width: 999px) {
+    .taskflow-atalhos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 @media (max-width: 768px) {
     .taskflow-mapa { grid-template-columns: minmax(0, 1fr); }
+    .taskflow-atalhos { grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 20px; }
+    .taskflow-atalho { max-width: 320px; }
     .taskflow-acoes { padding-inline: 0; gap: 10px; margin-top: 12px; }
     .taskflow-acoes > * { flex: 1 1 150px; }
-    .taskflow-acoes .agenda-acesso { width: 100%; }
     .area-ilustracao { padding: 10px; font-size: 25px; }
     /* Navegação — Responsividade - mantém cinco acessos em uma linha sem abreviar os nomes */
     .taskflow-acessos {
@@ -1187,8 +1165,7 @@ html.agenda-aberta body {
         overflow-wrap: anywhere;
     }
 
-    .taskflow-explorar,
-    .taskflow-boas-vindas .agenda-acesso {
+    .taskflow-explorar {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -1464,10 +1441,9 @@ html.agenda-aberta body {
 }
 
 @media (hover: hover) and (pointer: fine) {
+    .taskflow-atalho:is(a, button):not(:disabled):hover { transform: translateY(-3px) scale(1.02); border-color: var(--acesso-destaque); box-shadow: 0 0 18px color-mix(in srgb, var(--acesso-destaque) 30%, transparent); }
     .area-tecnologia:hover { border-color: #50bfe7; box-shadow: 0 6px 18px #00102255; transform: translateY(-2px); }
-    .taskflow-acoes > #abrir-laboratorio:hover { background: #ffc475; border-color: #ffe1a3; box-shadow: 0 0 23px #ff951e88; }
-    .taskflow-acoes > .taskflow-explorar:not(#abrir-laboratorio):hover { box-shadow: 0 0 20px #008dff77; }
-    .taskflow-acoes .agenda-acesso:not(:disabled):hover { background: #123858; border-color: #6ce5ff; box-shadow: 0 0 14px #1394db55; }
+    .taskflow-acoes > .taskflow-explorar:hover { box-shadow: 0 0 20px #008dff77; }
     /* Botões — Hover - crescimento discreto sem deslocar os elementos vizinhos. */
     :is(.botao-recolher-menu, .item-menu, .taskflow-acesso, .taskflow-explorar, .topico-taskflow, .agenda-botao, .agenda-dia):not(:disabled):not([aria-disabled="true"]):hover {
         scale: 1.02;
@@ -1520,6 +1496,8 @@ html.agenda-aberta body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+    .taskflow-atalho { transition: none; }
+    .taskflow-atalho:is(a, button):hover { transform: none; }
     .area-tecnologia:hover { transform: none; }
     :is(.botao-recolher-menu, .item-menu, .taskflow-acesso, .taskflow-explorar, .topico-taskflow, .agenda-botao, .agenda-dia) {
         scale: none;
