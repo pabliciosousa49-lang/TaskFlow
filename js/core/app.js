@@ -28,13 +28,13 @@ function mostrarView(view) {
     }
     window.scrollTo({ top: 0, behavior: "instant" });
 }
-for (const [id, view] of [["#abrir-home", viewHome], ["#abrir-taskflow", viewTaskFlow], ["#biblioteca-voltar", viewTaskFlow], ["#abrir-biblioteca", viewBiblioteca], ["#acessar-biblioteca", viewBiblioteca]]) {
+for (const [id, view] of [["#abrir-home", viewHome], ["#abrir-taskflow", viewTaskFlow], ["#home-explorar", viewTaskFlow], ["#biblioteca-voltar", viewTaskFlow], ["#abrir-biblioteca", viewBiblioteca], ["#acessar-biblioteca", viewBiblioteca]]) {
     document.querySelector(id).addEventListener("click", evento => {
         evento.preventDefault();
         mostrarView(view);
     });
 }
-document.querySelector("#acessar-carreira").addEventListener("click", evento => {
+for (const id of ["#acessar-carreira", "#home-carreira"]) document.querySelector(id).addEventListener("click", evento => {
     evento.preventDefault();
     mostrarView(viewBiblioteca);
     document.querySelector("#taskflow-carreira").scrollIntoView({ block: "start", behavior: "instant" });
@@ -302,6 +302,10 @@ function fecharAgenda() {
 
 // Acessos e fechamento — Escuta - abre o painel, trata Escape e devolve foco ao acesso original
 for (const id of ["#abrir-agenda", "#agenda-completa"]) document.querySelector(id).addEventListener("click", abrirAgenda);
+document.querySelector("#home-agenda").addEventListener("click", evento => {
+    evento.preventDefault();
+    abrirAgenda(evento);
+});
 document.querySelector("#fechar-agenda").addEventListener("click", fecharAgenda);
 painelAgenda.addEventListener("cancel", evento => { evento.preventDefault(); fecharAgenda(); });
 painelAgenda.addEventListener("close", () => {

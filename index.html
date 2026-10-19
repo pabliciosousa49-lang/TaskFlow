@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
   <link rel="stylesheet" href="./css/global/style.css">
   <link rel="stylesheet" href="./css/components/pomodoro.css">
+  <link rel="stylesheet" href="./css/pages/home.css">
 </head>
 
 <body>
@@ -98,19 +99,67 @@
          VIEW HOME
     ========================================= -->
 
-      <!-- Home — Apresentação - representar página inicial da plataforma -->
-      <section id="view-home" class="view view-ativa">
-
-        <!-- Banner principal — Apresentação - reproduzir área visual da Home -->
-        <div class="banner-home">
-
-          <img src="./assets/images/home-guia-voxel.png" width="1790" height="878" alt="Guia rápido: bem-vindo ao TaskFlow. Explore as áreas, estude e pratique, organize sua jornada e prepare seu futuro.">
-
+      <!-- Boas-vindas — guia interativo com texto e controles reais. -->
+      <section id="view-home" class="view view-ativa" aria-labelledby="home-titulo">
+        <div class="home-boas-vindas">
+          <header class="home-apresentacao">
+            <div class="home-apresentacao-texto">
+              <p class="home-identificador">GUIA RÁPIDO</p>
+              <h1 id="home-titulo">Bem-vindo ao <span>TaskFlow!</span></h1>
+              <p class="home-descricao">Seu ambiente completo para estudar, organizar, praticar e desenvolver sua carreira. Veja abaixo como usar o TaskFlow e aproveite ao máximo cada recurso.</p>
+              <div class="home-tour-acoes">
+                <button class="home-tour" type="button" disabled aria-describedby="home-tour-pendente"><i class="fa-solid fa-circle-play" aria-hidden="true"></i> Assista ao tour rápido <span aria-hidden="true">→</span></button>
+                <span class="home-tour-duracao"><i class="fa-regular fa-clock" aria-hidden="true"></i> Apenas 2 minutos</span>
+              </div>
+              <p id="home-tour-pendente">Tour em preparação.</p>
+            </div>
+          </header>
+          <section class="home-guia" aria-labelledby="home-guia-titulo">
+            <header class="home-guia-cabecalho">
+              <h2 id="home-guia-titulo">Como usar o TaskFlow</h2>
+              <p>Siga o passo a passo e descubra tudo o que você pode fazer.</p>
+            </header>
+            <div class="home-guia-cards">
+              <a id="home-explorar" class="home-guia-card" data-passo="1" href="#view-taskflow">
+                <div class="home-card-ilustracao"><img src="./assets/images/home-explore-voxel.png" width="353" height="242" alt="" loading="lazy"></div>
+                <div class="home-card-conteudo">
+                  <h3>Explore as áreas</h3>
+                  <p>Acesse a Biblioteca Técnica, Laboratório, Agenda, Área de Carreira e Gestor de IA.</p>
+                  <span class="home-card-seta" aria-hidden="true">→</span>
+                </div>
+              </a>
+              <a class="home-guia-card" data-passo="2" href="./pages/studio.html">
+                <div class="home-card-ilustracao"><img src="./assets/images/home-pratique-voxel.png" width="333" height="244" alt="" loading="lazy"></div>
+                <div class="home-card-conteudo">
+                  <h3>Estude e pratique</h3>
+                  <p>Utilize conteúdos, projetos e exercícios para evoluir com consistência.</p>
+                  <span class="home-card-seta" aria-hidden="true">→</span>
+                </div>
+              </a>
+              <a id="home-agenda" class="home-guia-card" data-passo="3" href="#painel-agenda" aria-haspopup="dialog">
+                <div class="home-card-ilustracao"><img src="./assets/images/home-agenda-voxel.png" width="338" height="239" alt="" loading="lazy"></div>
+                <div class="home-card-conteudo">
+                  <h3>Organize sua jornada</h3>
+                  <p>Use a Agenda para planejar seus estudos, definir metas e acompanhar seu progresso.</p>
+                  <span class="home-card-seta" aria-hidden="true">→</span>
+                </div>
+              </a>
+              <a id="home-carreira" class="home-guia-card" data-passo="4" href="#taskflow-carreira">
+                <div class="home-card-ilustracao"><img src="./assets/images/home-carreira-voxel.png" width="368" height="244" alt="" loading="lazy"></div>
+                <div class="home-card-conteudo">
+                  <h3>Prepare seu futuro</h3>
+                  <p>Desenvolva suas habilidades na Área de Carreira e conte com o Gestor de IA para tomar decisões mais eficazes.</p>
+                  <span class="home-card-seta" aria-hidden="true">→</span>
+                </div>
+              </a>
+            </div>
+          </section>
+          <footer class="home-dica">
+            <p><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span><strong>Dica:</strong> Use os recursos no seu ritmo e volte a este guia sempre que precisar.</span></p>
+            <span class="home-dica-mensagem">Vamos juntos nessa jornada! <span aria-hidden="true">→</span></span>
+          </footer>
         </div>
-
       </section>
-
-
 
       <!-- Recepção TaskFlow — Estrutura - apresenta o ambiente e suas áreas de estudo -->
       <section id="view-taskflow" class="view" aria-labelledby="titulo-taskflow">

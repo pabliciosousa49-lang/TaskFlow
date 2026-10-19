@@ -132,6 +132,21 @@ test("Biblioteca abre pelos dois acessos e Carreira revela a área sem duplicar 
     assert.equal(a.obter("view-taskflow").classList.contains("view-ativa"), false);
 });
 
+test("cards da Home reutilizam exploração, Agenda e Carreira com retorno de foco", () => {
+    const a = iniciar();
+    a.clicar("home-explorar");
+    assert.ok(a.obter("view-taskflow").classList.contains("view-ativa"));
+    a.clicar("abrir-home");
+    a.clicar("home-agenda");
+    assert.equal(a.obter("painel-agenda").open, true);
+    a.clicar("fechar-agenda");
+    assert.ok(a.obter("home-agenda").focado);
+    assert.ok(a.obter("view-home").classList.contains("view-ativa"));
+    a.clicar("home-carreira");
+    assert.ok(a.obter("view-biblioteca").classList.contains("view-ativa"));
+    assert.ok(a.obter("taskflow-carreira").ultimaRolagem);
+});
+
 test("Agenda navega para 2027, indica feriados e fins de semana sem alterar compromissos", () => {
     const a = iniciar();
     for (let i = 0; i < new Date().getMonth(); i++) a.clicar("mes-anterior");

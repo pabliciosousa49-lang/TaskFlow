@@ -1,0 +1,78 @@
+/* Boas-vindas — estilos exclusivos da Home; navegação e outros recursos preservados. */
+#view-home {
+    background: #020b1a;
+    color: var(--cor-texto);
+}
+.home-boas-vindas {
+    max-width: 1800px;
+    min-height: 100vh;
+    margin: auto;
+    padding: 0 clamp(18px, 4vw, 70px) 24px;
+    background: linear-gradient(180deg, #020b1a00 25%, #020b1a66 55%, #020b1af2 85%), url("../../assets/images/home-boas-vindas-fundo-voxel.png") right top / 100% auto no-repeat;
+}
+.home-apresentacao { display: flex; align-items: center; min-height: clamp(400px, 33vw, 570px); padding: 36px 0 26px; }
+.home-apresentacao-texto { width: 49%; min-width: 0; }
+.home-identificador { display: inline-block; margin-bottom: 20px; padding-bottom: 7px; border-bottom: 1px solid #007bff77; color: #00c8ff; font-size: 15px; font-weight: 500; letter-spacing: 5px; }
+#home-titulo { font-size: clamp(36px, 4.6vw, 76px); font-weight: 800; line-height: 1.03; letter-spacing: -1.5px; }
+#home-titulo span { display: block; color: #009dff; }
+.home-descricao { max-width: 590px; margin-top: 20px; color: var(--cor-texto-secundario); font-size: clamp(15px, 1.3vw, 20px); line-height: 1.5; }
+.home-tour-acoes { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; margin-top: 20px; }
+.home-tour { display: inline-flex; align-items: center; justify-content: center; gap: 12px; min-height: 52px; max-width: 100%; padding: 13px 20px; border: 1px solid #168dff; border-radius: 9px; background: linear-gradient(120deg, #0789ff, #0063ef); color: #fff; box-shadow: 0 0 18px #007bff33; font-size: 15px; font-weight: 700; }
+.home-tour > i { font-size: 23px; }
+.home-tour > span { margin-left: 8px; font-size: 26px; line-height: 1; }
+.home-tour:disabled { cursor: not-allowed; }
+.home-tour-duracao { display: inline-flex; align-items: center; gap: 8px; color: var(--cor-texto-secundario); font-size: 14px; }
+.home-tour-duracao i { color: #91b7db; font-size: 22px; }
+#home-tour-pendente { margin-top: 8px; color: #b5c9df; font-size: 12px; }
+.home-guia-cabecalho { position: relative; margin-bottom: 18px; padding-left: 22px; }
+.home-guia-cabecalho::before { position: absolute; left: 0; top: 0; bottom: 0; content: ''; width: 6px; border-radius: 5px; background: #00aaff; }
+.home-guia-cabecalho h2 { font-size: clamp(23px, 2.1vw, 32px); line-height: 1.3; }
+.home-guia-cabecalho p { margin-top: 4px; color: var(--cor-texto-secundario); font-size: clamp(14px, 1.2vw, 18px); line-height: 1.5; }
+.home-guia-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
+.home-guia-card { --home-card-cor: #ffad26; display: flex; flex-direction: column; min-width: 0; border: 1px solid var(--home-card-cor); border-radius: 12px; background: #020b19; color: var(--cor-texto); text-decoration: none; box-shadow: 0 0 12px #0005; transition: transform .18s ease, box-shadow .18s ease; }
+.home-guia-card[data-passo="2"] { --home-card-cor: #00aeff; }
+.home-guia-card[data-passo="3"] { --home-card-cor: #ffcc33; }
+.home-guia-card[data-passo="4"] { --home-card-cor: #00d9b8; }
+/* Exibe apenas a ilustração e o número originais, sem repetir o texto da imagem. */
+.home-card-ilustracao { aspect-ratio: 2.65; overflow: hidden; border-radius: 11px 11px 0 0; }
+.home-card-ilustracao img { display: block; width: 100%; height: auto; object-fit: cover; object-position: center top; }
+.home-card-conteudo { position: relative; flex: 1; padding: 10px 16px 18px; background: linear-gradient(#020b19dd, #020b19); border-radius: 0 0 11px 11px; }
+.home-card-conteudo h3 { margin-bottom: 8px; font-size: clamp(15px, 1.3vw, 20px); font-weight: 800; line-height: 1.3; }
+.home-card-conteudo p { padding-right: 48px; color: var(--cor-texto-secundario); font-size: clamp(12px, 1vw, 15px); line-height: 1.5; overflow-wrap: anywhere; }
+.home-card-seta { position: absolute; right: 12px; bottom: 16px; display: grid; place-items: center; width: 38px; height: 38px; border: 2px solid var(--home-card-cor); border-radius: 50%; color: var(--home-card-cor); font-size: 28px; line-height: 1; }
+.home-guia-card:focus-visible, .home-tour:focus-visible { outline: 3px solid #6ce5ff; outline-offset: 4px; }
+.home-dica { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px 24px; margin-top: 22px; padding: 14px 20px; border: 1px solid #164365; border-radius: 10px; background: #031225db; }
+.home-dica p { display: flex; align-items: center; gap: 12px; color: var(--cor-texto-secundario); font-size: 14px; line-height: 1.5; }
+.home-dica p i { color: #ffd84d; font-size: 23px; }
+.home-dica strong { color: var(--cor-texto); }
+.home-dica-mensagem { color: #00baff; font-size: 14px; font-weight: 700; }
+.home-dica-mensagem > span { margin-left: 14px; font-size: 25px; }
+@media (hover: hover) and (pointer: fine) {
+    .home-guia-card:hover { transform: translateY(-3px); box-shadow: 0 0 16px color-mix(in srgb, var(--home-card-cor) 24%, transparent); }
+    .home-tour:not(:disabled):hover { box-shadow: 0 0 24px #007bff66; }
+}
+@media (max-width: 1199px) {
+    .home-boas-vindas { background-size: auto 620px; background-position: 60% top; }
+    .home-apresentacao-texto { width: 55%; padding: 18px; border-radius: 12px; background: #020b1ab8; }
+    .home-guia-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .home-card-conteudo h3 { font-size: 20px; }
+    .home-card-conteudo p { font-size: 15px; }
+}
+@media (max-width: 600px) {
+    .home-boas-vindas { padding-inline: 16px; background-size: auto 420px; background-position: 66% top; }
+    .home-apresentacao { min-height: auto; padding-top: 240px; }
+    .home-apresentacao-texto { width: 100%; padding: 18px 0; background: linear-gradient(#020b1aa6, #020b1a); }
+    .home-identificador { margin-bottom: 16px; font-size: 12px; }
+    #home-titulo { font-size: clamp(36px, 9vw, 48px); }
+    .home-descricao { font-size: 16px; }
+    .home-tour-acoes { gap: 12px; }
+    .home-tour { width: 100%; }
+    .home-guia-cards { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+    .home-guia-cabecalho { padding-left: 18px; }
+    .home-dica { padding: 16px; }
+    .home-dica-mensagem { font-size: 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .home-guia-card { transition: none; }
+    .home-guia-card:hover { transform: none; }
+}
