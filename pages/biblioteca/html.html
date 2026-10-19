@@ -17,7 +17,6 @@
       <p>Biblioteca Técnica</p>
     </div>
     <span class="biblioteca-tecnologia" data-identidade="html">HTML</span>
-    <button id="biblioteca-pesquisar" class="biblioteca-pesquisa-botao" type="button" aria-haspopup="dialog" aria-controls="biblioteca-pesquisa" disabled>Pesquisar</button>
     <a class="biblioteca-retorno" href="../../index.html" data-taskflow-voltar>← Voltar</a>
   </header>
   <section class="biblioteca-apresentacao" aria-label="Biblioteca de HTML">
@@ -62,24 +61,21 @@
       </div>
     </section>
   </nav>
-  <dialog id="biblioteca-pesquisa" class="biblioteca-pesquisa" aria-labelledby="biblioteca-pesquisa-titulo">
-    <div class="biblioteca-pesquisa-cabecalho">
-      <h2 id="biblioteca-pesquisa-titulo">Pesquisar HTML</h2>
-      <button id="biblioteca-pesquisa-fechar" class="biblioteca-pesquisa-botao" type="button">Fechar</button>
-    </div>
-    <form id="biblioteca-pesquisa-formulario" role="search">
-      <label for="biblioteca-pesquisa-campo">Tag, conceito ou o que você quer criar</label>
-      <input id="biblioteca-pesquisa-campo" type="search" autocomplete="off" placeholder="Ex.: parágrafo, senha, imagem" aria-describedby="biblioteca-pesquisa-status">
-    </form>
-    <p id="biblioteca-pesquisa-status" role="status" aria-live="polite" aria-atomic="true">Digite uma tag, conceito ou intenção. Exemplos: parágrafo, senha ou imagem.</p>
-    <ul id="biblioteca-pesquisa-resultados" aria-label="Resultados da pesquisa"></ul>
-  </dialog>
   <main id="biblioteca-html" class="biblioteca-layout" data-tecnologia="html">
     <button id="biblioteca-alternar-menu" class="biblioteca-menu-botao" type="button"
       aria-controls="biblioteca-menu" aria-expanded="false" disabled>Mostrar níveis</button>
     <aside id="biblioteca-menu" class="biblioteca-menu" aria-labelledby="biblioteca-menu-titulo">
       <span class="biblioteca-etiqueta">GUIA DE ESTUDOS</span>
       <h2 id="biblioteca-menu-titulo">Níveis de HTML</h2>
+      <section id="biblioteca-pesquisa" class="biblioteca-pesquisa" aria-label="Pesquisa de conteúdos">
+        <form id="biblioteca-pesquisa-formulario" role="search" aria-label="Pesquisar na documentação">
+          <label for="biblioteca-pesquisa-campo">Pesquisar conteúdo</label>
+          <input id="biblioteca-pesquisa-campo" type="search" autocomplete="off" placeholder="Pesquisar conteúdo..." aria-describedby="biblioteca-pesquisa-status" disabled>
+          <button id="biblioteca-pesquisa-limpar" class="biblioteca-pesquisa-limpar" type="button" hidden>Limpar pesquisa</button>
+        </form>
+        <p id="biblioteca-pesquisa-status" role="status" aria-live="polite" aria-atomic="true">Pesquise pelo título, conceito ou palavra-chave.</p>
+        <ul id="biblioteca-pesquisa-resultados" aria-label="Resultados da pesquisa" hidden></ul>
+      </section>
       <nav id="biblioteca-niveis" aria-label="Níveis e assuntos de HTML">
         <p class="biblioteca-menu-aviso">Carregando níveis…</p>
       </nav>

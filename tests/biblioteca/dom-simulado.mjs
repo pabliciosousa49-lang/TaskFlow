@@ -34,13 +34,13 @@ export class Elemento {
 export function iniciar(tecnologia) {
     const copias = [];
     const elementos = {};
-    for (const id of ["biblioteca-menu", "biblioteca-alternar-menu", "biblioteca-niveis", "biblioteca-leitura", "biblioteca-estado-vazio", "biblioteca-titulo", "biblioteca-nivel", "biblioteca-vazio-titulo", "biblioteca-vazio-descricao", "biblioteca-pesquisar", "biblioteca-pesquisa", "biblioteca-pesquisa-campo", "biblioteca-pesquisa-resultados", "biblioteca-pesquisa-status", "biblioteca-pesquisa-formulario", "biblioteca-pesquisa-fechar"]) {
+    for (const id of ["biblioteca-menu", "biblioteca-alternar-menu", "biblioteca-niveis", "biblioteca-leitura", "biblioteca-estado-vazio", "biblioteca-titulo", "biblioteca-nivel", "biblioteca-vazio-titulo", "biblioteca-vazio-descricao", "biblioteca-pesquisa", "biblioteca-pesquisa-campo", "biblioteca-pesquisa-resultados", "biblioteca-pesquisa-status", "biblioteca-pesquisa-formulario", "biblioteca-pesquisa-limpar"]) {
         elementos["#" + id] = new Elemento(); elementos["#" + id].id = id;
     }
     const pagina = new Elemento("main"); pagina.dataset.tecnologia = tecnologia;
     const nav = new Elemento("nav"); nav.className = "biblioteca-conteudos-navegacao"; nav.append(new Elemento("button"), new Elemento("button"));
     elementos["#biblioteca-leitura"].append(nav);
-    elementos["#biblioteca-pesquisa"].append(...["campo", "resultados", "status", "formulario", "fechar"].map(id => elementos["#biblioteca-pesquisa-" + id]));
+    elementos["#biblioteca-pesquisa"].append(...["campo", "resultados", "status", "formulario", "limpar"].map(id => elementos["#biblioteca-pesquisa-" + id]));
     const document = { body: new Elemento("body"), addEventListener() {}, querySelector: s => s === "main[data-tecnologia]" ? pagina : s === ".biblioteca-conteudos-navegacao" ? nav : elementos[s], createElement: tag => {
         const node = new Elemento(tag);
         if (tag === "template") { node.content = { querySelectorAll: () => [] }; node.innerHTML = ""; }

@@ -75,14 +75,13 @@ test("navegação CSS simulada: 115 assuntos, prévias isoladas, anterior/próxi
         assert(frame.srcdoc.includes(assuntos[i].exemploCodigo.replace(/</g, "\\3c ")));
     }
     api.iniciarPesquisa();
-    elementos["#biblioteca-pesquisar"].disparar("click");
     elementos["#biblioteca-pesquisa-campo"].value = "padding";
     elementos["#biblioteca-pesquisa-campo"].disparar("input");
     const resultado = elementos["#biblioteca-pesquisa-resultados"].querySelector("button");
     mobile.matches = true; resultado.disparar("click");
     assert.equal(elementos["#biblioteca-titulo"].textContent, "Padding");
     assert.equal(elementos["#biblioteca-menu"].hidden, true);
-    assert.equal(elementos["#biblioteca-pesquisa"].open, false);
+    assert.equal(elementos["#biblioteca-pesquisa-campo"].disabled, false);
     assert(elementos["#biblioteca-leitura"].focado);
 });
 
@@ -191,4 +190,35 @@ test("CSS: anterior e próximo retornam ao início sem fechar o módulo selecion
     leitura.scrollTop = 350;
     nav.children[0].disparar('click');
     assert.equal(leitura.scrollTop, 0); assert.equal(leitura.rolagens, 2);
+});
+
+for (const linguagem of ["html", "css", "javascript", "typescript", "react"]) test(`${linguagem}: pesquisa no guia seleciona título, reinicia leitura e mantém um único tópico ativo`, () => {
+    const { api, elementos, mobile, nav } = iniciar(linguagem);
+    api.selecionarAssunto(0, false); api.iniciarPesquisa();
+    const topicos = elementos["#biblioteca-niveis"].querySelectorAll(".biblioteca-assunto");
+    const titulo = topicos.at(-1).textContent;
+    const campo = elementos["#biblioteca-pesquisa-campo"], lista = elementos["#biblioteca-pesquisa-resultados"];
+    const leitura = elementos["#biblioteca-leitura"], menu = elementos["#biblioteca-menu"];
+    campo.value = titulo; campo.disparar("input");
+    const resultado = lista.querySelectorAll("button").find(botao => botao.querySelector("strong").textContent === titulo);
+    assert(resultado); assert.equal(lista.hidden, false);
+    leitura.scrollTop = 650; menu.scrollTop = 80; mobile.matches = true;
+    resultado.disparar("click");
+    assert.equal(elementos["#biblioteca-titulo"].textContent, titulo);
+    assert.equal(leitura.scrollTop, 0); assert.equal(menu.scrollTop, 80);
+    assert.equal(leitura.ultimaRolagem.block, "start"); assert.equal(menu.hidden, true);
+    assert.equal(topicos.filter(b => b.getAttribute("aria-current") === "true").length, 1);
+    assert.equal(topicos.at(-1).getAttribute("aria-current"), "true");
+    leitura.scrollTop = 900; resultado.disparar("click");
+    assert.equal(leitura.scrollTop, 0, "mesmo tópico pesquisado reabre desde o início");
+    nav.children[0].disparar("click");
+    assert.equal(topicos.filter(b => b.getAttribute("aria-current") === "true").length, 1);
+    assert.equal(topicos.at(-1).getAttribute("aria-current"), null);
+    campo.value = "termo_inexistente_94857"; campo.disparar("input");
+    assert.equal(lista.children.length, 0); assert.equal(lista.hidden, true);
+    assert.match(elementos["#biblioteca-pesquisa-status"].textContent, /Nenhum assunto/);
+    elementos["#biblioteca-pesquisa-limpar"].disparar("click");
+    assert.equal(campo.value, ""); assert(campo.focado);
+    assert.equal(elementos["#biblioteca-pesquisa-limpar"].hidden, true);
+    assert.equal(topicos.filter(b => b.getAttribute("aria-current") === "true").length, 1);
 });

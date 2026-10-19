@@ -236,7 +236,7 @@ function blocoLeitura(titulo, valor, codigo = false) {
     return secao;
 }
 
-function selecionarAssunto(indice, focar = true) {
+function selecionarAssunto(indice, focar = true, reiniciarLeitura = false) {
     const registro = assuntosOrdenados[indice];
     if (!registro) return;
     const mudouAssunto = assuntoAtual !== indice;
@@ -355,11 +355,11 @@ function selecionarAssunto(indice, focar = true) {
     if (focar) {
         menuAberto = false;
         atualizarMenu();
-        if (documentacaoHTML || documentacaoCSS) {
+        if (documentacaoHTML || documentacaoCSS || reiniciarLeitura) {
             // HTML/CSS — Leitura - retorna ao título sem deslocar a rolagem interna do guia.
             const posicaoMenu = menu.scrollTop;
             leitura.focus({ preventScroll: true });
-            if (mudouAssunto) {
+            if (mudouAssunto || reiniciarLeitura) {
                 leitura.scrollTop = 0;
                 leitura.scrollIntoView({ block: "start", behavior: "instant" });
             }
@@ -484,24 +484,25 @@ function pesquisarAssuntos(consulta) {
         .sort((a, b) => a.prioridade - b.prioridade || a.indice - b.indice);
 }
 
-// Pesquisa — Interface - o diálogo reutiliza a seleção e a navegação de assuntos.
+// Pesquisa — Guia compartilhado: a seleção de resultados usa o mesmo estado dos tópicos.
 function iniciarPesquisa() {
-    const abrir = document.querySelector("#biblioteca-pesquisar");
-    const dialogo = document.querySelector("#biblioteca-pesquisa");
-    if (!documentacaoCompleta || !abrir || !dialogo) return;
-    const campo = dialogo.querySelector("#biblioteca-pesquisa-campo");
-    const lista = dialogo.querySelector("#biblioteca-pesquisa-resultados");
-    const status = dialogo.querySelector("#biblioteca-pesquisa-status");
+    const pesquisa = document.querySelector("#biblioteca-pesquisa");
+    if (!documentacaoCompleta || !pesquisa) return;
+    const campo = pesquisa.querySelector("#biblioteca-pesquisa-campo");
+    const lista = pesquisa.querySelector("#biblioteca-pesquisa-resultados");
+    const status = pesquisa.querySelector("#biblioteca-pesquisa-status");
+    const limpar = pesquisa.querySelector("#biblioteca-pesquisa-limpar");
     let resultados = [], anuncio;
     function mostrarResultados() {
         clearTimeout(anuncio);
         resultados = pesquisarAssuntos(campo.value);
         lista.replaceChildren();
+        lista.hidden = !resultados.length;
+        limpar.hidden = !campo.value;
         const mensagem = !normalizarPesquisa(campo.value)
-            ? (documentacaoProgramacao ? "Digite um conceito ou intenção: eventos, tipos, estado ou mapear lógica." : documentacaoCSS ? "Digite uma propriedade, conceito ou intenção. Exemplos: centralizar, padding ou cor de fundo." : "Digite uma tag, conceito ou intenção. Exemplos: parágrafo, senha ou imagem.")
-            : !resultados.length ? "Nenhum assunto encontrado. Tente outra tag ou palavra."
+            ? "Pesquise pelo título, conceito ou palavra-chave."
+            : !resultados.length ? "Nenhum assunto encontrado. Tente outra palavra."
                 : resultados.length + (resultados.length === 1 ? " assunto encontrado." : " assuntos encontrados. Escolha um resultado.");
-        // Aguarda uma pausa na digitação antes de anunciar a contagem.
         anuncio = setTimeout(() => { status.textContent = mensagem; }, 200);
         for (const { registro, indice } of resultados) {
             const item = document.createElement("li");
@@ -510,47 +511,22 @@ function iniciarPesquisa() {
             const titulo = document.createElement("strong");
             titulo.textContent = registro.assunto.titulo;
             const caminho = document.createElement("span");
-            caminho.textContent = registro.nivel.nome + " · " + registro.modulo.titulo;
-            const descricao = document.createElement("span");
-            descricao.textContent = registro.assunto.explicacao.split(/(?<=\.)\s/)[0];
-            botao.append(titulo, caminho, descricao);
-            botao.addEventListener("click", () => {
-                dialogo.close();
-                selecionarAssunto(indice);
-            });
+            caminho.textContent = registro.nivel.nome + " · " + (registro.modulo.titulo || registro.modulo.nome);
+            botao.append(titulo, caminho);
+            botao.addEventListener("click", () => selecionarAssunto(indice, true, true));
             item.append(botao);
             lista.append(item);
         }
     }
-    abrir.disabled = false;
-    abrir.addEventListener("click", () => {
-        campo.value = "";
-        mostrarResultados();
-        dialogo.showModal();
-        campo.focus();
-    });
+    campo.disabled = false;
     campo.addEventListener("input", mostrarResultados);
-    dialogo.querySelector("#biblioteca-pesquisa-formulario").addEventListener("submit", (event) => {
+    pesquisa.querySelector("#biblioteca-pesquisa-formulario").addEventListener("submit", event => {
         event.preventDefault();
-        if (resultados.length === 1) {
-            dialogo.close();
-            selecionarAssunto(resultados[0].indice);
-        } else lista.querySelector("button")?.focus();
+        if (resultados.length === 1) selecionarAssunto(resultados[0].indice, true, true);
+        else lista.querySelector("button")?.focus();
     });
-    dialogo.querySelector("#biblioteca-pesquisa-fechar").addEventListener("click", () => {
-        dialogo.close();
-        abrir.focus();
-    });
-    dialogo.addEventListener("keydown", (event) => {
-        // Não propaga Escape para o painel externo quando a documentação está incorporada.
-        if (event.key === "Escape") event.stopPropagation();
-    });
-    dialogo.addEventListener("cancel", (event) => {
-        event.preventDefault();
-        dialogo.close();
-        abrir.focus();
-    });
-    dialogo.addEventListener("close", () => clearTimeout(anuncio));
+    limpar.addEventListener("click", () => { campo.value = ""; mostrarResultados(); campo.focus(); });
+    mostrarResultados();
 }
 
 async function iniciarBiblioteca() {

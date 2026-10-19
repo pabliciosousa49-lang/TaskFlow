@@ -92,12 +92,12 @@ test('pesquisa por intenção é limitada à tecnologia aberta e permite selecio
   for (const [tecnologia, termos] of casos) {
     const { api, elementos, mobile } = iniciar(tecnologia);
     for (const [termo, id] of termos) assert.equal(api.pesquisarAssuntos(termo)[0]?.registro.assunto.id, id, termo);
-    api.iniciarPesquisa(); elementos['#biblioteca-pesquisar'].disparar('click');
+    api.iniciarPesquisa();
     elementos['#biblioteca-pesquisa-campo'].value = 'mapear lógica';
     elementos['#biblioteca-pesquisa-campo'].disparar('input');
     mobile.matches = true;
     elementos['#biblioteca-pesquisa-resultados'].querySelector('button').disparar('click');
-    assert.equal(elementos['#biblioteca-pesquisa'].open, false);
+    assert.equal(elementos['#biblioteca-pesquisa-campo'].disabled, false);
     assert.equal(elementos['#biblioteca-menu'].hidden, true);
     assert(elementos['#biblioteca-leitura'].focado);
     assert.equal(api.pesquisarAssuntos('senha').length, 0);
