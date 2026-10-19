@@ -146,7 +146,7 @@ test("HTML conserva a sequência de leitura e não recebe componentes exclusivos
     const { api, elementos } = iniciar("html");
     api.selecionarAssunto(0);
     const conteudo = elementos["#biblioteca-leitura"].querySelector(".biblioteca-conteudo");
-    assert.deepEqual(conteudo.children.map(s => s.querySelector("h2")?.textContent), ["Conceito", "Responsabilidade", "Exemplo de código", "Resultado", "Aplicação prática", "Observações importantes"]);
+    assert.deepEqual(conteudo.children.map(s => s.querySelector("h2")?.textContent), ["Conceito", "Exemplo de código", "Entenda o exemplo", "💡Dica", "Resultado", "Aplicação prática", "Observações importantes"]);
     assert.equal(conteudo.querySelector(".biblioteca-css-exemplo"), null);
     assert.equal(conteudo.querySelector(".biblioteca-css-relacionados"), null);
 });
@@ -165,7 +165,8 @@ for (const linguagem of ["html", "css"]) test(`${linguagem}: troca de tópico re
     assert.equal(botoes.filter(b => b.getAttribute('aria-current') === 'true').length, 1);
     leitura.scrollTop = 200; const rolagens = leitura.rolagens;
     api.selecionarAssunto(1);
-    assert.equal(leitura.scrollTop, 200); assert.equal(leitura.rolagens, rolagens);
+    assert.equal(leitura.scrollTop, linguagem === "html" ? 0 : 200);
+    assert.equal(leitura.rolagens, rolagens + (linguagem === "html" ? 1 : 0));
 });
 
 test("carga inicial não força rolagem; JavaScript mantém comportamento anterior", () => {

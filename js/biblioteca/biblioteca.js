@@ -208,7 +208,16 @@ function blocoCodigo(valor, titulo, linguagem = documentacaoCSS ? "css" : docume
             }
         });
         ferramentas.append(rotulo, copiar);
-        bloco.append(ferramentas, pre, resultado);
+        if (documentacaoHTML) {
+            const corpo = document.createElement("div");
+            corpo.className = "biblioteca-html-codigo-corpo";
+            const linhas = document.createElement("span");
+            linhas.className = "biblioteca-html-linhas";
+            linhas.setAttribute("aria-hidden", "true");
+            linhas.textContent = valor.split("\n").map((_, indice) => indice + 1).join("\n");
+            corpo.append(linhas, pre);
+            bloco.append(ferramentas, corpo, resultado);
+        } else bloco.append(ferramentas, pre, resultado);
     } else bloco.append(pre);
     return bloco;
 }
@@ -243,6 +252,7 @@ function selecionarAssunto(indice, focar = true, reiniciarLeitura = false) {
     assuntoAtual = indice;
     const { assunto, nivel, modulo, botao, painel, categoria, detalhes } = registro;
     document.querySelector("#biblioteca-titulo").textContent = assunto.titulo;
+    if (documentacaoHTML) document.querySelector("#biblioteca-html-breadcrumb").textContent = `HTML › ${nivel.nome} › ${assunto.titulo}`;
     document.querySelector("#biblioteca-nivel").textContent = `${nivel.nome} · ${modulo.titulo || modulo.nome}`;
     for (const item of assuntosOrdenados) item.botao.removeAttribute("aria-current");
     botao.setAttribute("aria-current", "true");
@@ -334,18 +344,39 @@ function selecionarAssunto(indice, focar = true, reiniciarLeitura = false) {
             referencia.append(resumo, blocoCodigo(assunto.sintaxe, "Sintaxe"));
             exemplo.insertBefore(referencia, contexto);
         }
-        const boasPraticas = blocoLeitura(documentacaoHTML ? "Observações importantes" : "Boas práticas", assunto.boasPraticas);
-        if (documentacaoHTML) boasPraticas.className = "biblioteca-observacao";
-        conteudoLeitura.append(
-            ...(!documentacaoHTML ? [blocoLeitura("Objetivo", assunto.objetivo)] : []),
-            blocoLeitura(documentacaoHTML ? "Conceito" : "Explicação", assunto.explicacao),
-            ...(documentacaoHTML ? [blocoLeitura("Responsabilidade", assunto.responsabilidadeCodigo)] : []),
-            ...(!documentacaoHTML ? [blocoLeitura("Sintaxe", assunto.sintaxe, true)] : []),
+        if (documentacaoHTML) {
+            const dica = document.createElement("aside");
+            dica.className = "biblioteca-html-dica";
+            const tituloDica = document.createElement("h2");
+            const lampada = document.createElement("span");
+            lampada.setAttribute("aria-hidden", "true"); lampada.textContent = "💡";
+            const rotulo = document.createElement("span"); rotulo.textContent = "Dica";
+            tituloDica.append(lampada, rotulo);
+            const textoDica = document.createElement("p");
+            textoDica.textContent = assunto.boasPraticas.at(-1);
+            dica.append(tituloDica, textoDica);
+            conteudoLeitura.append(
+                blocoLeitura("Conceito", assunto.explicacao),
+                exemplo,
+                blocoLeitura("Entenda o exemplo", assunto.responsabilidadeCodigo),
+                dica,
+                blocoResultado(assunto),
+                blocoLeitura("Aplicação prática", assunto.aplicacaoReal)
+            );
+            const observacoes = assunto.boasPraticas.slice(0, -1);
+            if (observacoes.length) {
+                const boasPraticas = blocoLeitura("Observações importantes", observacoes);
+                boasPraticas.className = "biblioteca-observacao";
+                conteudoLeitura.append(boasPraticas);
+            }
+        } else conteudoLeitura.append(
+            blocoLeitura("Objetivo", assunto.objetivo),
+            blocoLeitura("Explicação", assunto.explicacao),
+            blocoLeitura("Sintaxe", assunto.sintaxe, true),
             exemplo,
-            ...(!documentacaoHTML ? [blocoLeitura("Responsabilidade", assunto.responsabilidadeCodigo)] : []),
-            ...(documentacaoHTML ? [blocoResultado(assunto)] : []),
-            blocoLeitura(documentacaoHTML ? "Aplicação prática" : "Aplicação real", assunto.aplicacaoReal),
-            boasPraticas
+            blocoLeitura("Responsabilidade", assunto.responsabilidadeCodigo),
+            blocoLeitura("Aplicação real", assunto.aplicacaoReal),
+            blocoLeitura("Boas práticas", assunto.boasPraticas)
         );
     }
     estadoVazio.hidden = true;
@@ -359,7 +390,7 @@ function selecionarAssunto(indice, focar = true, reiniciarLeitura = false) {
             // HTML/CSS — Leitura - retorna ao título sem deslocar a rolagem interna do guia.
             const posicaoMenu = menu.scrollTop;
             leitura.focus({ preventScroll: true });
-            if (mudouAssunto || reiniciarLeitura) {
+            if (mudouAssunto || reiniciarLeitura || documentacaoHTML) {
                 leitura.scrollTop = 0;
                 leitura.scrollIntoView({ block: "start", behavior: "instant" });
             }

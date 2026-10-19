@@ -534,3 +534,34 @@ body:is(.biblioteca-html, .biblioteca-css, .biblioteca-javascript, .biblioteca-t
 body:is(.biblioteca-html, .biblioteca-css, .biblioteca-javascript, .biblioteca-typescript, .biblioteca-react) .biblioteca-assunto::before { content: ""; flex: 0 0 9px; width: 9px; height: 9px; border: 1px solid #6c93b4; border-radius: 50%; background: transparent; }
 body:is(.biblioteca-html, .biblioteca-css, .biblioteca-javascript, .biblioteca-typescript, .biblioteca-react) .biblioteca-assunto[aria-current="true"] { border-color: #d98b4d; background: #3b261bd9; color: #ffe1c4; box-shadow: 0 0 8px #ff9d2720; }
 body:is(.biblioteca-html, .biblioteca-css, .biblioteca-javascript, .biblioteca-typescript, .biblioteca-react) .biblioteca-assunto[aria-current="true"]::before { background: #ffad5c; border-color: #ffad5c; box-shadow: 0 0 6px #ff8a3a66; }
+
+/* HTML — apresentação editorial específica; dados e demais documentações preservados. */
+body.biblioteca-html #biblioteca-menu-titulo { margin: 0 0 16px; color: #f5f8ff; font-size: 21px; }
+body.biblioteca-html .biblioteca-html-linguagem { display: flex; align-items: center; gap: 10px; margin: 18px 0 12px; color: #ffbd82; font-size: 15px; font-weight: 700; }
+body.biblioteca-html .biblioteca-html-linguagem img { flex: 0 0 28px; }
+body.biblioteca-html .biblioteca-categoria { border-color: #245680; background: #081b35; }
+body.biblioteca-html .biblioteca-modulo summary { border-inline-start: 1px solid #245680; }
+body.biblioteca-html .biblioteca-assunto[aria-current="true"] { border-color: #ffad5c; border-inline-start: 3px solid #ff963e; background: #102d4c; color: #fff0e0; }
+body.biblioteca-html .biblioteca-html-titulo { display: flex; align-items: flex-start; gap: 12px; margin: 16px 0; }
+body.biblioteca-html .biblioteca-html-titulo img { flex: 0 0 36px; margin-top: 3px; }
+body.biblioteca-html .biblioteca-html-titulo h1 { margin: 0; min-width: 0; line-height: 1.25; overflow-wrap: anywhere; }
+body.biblioteca-html #biblioteca-html-breadcrumb { color: #9bc9f1; font-size: 11px; line-height: 1.8; letter-spacing: 1px; }
+body.biblioteca-html .biblioteca-conteudo > section, body.biblioteca-html .biblioteca-html-dica { min-width: 0; margin-top: 26px; }
+body.biblioteca-html .biblioteca-conteudo > section:first-child { margin-top: 0; }
+body.biblioteca-html .biblioteca-conteudo > section > h2 { font-size: 20px; color: #f5f8ff; }
+body.biblioteca-html .biblioteca-codigo { border-color: #23679d; background: #031124; box-shadow: 0 0 12px #007bff12; }
+body.biblioteca-html .biblioteca-codigo-ferramentas { background: #0a2240; color: #ffbd82; }
+body.biblioteca-html .biblioteca-html-codigo-corpo { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; min-width: 0; }
+body.biblioteca-html .biblioteca-html-linhas { padding: 16px 10px; border-right: 1px solid #1b3959; color: #7594af; white-space: pre; text-align: right; user-select: none; font: 13px/1.7 Consolas, monospace; }
+body.biblioteca-html .biblioteca-html-codigo-corpo pre { min-width: 0; max-width: 100%; padding: 16px; overflow-x: auto; background: #031124; white-space: pre; font: 13px/1.7 Consolas, monospace; }
+body.biblioteca-html .biblioteca-html-codigo-corpo code { font: inherit; white-space: pre; }
+body.biblioteca-html .biblioteca-html-dica { padding: 18px 20px; border: 1px solid #a46b26; border-inline-start: 3px solid #ffcc33; border-radius: 10px; background: #0b1e35; box-shadow: inset 0 0 14px #ffad5c05; }
+body.biblioteca-html .biblioteca-html-dica h2 { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; color: #ffd84d; font-size: 17px; }
+body.biblioteca-html .biblioteca-html-dica p { color: #e0ebf7; font-size: 15px; line-height: 1.7; }
+@media (max-width: 760px) {
+    body.biblioteca-html .biblioteca-html-titulo { gap: 10px; }
+    body.biblioteca-html .biblioteca-html-titulo img { width: 28px; height: 28px; flex-basis: 28px; }
+    body.biblioteca-html .biblioteca-html-dica { padding: 16px; }
+    body.biblioteca-html .biblioteca-html-codigo-corpo pre { padding: 14px 10px; }
+    body.biblioteca-html .biblioteca-html-linhas { padding: 14px 8px; }
+}
