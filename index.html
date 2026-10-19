@@ -50,7 +50,7 @@
         <!-- Home — Navegação - permitir retorno à página inicial -->
         <a href="#" id="abrir-home" class="item-menu item-menu-ativo">
           <i class="fa-solid fa-house" aria-hidden="true"></i>
-          <span>Home Dev Club</span>
+          <span>Home</span>
         </a>
 
 
@@ -60,9 +60,9 @@
           <span>TaskFlow</span>
         </a>
 
-        <a href="#" class="item-menu">
-          <i class="fa-solid fa-server" aria-hidden="true"></i>
-          <span>Hostinger</span>
+        <a href="#view-biblioteca" id="abrir-biblioteca" class="item-menu">
+          <i class="fa-solid fa-book-open" aria-hidden="true"></i>
+          <span>Biblioteca Técnica</span>
         </a>
 
         <a href="#" class="item-menu">
@@ -103,7 +103,7 @@
         <!-- Banner principal — Apresentação - reproduzir área visual da Home -->
         <div class="banner-home">
 
-          <img src="./assets/images/principal-home.png" alt="Banner principal DevClub">
+          <img src="./assets/images/home-guia-voxel.png" width="1790" height="878" alt="Guia rápido: bem-vindo ao TaskFlow. Explore as áreas, estude e pratique, organize sua jornada e prepare seu futuro.">
 
         </div>
 
@@ -150,7 +150,7 @@
               <p>Quatro áreas para conhecer.<br>Novas experiências por tópico virão nas próximas etapas.</p>
             </div>
             <nav class="taskflow-atalhos" aria-label="Recursos do TaskFlow">
-              <a class="taskflow-atalho" data-acesso="biblioteca" aria-label="Biblioteca Técnica" href="#taskflow-categorias">
+              <a class="taskflow-atalho" data-acesso="biblioteca" aria-label="Biblioteca Técnica" id="acessar-biblioteca" href="#view-biblioteca">
                 <img src="./assets/images/acesso-biblioteca-voxel.png" width="286" height="720" alt="" loading="lazy">
               </a>
               <a class="taskflow-atalho" data-acesso="laboratorio" aria-label="Laboratório" id="abrir-laboratorio" href="./pages/studio.html">
@@ -159,7 +159,7 @@
               <button class="taskflow-atalho" data-acesso="agenda" aria-label="Agenda" id="abrir-agenda" type="button" aria-haspopup="dialog">
                 <img src="./assets/images/acesso-agenda-voxel.png" width="279" height="716" alt="" loading="lazy">
               </button>
-              <a class="taskflow-atalho" data-acesso="carreira" aria-label="Área de Carreira" href="#taskflow-carreira">
+              <a class="taskflow-atalho" data-acesso="carreira" aria-label="Área de Carreira" id="acessar-carreira" href="#taskflow-carreira">
                 <img src="./assets/images/acesso-carreira-voxel.png" width="285" height="712" alt="" loading="lazy">
               </a>
               <button class="taskflow-atalho" data-acesso="ia" aria-label="Gestor de IA — indisponível" type="button" disabled>
@@ -167,6 +167,35 @@
                 <span class="taskflow-atalho-status">Indisponível</span>
               </button>
             </nav>
+            <p class="taskflow-nota">Cada jornada tem seu ritmo. Comece pela curiosidade.</p>
+          </section>
+          <!-- Próximos eventos — Estrutura - apresenta até três compromissos futuros -->
+          <aside class="proximos-eventos" aria-label="Próximos eventos">
+            <button id="alternar-eventos" class="agenda-botao" type="button" aria-expanded="false"
+              aria-controls="painel-eventos"><i class="fa-regular fa-calendar-check" aria-hidden="true"></i> Próximos eventos <span class="eventos-indicador" aria-hidden="true">⌃</span></button>
+            <div id="painel-eventos" class="eventos-conteudo" hidden>
+              <div class="agenda-barra">
+                <h2>Próximos eventos</h2><button id="fechar-eventos" class="agenda-botao" type="button"
+                  aria-label="Fechar próximos eventos">×</button>
+              </div>
+              <ul id="lista-eventos" class="agenda-lista"></ul>
+              <button id="agenda-completa" class="agenda-botao" type="button" aria-haspopup="dialog">Abrir agenda
+                completa</button>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="view-biblioteca" class="view" aria-labelledby="titulo-biblioteca">
+        <div class="biblioteca-hub">
+          <header class="biblioteca-hub-cabecalho">
+            <div>
+              <span class="taskflow-identificador">ESTUDE NO SEU RITMO</span>
+              <h1 id="titulo-biblioteca" tabindex="-1">Biblioteca Técnica</h1>
+              <p>Escolha uma área para explorar os conteúdos.</p>
+            </div>
+            <button id="biblioteca-voltar" class="taskflow-explorar" type="button">← Voltar ao TaskFlow</button>
+          </header>
             <div id="taskflow-categorias" class="taskflow-mapa">
               <!-- Front-end — Estrutura - agrupa os tópicos desta área -->
               <article class="area-tecnologia" aria-labelledby="titulo-frontend">
@@ -322,22 +351,6 @@
                 </div>
               </article>
             </div>
-            <p class="taskflow-nota">Cada jornada tem seu ritmo. Comece pela curiosidade.</p>
-          </section>
-          <!-- Próximos eventos — Estrutura - apresenta até três compromissos futuros -->
-          <aside class="proximos-eventos" aria-label="Próximos eventos">
-            <button id="alternar-eventos" class="agenda-botao" type="button" aria-expanded="false"
-              aria-controls="painel-eventos">Próximos eventos</button>
-            <div id="painel-eventos" class="eventos-conteudo" hidden>
-              <div class="agenda-barra">
-                <h2>Próximos eventos</h2><button id="fechar-eventos" class="agenda-botao" type="button"
-                  aria-label="Fechar próximos eventos">×</button>
-              </div>
-              <ul id="lista-eventos" class="agenda-lista"></ul>
-              <button id="agenda-completa" class="agenda-botao" type="button" aria-haspopup="dialog">Abrir agenda
-                completa</button>
-            </div>
-          </aside>
         </div>
       </section>
 
@@ -362,6 +375,10 @@
           <h3 id="agenda-mes" aria-live="polite"></h3>
           <button id="mes-seguinte" class="agenda-botao" type="button" aria-label="Mês seguinte">›</button>
         </div>
+        <div class="agenda-ano-controle">
+          <label for="agenda-ano">Ir para o ano</label>
+          <input id="agenda-ano" type="number" min="1" max="9999" step="1" inputmode="numeric" aria-label="Ano do calendário">
+        </div>
         <div class="agenda-semana" aria-hidden="true">
           <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
         </div>
@@ -370,7 +387,11 @@
           <span><i class="agenda-legenda-selecao" aria-hidden="true"></i>Dia selecionado</span>
           <span><i class="agenda-legenda-hoje" aria-hidden="true"></i>Hoje</span>
           <span><i class="agenda-legenda-evento" aria-hidden="true"></i>Com compromisso</span>
+          <span><i class="agenda-legenda-feriado" aria-hidden="true"></i>Feriado nacional</span>
+          <span><i class="agenda-legenda-fim-semana" aria-hidden="true"></i>Fim de semana</span>
         </div>
+        <p class="agenda-escopo-feriados">Feriados nacionais do Brasil. Feriados locais e pontos facultativos não estão incluídos.</p>
+        <ul id="agenda-feriados" class="agenda-feriados" aria-label="Feriados nacionais do mês"></ul>
         <h3 id="agenda-data-selecionada"></h3>
       </section>
       <!-- Compromissos do dia — Apresentação - acompanha a data selecionada -->

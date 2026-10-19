@@ -11,9 +11,11 @@ function iniciar(dados = "[]") {
     const elementos = new Map();
     function elemento() {
         const e = new Elemento();
-        e.classList = { add() {}, remove() {} };
+        const classes = new Set();
+        e.classList = { add: (...nomes) => nomes.forEach(n => classes.add(n)), remove: (...nomes) => nomes.forEach(n => classes.delete(n)), contains: n => classes.has(n) };
         e.style = { setProperty() {}, removeProperty() {} };
         e.setCustomValidity = valor => { e.validacao = valor; };
+        e.reportValidity = () => !e.validacao;
         e.closest = () => e;
         return e;
     }
@@ -110,4 +112,47 @@ test("Agenda rejeita campos inválidos e preserva armazenamento ilegível", () =
     assert.equal(bloqueada.obter("salvar-compromisso").disabled, true);
     bloqueada.salvar("Estudar", "2040-02-02");
     assert.equal(bloqueada.armazenamento.get("taskflow.agenda.compromissos.v1"), "dados ilegíveis");
+});
+
+test("Biblioteca abre pelos dois acessos e Carreira revela a área sem duplicar as views", () => {
+    const a = iniciar();
+    for (const acesso of ["abrir-biblioteca", "acessar-biblioteca", "acessar-carreira"]) {
+        a.clicar(acesso);
+        assert.ok(a.obter("view-biblioteca").classList.contains("view-ativa"));
+        assert.ok(a.obter("view-biblioteca").classList.contains("biblioteca-entrada"));
+        assert.equal(a.obter("abrir-biblioteca").getAttribute("aria-current"), "page");
+        assert.equal(a.obter("view-taskflow").classList.contains("view-ativa"), false);
+        a.clicar("biblioteca-voltar");
+        assert.ok(a.obter("view-taskflow").classList.contains("view-ativa"));
+        assert.equal(a.obter("view-biblioteca").classList.contains("view-ativa"), false);
+    }
+    assert.ok(a.obter("taskflow-carreira").ultimaRolagem);
+    a.clicar("abrir-home");
+    assert.ok(a.obter("view-home").classList.contains("view-ativa"));
+    assert.equal(a.obter("view-taskflow").classList.contains("view-ativa"), false);
+});
+
+test("Agenda navega para 2027, indica feriados e fins de semana sem alterar compromissos", () => {
+    const a = iniciar();
+    for (let i = 0; i < new Date().getMonth(); i++) a.clicar("mes-anterior");
+    const ano = a.obter("agenda-ano");
+    ano.value = "2027";
+    ano.disparar("change", { target: ano });
+    assert.match(a.obter("agenda-mes").textContent, /2027/);
+    const dias = a.obter("agenda-dias").children;
+    const feriado = dias.find(e => e.dataset.data === "2027-01-01");
+    assert.match(feriado.className, /agenda-feriado/);
+    assert.match(feriado.getAttribute("aria-label"), /feriado nacional: Confraternização Universal/);
+    assert.match(a.obter("agenda-feriados").textContent, /01\/01 — Confraternização Universal/);
+    const sabado = dias.find(e => e.dataset.data === "2027-01-02");
+    assert.match(sabado.className, /agenda-fim-semana/);
+    assert.match(sabado.getAttribute("aria-label"), /fim de semana/);
+    assert.doesNotMatch(sabado.className, /agenda-feriado/);
+    for (let i = 0; i < 12; i++) a.clicar("mes-seguinte");
+    assert.match(a.obter("agenda-mes").textContent, /2028/);
+    a.clicar("mes-anterior"); assert.match(a.obter("agenda-mes").textContent, /2027/);
+    ano.value = "0"; ano.disparar("change", { target: ano });
+    assert.ok(ano.validacao);
+    assert.match(a.obter("agenda-mes").textContent, /2027/);
+    assert.equal(a.armazenamento.get("taskflow.agenda.compromissos.v1"), "[]");
 });

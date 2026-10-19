@@ -1,36 +1,43 @@
-// Elementos da navegação — Seleção - localiza os acessos e as telas existentes
+// Navegação — mantém Home, TaskFlow e Biblioteca como abas da aplicação.
 const botaoHome = document.querySelector("#abrir-home");
 const botaoTaskFlow = document.querySelector("#abrir-taskflow");
+const botaoBiblioteca = document.querySelector("#abrir-biblioteca");
 const viewHome = document.querySelector("#view-home");
 const viewTaskFlow = document.querySelector("#view-taskflow");
-
-// Animação da recepção — Processamento - reinicia a entrada a cada abertura do TaskFlow
+const viewBiblioteca = document.querySelector("#view-biblioteca");
 function iniciarRecepcao() {
     viewTaskFlow.classList.remove("taskflow-entrada");
-    // Reinício visual — Observação - recalcula o layout para reiniciar a animação CSS
     void viewTaskFlow.offsetWidth;
     viewTaskFlow.classList.add("taskflow-entrada");
 }
-
-// Abertura do TaskFlow — Escuta - exibe a recepção e inicia sua apresentação
-botaoTaskFlow.addEventListener("click", function (event) {
-    event.preventDefault();
-    // Estado da interface — Atualização - ativa a recepção e seu acesso no menu
-    viewHome.classList.remove("view-ativa");
-    viewTaskFlow.classList.add("view-ativa");
-    botaoHome.classList.remove("item-menu-ativo");
-    botaoTaskFlow.classList.add("item-menu-ativo");
-    iniciarRecepcao();
-});
-
-// Retorno para Home — Escuta - restaura a tela inicial sem acumular listeners
-botaoHome.addEventListener("click", function (event) {
-    event.preventDefault();
-    // Estado da interface — Atualização - encerra a entrada e restaura a Home
-    viewTaskFlow.classList.remove("view-ativa", "taskflow-entrada");
-    viewHome.classList.add("view-ativa");
-    botaoTaskFlow.classList.remove("item-menu-ativo");
-    botaoHome.classList.add("item-menu-ativo");
+function mostrarView(view) {
+    for (const [pagina, acesso] of [[viewHome, botaoHome], [viewTaskFlow, botaoTaskFlow], [viewBiblioteca, botaoBiblioteca]]) {
+        pagina.classList.remove("view-ativa", "biblioteca-entrada");
+        acesso.classList.remove("item-menu-ativo");
+        acesso.removeAttribute("aria-current");
+    }
+    view.classList.add("view-ativa");
+    const acesso = view === viewHome ? botaoHome : view === viewTaskFlow ? botaoTaskFlow : botaoBiblioteca;
+    acesso.classList.add("item-menu-ativo");
+    acesso.setAttribute("aria-current", "page");
+    if (view === viewTaskFlow) iniciarRecepcao();
+    if (view === viewBiblioteca) {
+        void view.offsetWidth;
+        view.classList.add("biblioteca-entrada");
+        document.querySelector("#titulo-biblioteca").focus({ preventScroll: true });
+    }
+    window.scrollTo({ top: 0, behavior: "instant" });
+}
+for (const [id, view] of [["#abrir-home", viewHome], ["#abrir-taskflow", viewTaskFlow], ["#biblioteca-voltar", viewTaskFlow], ["#abrir-biblioteca", viewBiblioteca], ["#acessar-biblioteca", viewBiblioteca]]) {
+    document.querySelector(id).addEventListener("click", evento => {
+        evento.preventDefault();
+        mostrarView(view);
+    });
+}
+document.querySelector("#acessar-carreira").addEventListener("click", evento => {
+    evento.preventDefault();
+    mostrarView(viewBiblioteca);
+    document.querySelector("#taskflow-carreira").scrollIntoView({ block: "start", behavior: "instant" });
 });
 
 // Tópicos Front-end — Escuta - destaque visual em memória, sem interferir na navegação.
@@ -181,12 +188,30 @@ function preencherLista(lista, registros, mensagem, permitirEdicao) {
     registros.forEach(compromisso => lista.append(criarItemCompromisso(compromisso, permitirEdicao)));
 }
 
+// Feriados nacionais fixos: Leis 662/1949, 6.802/1980 e 14.759/2023.
+// Feriados locais e pontos facultativos dependem da localidade e não são presumidos.
+const feriadosNacionais = {
+    "01-01": "Confraternização Universal", "04-21": "Tiradentes",
+    "05-01": "Dia do Trabalho", "09-07": "Independência do Brasil",
+    "10-12": "Nossa Senhora Aparecida", "11-02": "Finados",
+    "11-15": "Proclamação da República", "11-20": "Dia Nacional de Zumbi e da Consciência Negra",
+    "12-25": "Natal"
+};
 // Calendário mensal — Atualização - alinha dias da semana e marca seleção, hoje e compromissos
 function atualizarCalendario() {
     const primeiroDia = criarDataLocal(`${mesExibido}-01`);
     document.querySelector("#agenda-mes").textContent = primeiroDia.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
     document.querySelector("#mes-anterior").disabled = mesExibido === "0001-01";
     document.querySelector("#mes-seguinte").disabled = mesExibido === "9999-12";
+    document.querySelector("#agenda-ano").value = Number(mesExibido.slice(0, 4));
+    const listaFeriados = document.querySelector("#agenda-feriados");
+    listaFeriados.replaceChildren();
+    for (const [diaMes, nome] of Object.entries(feriadosNacionais)) {
+        if (diaMes.slice(0, 2) !== mesExibido.slice(5)) continue;
+        const item = document.createElement("li");
+        item.textContent = `${diaMes.slice(3)}/${diaMes.slice(0, 2)} — ${nome}`;
+        listaFeriados.append(item);
+    }
     diasAgenda.replaceChildren();
     for (let indice = 0; indice < primeiroDia.getDay(); indice++) {
         const espaco = document.createElement("span");
@@ -201,9 +226,17 @@ function atualizarCalendario() {
         const botao = document.createElement("button");
         botao.type = "button";
         botao.className = quantidade ? "agenda-dia com-compromisso" : "agenda-dia";
+        const diaSemana = (primeiroDia.getDay() + dia - 1) % 7;
+        const fimDeSemana = diaSemana === 0 || diaSemana === 6;
+        const feriado = feriadosNacionais[data.slice(5)];
+        if (fimDeSemana) botao.className += " agenda-fim-semana";
+        if (feriado) {
+            botao.className += " agenda-feriado";
+            botao.title = feriado;
+        }
         botao.textContent = dia;
         botao.dataset.data = data;
-        botao.setAttribute("aria-label", `${apresentarData(data)}${quantidade ? `, ${quantidade} compromisso(s)` : ""}`);
+        botao.setAttribute("aria-label", `${apresentarData(data)}${fimDeSemana ? ", fim de semana" : ""}${feriado ? `, feriado nacional: ${feriado}` : ""}${quantidade ? `, ${quantidade} compromisso(s)` : ""}`);
         botao.setAttribute("aria-pressed", String(data === dataSelecionada));
         if (data === hoje) botao.setAttribute("aria-current", "date");
         diasAgenda.append(botao);
@@ -296,6 +329,19 @@ function mudarMes(deslocamento) {
 }
 document.querySelector("#mes-anterior").addEventListener("click", () => mudarMes(-1));
 document.querySelector("#mes-seguinte").addEventListener("click", () => mudarMes(1));
+// Acesso direto ao ano, incluindo 2027, sem limitar a navegação aos anos atuais.
+document.querySelector("#agenda-ano").addEventListener("change", evento => {
+    const ano = Number(evento.target.value);
+    if (!Number.isInteger(ano) || ano < 1 || ano > 9999) {
+        evento.target.setCustomValidity("Informe um ano entre 1 e 9999.");
+        evento.target.reportValidity();
+        return;
+    }
+    evento.target.setCustomValidity("");
+    mesExibido = `${String(ano).padStart(4, "0")}-${mesExibido.slice(5)}`;
+    atualizarCalendario();
+});
+
 diasAgenda.addEventListener("click", evento => {
     const botao = evento.target.closest("button[data-data]");
     if (!botao) return;

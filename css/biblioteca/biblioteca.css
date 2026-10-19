@@ -389,7 +389,7 @@ body.biblioteca-html {
     background: var(--biblioteca-fundo);
 }
 body:is(.biblioteca-html, .biblioteca-css)::before {
-    background-image: linear-gradient(#030e2233, #030e2266), url("../../assets/images/laboratorio-fundo-voxel.png");
+    background-image: linear-gradient(var(--biblioteca-veu), var(--biblioteca-veu)), url("../../assets/images/laboratorio-fundo-voxel.png");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -527,3 +527,7 @@ body.biblioteca-css #biblioteca-css .biblioteca-conteudo .biblioteca-observacao 
 @media (hover: hover) and (pointer: fine) {
     body.biblioteca-css .biblioteca-catalogo .biblioteca-tecnologias-itens > a[aria-current="page"]:hover { border-color: #4dafff; background: #124879; }
 }
+
+/* Véus suaves sobre o cenário; painéis e exemplos mantêm seu contraste. */
+body.biblioteca-html { --biblioteca-veu: #ff963e24; }
+body.biblioteca-css { --biblioteca-veu: #38aaff24; }

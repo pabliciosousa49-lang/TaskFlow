@@ -1642,3 +1642,52 @@ html.agenda-aberta body {
 @media (prefers-reduced-motion: reduce) {
     #painel-agenda, #painel-agenda * { animation: none; transition: none; scroll-behavior: auto; }
 }
+/* Home — guia fornecido sem cortes no texto ou nos elementos da arte. */
+#view-home .banner-home { min-height: auto; align-items: flex-start; }
+#view-home .banner-home img { width: 100%; height: auto; object-fit: contain; }
+
+/* Biblioteca — aba própria com as quatro áreas originais. */
+#view-biblioteca {
+    background: linear-gradient(#020a1866, #020a1899), url("../../assets/images/biblioteca-fundo-voxel.png") center top / cover no-repeat;
+}
+.biblioteca-hub { max-width: 1536px; margin: auto; padding: 40px clamp(14px, 2.6vw, 48px); }
+.biblioteca-hub-cabecalho { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 32px; padding: 24px; border: 1px solid #245f88; border-radius: 14px; background: #031225df; }
+.biblioteca-hub-cabecalho h1 { margin: 10px 0; font-size: clamp(28px, 4vw, 42px); color: #eef7ff; }
+.biblioteca-hub-cabecalho p { color: #b5c9df; line-height: 1.6; }
+.biblioteca-entrada .area-tecnologia { animation: biblioteca-area-entrada .4s ease backwards; }
+.biblioteca-entrada .area-tecnologia:nth-child(2) { animation-delay: .07s; }
+.biblioteca-entrada .area-tecnologia:nth-child(3) { animation-delay: .14s; }
+.biblioteca-entrada .area-tecnologia:nth-child(4) { animation-delay: .21s; }
+@keyframes biblioteca-area-entrada {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Próximos eventos — acesso dourado integrado à Agenda. */
+#alternar-eventos { display: inline-flex; align-items: center; gap: 10px; padding: 12px 18px; border: 1px solid #ffcc33; border-radius: 12px; background: linear-gradient(135deg, #102b48, #061327); color: #ffd84d; font-weight: 700; box-shadow: 0 4px 18px #0005, 0 0 12px #ffcc3320; }
+#alternar-eventos .eventos-indicador { transition: transform .18s ease; }
+#alternar-eventos[aria-expanded="true"] .eventos-indicador { transform: rotate(180deg); }
+#alternar-eventos:focus-visible { outline: 2px solid #ffcc33; outline-offset: 4px; }
+
+/* Calendário — fins de semana e feriados coexistem com seleção, hoje e eventos. */
+#painel-agenda .agenda-ano-controle { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 16px; color: #afc2d9; font-size: 13px; }
+#painel-agenda #agenda-ano { width: 100px; min-width: 0; min-height: 44px; padding: 8px; border: 1px solid #254b72; border-radius: 6px; color-scheme: dark; font: inherit; }
+#painel-agenda .agenda-fim-semana { color: #aac9ff; background: #102641; }
+#painel-agenda .agenda-semana :is(:first-child, :last-child) { color: #aac9ff; }
+#painel-agenda .agenda-dia.agenda-feriado { border-bottom: 3px solid #ff963e; }
+#painel-agenda .agenda-dia[aria-pressed="true"] { color: #fff; }
+#painel-agenda .agenda-legenda-feriado { border-bottom: 3px solid #ff963e; }
+#painel-agenda .agenda-legenda-fim-semana { background: #102641; border: 1px solid #aac9ff; border-radius: 2px; }
+#painel-agenda .agenda-escopo-feriados { color: #afc2d9; font-size: 12px; line-height: 1.6; }
+#painel-agenda .agenda-feriados { display: grid; gap: 6px; list-style: none; margin: 12px 0; color: #ffc58e; font-size: 12px; line-height: 1.6; }
+@media (hover: hover) and (pointer: fine) {
+    #alternar-eventos:not(:disabled):hover { background: #173959; border-color: #ffd84d; box-shadow: 0 0 18px #ffcc3340; }
+}
+@media (max-width: 768px) {
+    .biblioteca-hub { padding-top: 24px; }
+    .biblioteca-hub-cabecalho { padding: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .biblioteca-entrada .area-tecnologia { animation: none; }
+    #alternar-eventos, #alternar-eventos .eventos-indicador { transition: none; }
+}
