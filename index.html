@@ -13,6 +13,7 @@
   <!-- Font Awesome — Ícones - disponibilizar ícones para conteúdos de carreira -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
   <link rel="stylesheet" href="./css/global/style.css">
+  <link rel="stylesheet" href="./css/components/pomodoro.css">
 </head>
 
 <body>
@@ -114,18 +115,11 @@
       <!-- Recepção TaskFlow — Estrutura - apresenta o ambiente e suas áreas de estudo -->
       <section id="view-taskflow" class="view" aria-labelledby="titulo-taskflow">
         <div class="taskflow-recepcao">
-          <!-- Acessos superiores — Estrutura - apresenta os botões sem ações nesta etapa -->
-          <div class="taskflow-acessos" role="group" aria-label="Acessos do TaskFlow">
-            <button class="taskflow-acesso" type="button"><i class="fa-solid fa-house"
-                aria-hidden="true"></i><span>Home</span></button>
-            <button class="taskflow-acesso" type="button"><i class="fa-solid fa-video"
-                aria-hidden="true"></i><span>Aulas</span></button>
-            <button class="taskflow-acesso" type="button"><i class="fa-solid fa-user-group"
-                aria-hidden="true"></i><span>Comunidade</span></button>
-            <button class="taskflow-acesso" type="button"><i class="fa-solid fa-briefcase"
-                aria-hidden="true"></i><span>Vagas</span></button>
-            <button class="taskflow-acesso" type="button"><i class="fa-regular fa-life-ring"
-                aria-hidden="true"></i><span>Suporte</span></button>
+          <!-- Produtividade — acesso independente da navegação lateral. -->
+          <div class="pomodoro-acesso-area">
+            <button id="abrir-pomodoro" class="pomodoro-etiqueta" type="button" aria-haspopup="dialog" aria-controls="pomodoro-painel">
+              <i class="fa-solid fa-stopwatch" aria-hidden="true"></i> Relógio &amp; <strong>Pomodoro</strong>
+            </button>
           </div>
           <!-- Apresentação — Estrutura - acolhe o aluno e explica o propósito do ambiente -->
           <header class="taskflow-apresentacao">
@@ -422,7 +416,90 @@
       </form>
     </div>
   </dialog>
+  <dialog id="pomodoro-painel" class="pomodoro-painel" aria-labelledby="pomodoro-titulo">
+    <header class="pomodoro-cabecalho">
+      <h2 id="pomodoro-titulo"><i class="fa-solid fa-stopwatch" aria-hidden="true"></i> Relógio e Pomodoro</h2>
+      <button id="pomodoro-fechar" class="pomodoro-botao" type="button" aria-label="Fechar Relógio e Pomodoro">×</button>
+    </header>
+    <div class="pomodoro-conteudo">
+      <div class="pomodoro-abas" role="tablist" aria-label="Produtividade">
+        <button id="pomodoro-aba-foco" role="tab" aria-selected="true" aria-controls="pomodoro-tab-foco" type="button">Pomodoro</button>
+        <button id="pomodoro-aba-relogio" role="tab" aria-selected="false" aria-controls="pomodoro-tab-relogio" tabindex="-1" type="button">Relógio</button>
+        <button id="pomodoro-aba-estatisticas" role="tab" aria-selected="false" aria-controls="pomodoro-tab-estatisticas" tabindex="-1" type="button">Estatísticas</button>
+      </div>
+      <section id="pomodoro-tab-foco" role="tabpanel" tabindex="0" aria-labelledby="pomodoro-aba-foco">
+        <div class="pomodoro-palco">
+          <div class="pomodoro-cronometro">
+            <div id="pomodoro-temporizador" class="pomodoro-circulo" role="timer" aria-live="off" aria-label="Foco: 25:00">
+              <svg viewBox="0 0 200 200" aria-hidden="true" focusable="false">
+                <defs><linearGradient id="pomodoro-gradiente" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ffd84d"/><stop offset="100%" stop-color="#ff8a00"/></linearGradient></defs>
+                <circle class="pomodoro-trilho" cx="100" cy="100" r="90"/>
+                <circle id="pomodoro-progresso" cx="100" cy="100" r="90"/>
+              </svg>
+              <div class="pomodoro-tempo-central"><span id="pomodoro-modalidade">Foco</span><strong id="pomodoro-tempo">25:00</strong><span id="pomodoro-estado">Pronto para começar</span></div>
+            </div>
+          </div>
+          <div class="pomodoro-mentor">
+            <p>Foque agora e colha os resultados depois!</p>
+          </div>
+        </div>
+        <div class="pomodoro-modalidades" role="group" aria-label="Modalidade da sessão">
+          <button class="pomodoro-botao" type="button" data-modo="foco" aria-pressed="true">Foco</button>
+          <button class="pomodoro-botao" type="button" data-modo="curta" aria-pressed="false">Pausa curta</button>
+          <button class="pomodoro-botao" type="button" data-modo="longa" aria-pressed="false">Pausa longa</button>
+          <button class="pomodoro-botao" type="button" data-modo="personalizado" aria-pressed="false" aria-expanded="false" aria-controls="pomodoro-personalizado">Personalizado</button>
+        </div>
+        <form id="pomodoro-personalizado" class="pomodoro-personalizado" hidden>
+          <div class="pomodoro-configuracao-cabecalho">
+            <span>Personalização</span>
+            <button id="pomodoro-recolher-campos" class="pomodoro-botao" type="button" aria-label="Minimizar campos de personalização" aria-controls="pomodoro-personalizado"><span aria-hidden="true">−</span> Recolher</button>
+          </div>
+          <div class="pomodoro-duracao">
+            <label for="pomodoro-estudo">Tempo de estudo (horas:minutos)</label>
+            <input id="pomodoro-estudo" type="text" inputmode="numeric" placeholder="01:00" value="00:25" maxlength="5" pattern="[0-9]{2}:[0-9]{2}" aria-describedby="pomodoro-duracao-ajuda" required>
+          </div>
+          <div class="pomodoro-duracao">
+            <label for="pomodoro-pausa">Tempo de pausa (horas:minutos)</label>
+            <input id="pomodoro-pausa" type="text" inputmode="numeric" placeholder="00:10" value="00:05" maxlength="5" pattern="[0-9]{2}:[0-9]{2}" aria-describedby="pomodoro-duracao-ajuda" required>
+          </div>
+          <p id="pomodoro-duracao-ajuda">Exemplo: 01:30 para uma hora e meia de estudo e 00:10 para dez minutos de pausa. Cada etapa começa ao clicar em Iniciar.</p>
+          <button class="pomodoro-botao" type="submit">Aplicar tempos</button>
+        </form>
+        <div class="pomodoro-acoes">
+          <button id="pomodoro-iniciar" class="pomodoro-botao pomodoro-primario" type="button">Iniciar</button>
+          <button id="pomodoro-reiniciar" class="pomodoro-botao" type="button">Reiniciar</button>
+          <button id="pomodoro-parar" class="pomodoro-botao" type="button">Parar</button>
+        </div>
+        <div class="pomodoro-resumo">
+          <div id="pomodoro-ciclos" class="pomodoro-ciclos" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+          <p id="pomodoro-sessoes">0 sessões de foco concluídas hoje</p>
+        </div>
+      </section>
+      <section id="pomodoro-tab-relogio" class="pomodoro-relogio-area" role="tabpanel" tabindex="0" aria-labelledby="pomodoro-aba-relogio" hidden>
+        <span class="pomodoro-sobretitulo">SEU TEMPO, SEU RITMO</span>
+        <time id="pomodoro-relogio" aria-label="Horário local"></time>
+        <p id="pomodoro-data"></p>
+        <small>Horário local do seu navegador.</small>
+      </section>
+      <section id="pomodoro-tab-estatisticas" role="tabpanel" tabindex="0" aria-labelledby="pomodoro-aba-estatisticas" hidden>
+        <h3 class="pomodoro-estatisticas-titulo">Sua evolução de hoje</h3>
+        <dl class="pomodoro-estatisticas">
+          <div><dt>Ciclos de foco</dt><dd id="pomodoro-focos">0</dd></div>
+          <div><dt>Minutos de foco</dt><dd id="pomodoro-minutos-total">0</dd></div>
+          <div><dt>Pausas concluídas</dt><dd id="pomodoro-pausas">0</dd></div>
+        </dl>
+        <label id="pomodoro-meta-texto" for="pomodoro-meta">0 de 4 ciclos da meta diária</label>
+        <progress id="pomodoro-meta" max="4" value="0"></progress>
+        <p class="pomodoro-estatisticas-nota">Somente sessões concluídas são contabilizadas. O modo personalizado conta como foco.</p>
+      </section>
+      <p id="pomodoro-aviso" class="pomodoro-aviso" role="status" aria-live="polite"></p>
+      <p id="pomodoro-armazenamento" class="pomodoro-armazenamento" role="status"></p>
+      <footer class="pomodoro-rodape">Disciplina hoje, resultados amanhã.</footer>
+    </div>
+  </dialog>
+  <p id="pomodoro-notificacao" class="pomodoro-notificacao" role="status" hidden></p>
   <script src="./js/core/app.js"></script>
+  <script type="module" src="./js/modules/pomodoro/pomodoro.js"></script>
 
 </body>
 
