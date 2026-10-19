@@ -76,3 +76,14 @@ test('integração simulada: fechar todas as abas é restaurado sem criar docume
   assert.equal(a.api.abas().length,0);await a.api.abrirProjeto(p.id);
   assert.equal(a.api.abas().length,0);assert.equal(servico.buscarProjeto(p.id).arquivos.length,2);
 });
+
+test('Voltar salva pendências antes do histórico e bloqueia saída quando a gravação falha',async()=>{
+  const a=ambiente();let retornos=0;a.ctx.window.taskflowNavegacao={voltar(){retornos++}};
+  const {p,html}=projetoTeste();await a.api.abrirProjeto(p.id);
+  const voltar=()=>a.elemento('#studio-voltar').events.click[0]();
+  a.view.dispatch({changes:{from:0,to:a.view.state.doc.length,insert:'<p>preservado</p>'}});
+  const gravar=localStorage.setItem;localStorage.setItem=()=>{throw new Error('quota')};
+  voltar();assert.equal(retornos,0);assert.equal(a.elemento('#studio-salvamento').textContent,'Erro ao salvar');
+  localStorage.setItem=gravar;voltar();assert.equal(retornos,1);
+  assert.equal(servico.buscarProjeto(p.id).arquivos.find(f=>f.id===html.id).conteudo,'<p>preservado</p>');
+});

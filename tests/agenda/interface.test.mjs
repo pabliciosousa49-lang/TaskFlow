@@ -9,6 +9,9 @@ function iniciar(dados = "[]") {
     const fonte = readFileSync(new URL("../../js/core/app.js", import.meta.url), "utf8");
     const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
     const elementos = new Map();
+    const eventosDocumento = {}, eventosJanela = {};
+    const entradas = [{ url: "https://taskflow.test/index.html", state: null }];
+    let indice = 0;
     function elemento() {
         const e = new Elemento();
         const classes = new Set();
@@ -16,10 +19,15 @@ function iniciar(dados = "[]") {
         e.style = { setProperty() {}, removeProperty() {} };
         e.setCustomValidity = valor => { e.validacao = valor; };
         e.reportValidity = () => !e.validacao;
-        e.closest = () => e;
+        e.closest = seletor => {
+            if (seletor === "[data-taskflow-voltar]") return e.id === "biblioteca-voltar" ? e : null;
+            if (seletor === "button[data-data]") return e.dataset.data ? e : null;
+            if (seletor === "button[data-acao]") return e.dataset.acao ? e : null;
+            return null;
+        };
         return e;
     }
-    for (const [, id] of html.matchAll(/\bid="([^"]+)"/g)) elementos.set(`#${id}`, elemento());
+    for (const [, id] of html.matchAll(/\bid="([^"]+)"/g)) { const e = elemento(); e.id = id; elementos.set(`#${id}`, e); }
     const campos = ["titulo", "descricao", "data", "hora"].map(c => elementos.get(`#compromisso-${c}`));
     const formulario = elementos.get("#formulario-compromisso");
     formulario.reset = () => campos.forEach(c => { c.value = ""; });
@@ -27,19 +35,36 @@ function iniciar(dados = "[]") {
     const armazenamento = new Map([["taskflow.agenda.compromissos.v1", dados]]);
     const document = {
         documentElement: elemento(),
+        currentScript: { src: "https://taskflow.test/js/core/navegacao.js" }, referrer: "",
         querySelector: s => elementos.get(s), querySelectorAll: () => [],
-        createElement: () => elemento(), addEventListener() {}
+        createElement: () => elemento(), addEventListener: (tipo, fn) => { (eventosDocumento[tipo] ??= []).push(fn); }
     };
     let id = 0;
     const contexto = vm.createContext({
-        document, Date, setTimeout, clearTimeout,
+        document, Date, URL, setTimeout, clearTimeout,
+        sessionStorage: { getItem: () => null, removeItem() {}, setItem() {} },
         localStorage: { getItem: k => armazenamento.get(k) ?? null, setItem: (k, v) => armazenamento.set(k, v) },
         crypto: { randomUUID: () => `novo-${++id}` },
-        window: { matchMedia: () => ({ matches: true }), scrollY: 0, scrollTo() {}, confirm: () => true, addEventListener() {} }
+        window: {
+            location: { get href() { return entradas[indice].url; }, replace(url) { entradas[indice] = { url, state: null }; } },
+            history: {
+                get length() { return entradas.length; }, get state() { return entradas[indice].state; },
+                replaceState(state, _, url) { entradas[indice] = { url, state }; },
+                pushState(state, _, url) { entradas.splice(indice + 1); entradas.push({ url, state }); indice++; },
+                back() { if (indice) { indice--; for (const fn of eventosJanela.popstate || []) fn(); } }
+            },
+            matchMedia: () => ({ matches: true }), scrollY: 0, scrollTo() {}, confirm: () => true,
+            addEventListener: (tipo, fn) => { (eventosJanela[tipo] ??= []).push(fn); }
+        }
     });
+    vm.runInContext(readFileSync(new URL("../../js/core/navegacao.js", import.meta.url), "utf8"), contexto);
     vm.runInContext(fonte, contexto);
     const obter = id => elementos.get(`#${id}`);
-    const clicar = id => obter(id).disparar("click", { currentTarget: obter(id), preventDefault() {} });
+    const clicar = id => {
+        const evento = { currentTarget: obter(id), target: obter(id), button: 0, defaultPrevented: false, preventDefault() { this.defaultPrevented = true; } };
+        obter(id).disparar("click", evento);
+        for (const fn of eventosDocumento.click || []) fn(evento);
+    };
     const selecionar = data => {
         const alvo = elemento(); alvo.dataset.data = data;
         obter("agenda-dias").disparar("click", { target: alvo });
@@ -54,7 +79,7 @@ function iniciar(dados = "[]") {
         obter("compromisso-hora").value = hora;
         formulario.disparar("submit", { preventDefault() {} });
     };
-    return { obter, clicar, selecionar, acao, salvar, armazenamento };
+    return { obter, clicar, selecionar, acao, salvar, armazenamento, historico: contexto.window.history, location: contexto.window.location };
 }
 
 test("Agenda filtra por dia, atualiza quantidade e preserva marcadores e navegação mensal", () => {
@@ -123,7 +148,7 @@ test("Biblioteca abre pelos dois acessos e Carreira revela a área sem duplicar 
         assert.equal(a.obter("abrir-biblioteca").getAttribute("aria-current"), "page");
         assert.equal(a.obter("view-taskflow").classList.contains("view-ativa"), false);
         a.clicar("biblioteca-voltar");
-        assert.ok(a.obter("view-taskflow").classList.contains("view-ativa"));
+        assert.ok(a.obter("view-home").classList.contains("view-ativa"));
         assert.equal(a.obter("view-biblioteca").classList.contains("view-ativa"), false);
     }
     assert.ok(a.obter("taskflow-carreira").ultimaRolagem);
@@ -145,6 +170,22 @@ test("cards da Home reutilizam exploração, Agenda e Carreira com retorno de fo
     a.clicar("home-carreira");
     assert.ok(a.obter("view-biblioteca").classList.contains("view-ativa"));
     assert.ok(a.obter("taskflow-carreira").ultimaRolagem);
+});
+
+test("Voltar restaura Carreira → TaskFlow → Home e modais não criam páginas", () => {
+    const a = iniciar();
+    a.clicar("abrir-taskflow"); a.clicar("acessar-carreira");
+    const tamanho = a.historico.length;
+    a.clicar("abrir-agenda"); a.clicar("fechar-agenda");
+    assert.equal(a.historico.length, tamanho);
+    a.clicar("abrir-biblioteca");
+    a.clicar("biblioteca-voltar");
+    assert.ok(a.location.href.endsWith("#taskflow-carreira"));
+    assert.ok(a.obter("view-biblioteca").classList.contains("view-ativa"));
+    a.clicar("biblioteca-voltar");
+    assert.ok(a.obter("view-taskflow").classList.contains("view-ativa"));
+    a.historico.back();
+    assert.ok(a.obter("view-home").classList.contains("view-ativa"));
 });
 
 test("Agenda navega para 2027, indica feriados e fins de semana sem alterar compromissos", () => {

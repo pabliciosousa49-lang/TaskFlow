@@ -237,7 +237,7 @@
               <h1 id="titulo-biblioteca" tabindex="-1">Biblioteca Técnica</h1>
               <p>Escolha uma área para explorar os conteúdos.</p>
             </div>
-            <button id="biblioteca-voltar" class="taskflow-explorar" type="button">← Voltar ao TaskFlow</button>
+            <button id="biblioteca-voltar" class="taskflow-explorar" type="button" data-taskflow-voltar>← Voltar</button>
           </header>
             <div id="taskflow-categorias" class="taskflow-mapa">
               <!-- Front-end — Estrutura - agrupa os tópicos desta área -->
@@ -547,6 +547,7 @@
     </div>
   </dialog>
   <p id="pomodoro-notificacao" class="pomodoro-notificacao" role="status" hidden></p>
+  <script src="./js/core/navegacao.js"></script>
   <script src="./js/core/app.js"></script>
   <script type="module" src="./js/modules/pomodoro/pomodoro.js"></script>
 

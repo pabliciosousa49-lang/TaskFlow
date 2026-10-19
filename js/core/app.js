@@ -10,7 +10,7 @@ function iniciarRecepcao() {
     void viewTaskFlow.offsetWidth;
     viewTaskFlow.classList.add("taskflow-entrada");
 }
-function mostrarView(view) {
+function mostrarView(view, registrar = true, alvo = null) {
     for (const [pagina, acesso] of [[viewHome, botaoHome], [viewTaskFlow, botaoTaskFlow], [viewBiblioteca, botaoBiblioteca]]) {
         pagina.classList.remove("view-ativa", "biblioteca-entrada");
         acesso.classList.remove("item-menu-ativo");
@@ -26,9 +26,12 @@ function mostrarView(view) {
         view.classList.add("biblioteca-entrada");
         document.querySelector("#titulo-biblioteca").focus({ preventScroll: true });
     }
-    window.scrollTo({ top: 0, behavior: "instant" });
+    if (registrar) {
+        window.taskflowNavegacao.registrarView(view.id, alvo);
+        window.scrollTo({ top: 0, behavior: "instant" });
+    }
 }
-for (const [id, view] of [["#abrir-home", viewHome], ["#abrir-taskflow", viewTaskFlow], ["#home-explorar", viewTaskFlow], ["#biblioteca-voltar", viewTaskFlow], ["#abrir-biblioteca", viewBiblioteca], ["#acessar-biblioteca", viewBiblioteca]]) {
+for (const [id, view] of [["#abrir-home", viewHome], ["#abrir-taskflow", viewTaskFlow], ["#home-explorar", viewTaskFlow], ["#abrir-biblioteca", viewBiblioteca], ["#acessar-biblioteca", viewBiblioteca]]) {
     document.querySelector(id).addEventListener("click", evento => {
         evento.preventDefault();
         mostrarView(view);
@@ -36,9 +39,19 @@ for (const [id, view] of [["#abrir-home", viewHome], ["#abrir-taskflow", viewTas
 }
 for (const id of ["#acessar-carreira", "#home-carreira"]) document.querySelector(id).addEventListener("click", evento => {
     evento.preventDefault();
-    mostrarView(viewBiblioteca);
+    mostrarView(viewBiblioteca, true, "taskflow-carreira");
     document.querySelector("#taskflow-carreira").scrollIntoView({ block: "start", behavior: "instant" });
 });
+
+// A URL restaura a aba também no retorno entre documentos, sem criar outra entrada.
+function restaurarView() {
+    const rota = window.taskflowNavegacao.viewAtual();
+    const view = { "view-home": viewHome, "view-taskflow": viewTaskFlow, "view-biblioteca": viewBiblioteca }[rota.id] || viewHome;
+    mostrarView(view, false);
+    if (rota.alvo) document.querySelector(`#${rota.alvo}`)?.scrollIntoView({ block: "start", behavior: "instant" });
+}
+window.addEventListener("popstate", restaurarView);
+restaurarView();
 
 // Tópicos Front-end — Escuta - destaque visual em memória, sem interferir na navegação.
 const topicosFrontend = document.querySelectorAll(".area-topicos .topico-frontend");

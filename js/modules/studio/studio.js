@@ -491,11 +491,9 @@ botaoSalvarStudio.addEventListener("click", mostrarGerenciamento);
 document.querySelector("#studio-meus-projetos").addEventListener("click", mostrarGerenciamento);
 document.querySelector("#studio-voltar").addEventListener("click", () => {
     if (abrindoProjeto || criandoProjeto) return;
-    if (!document.querySelector("#studio-ambiente").hidden) {
-        mostrarGerenciamento();
-    } else {
-        window.location.assign("../index.html");
-    }
+    registrarInterface();
+    if (alteracoesPendentes && !salvarProjetoAtual()) return;
+    window.taskflowNavegacao.voltar();
 });
 document.querySelector("#studio-abrir-editor").addEventListener("click", () => selecionarPainel("editor"));
 document.querySelector("#studio-abrir-previa").addEventListener("click", () => selecionarPainel("previa"));
