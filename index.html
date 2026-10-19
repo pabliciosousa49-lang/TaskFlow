@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="./css/global/style.css">
   <link rel="stylesheet" href="./css/components/pomodoro.css">
   <link rel="stylesheet" href="./css/pages/home.css">
+  <link rel="stylesheet" href="./css/biblioteca/central.css">
 </head>
 
 <body>
@@ -234,8 +235,8 @@
           <header class="biblioteca-hub-cabecalho">
             <div>
               <span class="taskflow-identificador">ESTUDE NO SEU RITMO</span>
-              <h1 id="titulo-biblioteca" tabindex="-1">Biblioteca Técnica</h1>
-              <p>Escolha uma área para explorar os conteúdos.</p>
+              <h1 id="titulo-biblioteca" tabindex="-1">Biblioteca <span>Técnica</span></h1>
+              <p>Documentação e conteúdos para você aprender e evoluir</p>
             </div>
             <button id="biblioteca-voltar" class="taskflow-explorar" type="button" data-taskflow-voltar>← Voltar</button>
           </header>
@@ -279,6 +280,7 @@
                     <span class="topico-nome">Vite</span>
                   </button>
                 </div>
+                <button class="biblioteca-categoria-atalho" type="button" aria-label="Explorar esta categoria">→</button>
               </article>
               <!-- Back-end — Estrutura - agrupa os tópicos desta área -->
               <article class="area-tecnologia" aria-labelledby="titulo-backend">
@@ -294,7 +296,7 @@
                   <button class="topico-taskflow topico-backend" type="button" data-categoria="backend"
                     data-topico="node">
                     <i aria-hidden="true" class="devicon-nodejs-plain colored topico-icone"></i>
-                    <span class="topico-nome">Node</span>
+                    <span class="topico-nome">Node.js</span>
                   </button>
                   <button class="topico-taskflow topico-backend" type="button" data-categoria="backend"
                     data-topico="express">
@@ -327,6 +329,7 @@
                     <span class="topico-nome">Docker</span>
                   </button>
                 </div>
+                <button class="biblioteca-categoria-atalho" type="button" aria-label="Explorar esta categoria">→</button>
               </article>
               <!-- Mobile — Estrutura - agrupa os tópicos desta área -->
               <article class="area-tecnologia" aria-labelledby="titulo-mobile">
@@ -359,8 +362,55 @@
                     <span class="topico-nome">iOS</span>
                   </button>
                 </div>
+                <button class="biblioteca-categoria-atalho" type="button" aria-label="Explorar esta categoria">→</button>
               </article>
               <!-- Carreira — Estrutura - agrupa os tópicos desta área -->
+
+            </div>
+          <p id="biblioteca-integracao-status" role="status" aria-live="polite"></p>
+          <section id="biblioteca-central" class="biblioteca-layout" data-biblioteca-central="" data-tecnologia="html" aria-label="Consulta da Biblioteca Técnica">
+            <button id="biblioteca-alternar-menu" class="biblioteca-menu-botao" type="button" aria-controls="biblioteca-menu" aria-expanded="false" disabled>Mostrar Guia de Estudos</button>
+            <aside id="biblioteca-menu" class="biblioteca-menu" aria-labelledby="biblioteca-menu-titulo">
+              <h2 id="biblioteca-menu-titulo"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Guia de Estudos</h2>
+              <section id="biblioteca-pesquisa" class="biblioteca-pesquisa" aria-label="Pesquisa de conteúdos">
+                <form id="biblioteca-pesquisa-formulario" role="search" aria-label="Pesquisar na Biblioteca">
+                  <label for="biblioteca-pesquisa-campo">Pesquisar conteúdo</label>
+                  <input id="biblioteca-pesquisa-campo" type="search" autocomplete="off" placeholder="Pesquisar conteúdo..." aria-describedby="biblioteca-pesquisa-status" disabled>
+                  <button id="biblioteca-pesquisa-limpar" type="button" hidden>Limpar pesquisa</button>
+                </form>
+                <p id="biblioteca-pesquisa-status" role="status" aria-live="polite"></p>
+                <ul id="biblioteca-pesquisa-resultados" aria-label="Resultados da pesquisa" hidden></ul>
+              </section>
+              <nav id="biblioteca-niveis" aria-label="Linguagens, níveis, módulos e tópicos"><p>Carregando conteúdos…</p></nav>
+            </aside>
+            <article id="biblioteca-leitura" class="biblioteca-leitura" tabindex="-1" aria-labelledby="biblioteca-titulo">
+              <header class="biblioteca-leitura-cabecalho">
+                <p id="biblioteca-central-breadcrumb">Biblioteca Técnica</p>
+                <div class="biblioteca-central-titulo"><img id="biblioteca-central-icone" src="./assets/images/biblioteca-html.svg" width="30" height="30" alt="" aria-hidden="true"><h2 id="biblioteca-titulo">Documentação</h2></div>
+                <span id="biblioteca-nivel" class="biblioteca-nivel">Todos os níveis</span>
+                <a id="biblioteca-central-original" href="./pages/biblioteca/html.html">Abrir documentação original</a>
+              </header>
+              <div id="biblioteca-estado-vazio" role="status"><h3 id="biblioteca-vazio-titulo">Carregando documentação</h3><p id="biblioteca-vazio-descricao">Os conteúdos existentes aparecerão nesta área.</p></div>
+              <nav class="biblioteca-conteudos-navegacao" aria-label="Navegação entre assuntos" hidden><button type="button" disabled>← Assunto anterior</button><button type="button" disabled>Próximo assunto →</button></nav>
+            </article>
+          </section>
+          <button id="biblioteca-abrir-anotacoes" class="biblioteca-anotacoes-flutuante" type="button" aria-haspopup="dialog" aria-controls="biblioteca-anotacoes"><i class="fa-regular fa-note-sticky" aria-hidden="true"></i><span>Anotações</span></button>
+          <dialog id="biblioteca-anotacoes" class="biblioteca-anotacoes" aria-labelledby="anotacoes-titulo">
+            <header><h2 id="anotacoes-titulo">Minhas anotações</h2><button id="anotacoes-fechar" type="button" aria-label="Fechar anotações">×</button></header>
+            <button id="anotacoes-nova" type="button" disabled>+ Nova anotação</button>
+            <div class="anotacoes-filtros"><label for="anotacoes-filtro">Linguagem</label><select id="anotacoes-filtro"><option value="">Todas</option></select><label for="anotacoes-pesquisa">Pesquisar anotações</label><input id="anotacoes-pesquisa" type="search" placeholder="Pesquisar anotações..."></div>
+            <p id="anotacoes-status" role="status" aria-live="polite"></p>
+            <form id="anotacoes-formulario" hidden>
+              <h3 id="anotacoes-formulario-titulo">Nova anotação</h3>
+              <label for="anotacoes-nome">Título</label><input id="anotacoes-nome" required maxlength="120">
+              <label for="anotacoes-linguagem">Linguagem</label><select id="anotacoes-linguagem" required></select>
+              <label for="anotacoes-topico">Tópico</label><select id="anotacoes-topico" required></select>
+              <label for="anotacoes-texto">Anotação</label><textarea id="anotacoes-texto" rows="6" required maxlength="10000"></textarea>
+              <div><button type="submit">Salvar anotação</button><button id="anotacoes-cancelar" type="button">Cancelar</button></div>
+            </form>
+            <ul id="anotacoes-lista" aria-label="Anotações salvas"></ul>
+          </dialog>
+          <div class="biblioteca-carreira-preservada">
               <article id="taskflow-carreira" class="area-tecnologia" aria-labelledby="titulo-carreira">
                 <header class="area-cabecalho">
                   <span class="area-numero" aria-hidden="true">04</span>
@@ -393,7 +443,7 @@
                   </button>
                 </div>
               </article>
-            </div>
+          </div>
         </div>
       </section>
 
@@ -550,6 +600,7 @@
   <script src="./js/core/navegacao.js"></script>
   <script src="./js/core/app.js"></script>
   <script type="module" src="./js/modules/pomodoro/pomodoro.js"></script>
+  <script type="module" src="./js/biblioteca/central.js"></script>
 
 </body>
 

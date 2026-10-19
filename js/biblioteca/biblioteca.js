@@ -1,8 +1,12 @@
-const pagina = document.querySelector("main[data-tecnologia]");
-const documentacaoHTML = pagina.dataset.tecnologia === "html";
-const documentacaoCSS = pagina.dataset.tecnologia === "css";
-const documentacaoProgramacao = ["javascript", "typescript", "react"].includes(pagina.dataset.tecnologia);
-const documentacaoCompleta = documentacaoHTML || documentacaoCSS || documentacaoProgramacao;
+const pagina = document.querySelector("main[data-tecnologia]") || document.querySelector("[data-biblioteca-central]");
+const central = pagina.dataset.bibliotecaCentral !== undefined;
+const linguagensGuia = new Map();
+const catalogoCentral = new Map();
+let tecnologiaConstruida = pagina.dataset.tecnologia;
+let documentacaoHTML = pagina.dataset.tecnologia === "html";
+let documentacaoCSS = pagina.dataset.tecnologia === "css";
+let documentacaoProgramacao = ["javascript", "typescript", "react"].includes(pagina.dataset.tecnologia);
+let documentacaoCompleta = documentacaoHTML || documentacaoCSS || documentacaoProgramacao;
 const menu = document.querySelector("#biblioteca-menu");
 const alternarMenu = document.querySelector("#biblioteca-alternar-menu");
 const niveis = document.querySelector("#biblioteca-niveis");
@@ -29,7 +33,7 @@ function atualizarMenu() {
     alternarMenu.hidden = !tamanhoMobile.matches;
     alternarMenu.setAttribute("aria-expanded", String(!menu.hidden));
     alternarMenu.textContent = menu.hidden ? "Mostrar níveis" : "Ocultar níveis";
-    document.body.dataset.menuAberto = String(!menu.hidden);
+    (central ? pagina : document.body).dataset.menuAberto = String(!menu.hidden);
 }
 
 alternarMenu.disabled = false;
@@ -208,7 +212,7 @@ function blocoCodigo(valor, titulo, linguagem = documentacaoCSS ? "css" : docume
             }
         });
         ferramentas.append(rotulo, copiar);
-        if (documentacaoHTML) {
+        if (documentacaoHTML || central) {
             const corpo = document.createElement("div");
             corpo.className = "biblioteca-html-codigo-corpo";
             const linhas = document.createElement("span");
@@ -248,11 +252,23 @@ function blocoLeitura(titulo, valor, codigo = false) {
 function selecionarAssunto(indice, focar = true, reiniciarLeitura = false) {
     const registro = assuntosOrdenados[indice];
     if (!registro) return;
+    if (central) {
+        pagina.dataset.tecnologia = registro.tecnologia;
+        documentacaoHTML = registro.tecnologia === "html";
+        documentacaoCSS = registro.tecnologia === "css";
+        documentacaoProgramacao = !documentacaoHTML && !documentacaoCSS;
+        documentacaoCompleta = true;
+        const linguagem = catalogoCentral.get(registro.tecnologia);
+        document.querySelector("#biblioteca-central-breadcrumb").textContent = `${linguagem.nome} › ${registro.nivel.nome} › ${registro.assunto.titulo}`;
+        document.querySelector("#biblioteca-central-icone").src = `./assets/images/biblioteca-${registro.tecnologia}.svg`;
+        document.querySelector("#biblioteca-central-original").href = `./pages/biblioteca/${registro.tecnologia}.html`;
+        linguagensGuia.get(registro.tecnologia).open = true;
+    }
     const mudouAssunto = assuntoAtual !== indice;
     assuntoAtual = indice;
     const { assunto, nivel, modulo, botao, painel, categoria, detalhes } = registro;
     document.querySelector("#biblioteca-titulo").textContent = assunto.titulo;
-    if (documentacaoHTML) document.querySelector("#biblioteca-html-breadcrumb").textContent = `HTML › ${nivel.nome} › ${assunto.titulo}`;
+    if (documentacaoHTML && !central) document.querySelector("#biblioteca-html-breadcrumb").textContent = `HTML › ${nivel.nome} › ${assunto.titulo}`;
     document.querySelector("#biblioteca-nivel").textContent = `${nivel.nome} · ${modulo.titulo || modulo.nome}`;
     for (const item of assuntosOrdenados) item.botao.removeAttribute("aria-current");
     botao.setAttribute("aria-current", "true");
@@ -265,7 +281,9 @@ function selecionarAssunto(indice, focar = true, reiniciarLeitura = false) {
         leitura.insertBefore(conteudoLeitura, navegacaoAssuntos);
     }
     conteudoLeitura.replaceChildren();
-    if (documentacaoProgramacao) {
+    if (central && !documentacaoHTML) {
+        apresentarConteudoCentral(conteudoLeitura, assunto);
+    } else if (documentacaoProgramacao) {
         conteudoLeitura.append(blocoLeitura("O que é", assunto.explicacao), blocoLeitura("Quando usar", assunto.aplicacaoReal));
         if (assunto.mapeamento) conteudoLeitura.append(blocoLeitura("Mapa de raciocínio", assunto.mapeamento));
         conteudoLeitura.append(blocoLeitura("Onde reproduzir", assunto.ambiente));
@@ -379,6 +397,7 @@ function selecionarAssunto(indice, focar = true, reiniciarLeitura = false) {
             blocoLeitura("Boas práticas", assunto.boasPraticas)
         );
     }
+    if (central) pagina.dispatchEvent(new CustomEvent("biblioteca:selecao", { detail: { linguagem: registro.tecnologia, topico: assunto.id, titulo: assunto.titulo } }));
     estadoVazio.hidden = true;
     navegacaoAssuntos.hidden = false;
     anterior.disabled = indice === 0;
@@ -386,11 +405,11 @@ function selecionarAssunto(indice, focar = true, reiniciarLeitura = false) {
     if (focar) {
         menuAberto = false;
         atualizarMenu();
-        if (documentacaoHTML || documentacaoCSS || reiniciarLeitura) {
+        if (central || documentacaoHTML || documentacaoCSS || reiniciarLeitura) {
             // HTML/CSS — Leitura - retorna ao título sem deslocar a rolagem interna do guia.
             const posicaoMenu = menu.scrollTop;
             leitura.focus({ preventScroll: true });
-            if (mudouAssunto || reiniciarLeitura || documentacaoHTML) {
+            if (mudouAssunto || reiniciarLeitura || documentacaoHTML || central) {
                 leitura.scrollTop = 0;
                 leitura.scrollIntoView({ block: "start", behavior: "instant" });
             }
@@ -412,7 +431,7 @@ function listaAssuntos(assuntos, nivel, modulo, painel, categoria, detalhes) {
         botao.className = "biblioteca-assunto";
         botao.textContent = assunto.titulo || assunto.nome || assunto.id;
         const indice = assuntosOrdenados.length;
-        assuntosOrdenados.push({ assunto, nivel, modulo, botao, painel, categoria, detalhes });
+        assuntosOrdenados.push({ assunto, nivel, modulo, botao, painel, categoria, detalhes, tecnologia: tecnologiaConstruida });
         botao.addEventListener("click", () => selecionarAssunto(indice));
         item.append(botao);
         lista.append(item);
@@ -421,9 +440,9 @@ function listaAssuntos(assuntos, nivel, modulo, painel, categoria, detalhes) {
 }
 
 // Níveis — Apresentação - gera as categorias exclusivamente a partir do modelo carregado
-function construirNiveis(dados) {
-    niveis.replaceChildren();
-    assuntosOrdenados.length = 0;
+function construirNiveis(dados, destino = niveis, limpar = true) {
+    if (limpar) { destino.replaceChildren(); assuntosOrdenados.length = 0; }
+    tecnologiaConstruida = dados.id;
     dados.niveis.forEach((nivel, indice) => {
         const grupo = document.createElement("section");
         grupo.className = "biblioteca-grupo";
@@ -431,7 +450,7 @@ function construirNiveis(dados) {
         botao.type = "button";
         botao.className = "biblioteca-categoria";
         const painel = document.createElement("div");
-        painel.id = `biblioteca-nivel-${nivel.id}`;
+        painel.id = `biblioteca-nivel-${central ? dados.id + "-" : ""}${nivel.id}`;
         painel.className = "biblioteca-categoria-conteudo";
         painel.hidden = true;
         botao.setAttribute("aria-controls", painel.id);
@@ -480,7 +499,7 @@ function construirNiveis(dados) {
             }
         });
         grupo.append(botao, painel);
-        niveis.append(grupo);
+        destino.append(grupo);
     });
 }
 
@@ -542,7 +561,7 @@ function iniciarPesquisa() {
             const titulo = document.createElement("strong");
             titulo.textContent = registro.assunto.titulo;
             const caminho = document.createElement("span");
-            caminho.textContent = registro.nivel.nome + " · " + (registro.modulo.titulo || registro.modulo.nome);
+            caminho.textContent = (central ? catalogoCentral.get(registro.tecnologia).nome + " · " : "") + registro.nivel.nome + " · " + (registro.modulo.titulo || registro.modulo.nome);
             botao.append(titulo, caminho);
             botao.addEventListener("click", () => selecionarAssunto(indice, true, true));
             item.append(botao);
@@ -581,4 +600,62 @@ async function iniciarBiblioteca() {
     }
 }
 
-iniciarBiblioteca();
+
+// A central usa os mesmos modelos, blocos de código e seleção da documentação original.
+function apresentarConteudoCentral(destino, assunto) {
+    destino.append(blocoLeitura("Conceito", assunto.explicacao));
+    if (assunto.exemploHTML) destino.append(blocoCodigo(assunto.exemploHTML, "HTML de apoio", "html"));
+    destino.append(blocoLeitura("Exemplo de código", assunto.exemploCodigo, true), blocoLeitura("Entenda o exemplo", assunto.responsabilidadeCodigo));
+    const dica = blocoLeitura("💡 Dica", assunto.boasPraticas.at(-1)); dica.className = "biblioteca-html-dica"; destino.append(dica);
+    destino.append(blocoLeitura("Quando usar", assunto.aplicacaoReal));
+    if (documentacaoCSS) {
+        destino.append(blocoResultado(assunto));
+        if (assunto.orientacao) destino.append(blocoLeitura("Observe na prévia", assunto.orientacao));
+        if (assunto.codigoPrincipal) destino.append(blocoCodigo(assunto.codigoPrincipal, "CSS principal", "css"));
+        if (assunto.estilosApoio) destino.append(blocoCodigo(assunto.estilosApoio, "Estilos de apoio", "css"));
+        if (assunto.htmlReferencia) destino.append(blocoCodigo(assunto.htmlReferencia, "Conexão no HTML", "html"));
+    } else {
+        if (assunto.mapeamento) destino.append(blocoLeitura("Mapa de raciocínio", assunto.mapeamento));
+        if (assunto.ambiente) destino.append(blocoLeitura("Onde reproduzir", assunto.ambiente));
+        if (assunto.resultadoEsperado) destino.append(blocoLeitura("Resultado esperado · não executado aqui", assunto.resultadoEsperado));
+    }
+    if (assunto.boasPraticas.length > 1) destino.append(blocoLeitura("Cuidados e observações", assunto.boasPraticas.slice(0, -1)));
+    const relacionados = document.createElement("section");
+    const titulo = document.createElement("h2"); titulo.textContent = "Veja também"; relacionados.append(titulo);
+    for (const id of assunto.relacionados || []) {
+        const indice = assuntosOrdenados.findIndex(r => r.tecnologia === pagina.dataset.tecnologia && r.assunto.id === id);
+        if (indice < 0) continue;
+        const botao = document.createElement("button"); botao.type = "button"; botao.textContent = assuntosOrdenados[indice].assunto.titulo;
+        botao.addEventListener("click", () => selecionarAssunto(indice)); relacionados.append(botao);
+    }
+    if (relacionados.children.length > 1) destino.append(relacionados);
+    if (assunto.fonte) { const fonte = document.createElement("a"); fonte.href = assunto.fonte; fonte.textContent = "Consultar documentação de referência"; destino.append(fonte); }
+}
+
+export function construirCatalogoCentral(catalogo) {
+    niveis.replaceChildren(); assuntosOrdenados.length = 0; linguagensGuia.clear(); catalogoCentral.clear();
+    for (const dados of catalogo) {
+        catalogoCentral.set(dados.id, dados);
+        const linguagem = document.createElement("details"); linguagem.className = "biblioteca-linguagem";
+        const resumo = document.createElement("summary");
+        const icone = document.createElement("img"); icone.src = `./assets/images/biblioteca-${dados.id}.svg`; icone.alt = ""; icone.width = 24; icone.height = 24;
+        const nome = document.createElement("span"); nome.textContent = dados.nome;
+        resumo.append(icone, nome); linguagem.append(resumo);
+        const conteudo = document.createElement("div"); linguagem.append(conteudo);
+        linguagensGuia.set(dados.id, linguagem);
+        construirNiveis(dados, conteudo, false); niveis.append(linguagem);
+    }
+    if (assuntosOrdenados.length) { selecionarAssunto(0, false); iniciarPesquisa(); }
+    return {
+        catalogo,
+        selecionarLinguagem(id) { const indice = assuntosOrdenados.findIndex(r => r.tecnologia === id); if (indice < 0) return false; selecionarAssunto(indice); return true; },
+        selecionado() { const r = assuntosOrdenados[assuntoAtual]; return r ? { linguagem: r.tecnologia, topico: r.assunto.id, titulo: r.assunto.titulo } : null; }
+    };
+}
+
+export async function iniciarBibliotecaCentral() {
+    const catalogo = await Promise.all(Object.values(modelos).map(async carregar => (await carregar()).conteudos));
+    return construirCatalogoCentral(catalogo);
+}
+
+if (!central) iniciarBiblioteca();

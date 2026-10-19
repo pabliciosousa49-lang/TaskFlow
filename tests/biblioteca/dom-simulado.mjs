@@ -31,13 +31,13 @@ export class Elemento {
     }
     querySelector(s) { return this.querySelectorAll(s)[0] || null; }
 }
-export function iniciar(tecnologia) {
+export function iniciar(tecnologia, central = false) {
     const copias = [];
     const elementos = {};
-    for (const id of ["biblioteca-html-breadcrumb", "biblioteca-menu", "biblioteca-alternar-menu", "biblioteca-niveis", "biblioteca-leitura", "biblioteca-estado-vazio", "biblioteca-titulo", "biblioteca-nivel", "biblioteca-vazio-titulo", "biblioteca-vazio-descricao", "biblioteca-pesquisa", "biblioteca-pesquisa-campo", "biblioteca-pesquisa-resultados", "biblioteca-pesquisa-status", "biblioteca-pesquisa-formulario", "biblioteca-pesquisa-limpar"]) {
+    for (const id of ["biblioteca-central-breadcrumb", "biblioteca-central-icone", "biblioteca-central-original", "biblioteca-html-breadcrumb", "biblioteca-menu", "biblioteca-alternar-menu", "biblioteca-niveis", "biblioteca-leitura", "biblioteca-estado-vazio", "biblioteca-titulo", "biblioteca-nivel", "biblioteca-vazio-titulo", "biblioteca-vazio-descricao", "biblioteca-pesquisa", "biblioteca-pesquisa-campo", "biblioteca-pesquisa-resultados", "biblioteca-pesquisa-status", "biblioteca-pesquisa-formulario", "biblioteca-pesquisa-limpar"]) {
         elementos["#" + id] = new Elemento(); elementos["#" + id].id = id;
     }
-    const pagina = new Elemento("main"); pagina.dataset.tecnologia = tecnologia;
+    const pagina = new Elemento("main"); pagina.dataset.tecnologia = tecnologia; if (central) pagina.dataset.bibliotecaCentral = "";
     const nav = new Elemento("nav"); nav.className = "biblioteca-conteudos-navegacao"; nav.append(new Elemento("button"), new Elemento("button"));
     elementos["#biblioteca-leitura"].append(nav);
     elementos["#biblioteca-pesquisa"].append(...["campo", "resultados", "status", "formulario", "limpar"].map(id => elementos["#biblioteca-pesquisa-" + id]));
@@ -47,10 +47,12 @@ export function iniciar(tecnologia) {
         return node;
     } };
     const mobile = { matches: false, addEventListener() {} };
-    const ctx = vm.createContext({ document, window: { matchMedia: () => mobile }, navigator: { clipboard: { writeText: async texto => { copias.push(texto); } } }, setTimeout: fn => { fn(); return 1; }, clearTimeout() {} });
-    const fonte = readFileSync(new URL("../../js/biblioteca/biblioteca.js", import.meta.url), "utf8").replace(/iniciarBiblioteca\(\);\s*$/, "");
-    vm.runInContext(fonte + ";globalThis.api={construirNiveis,selecionarAssunto,pesquisarAssuntos,iniciarPesquisa,destacarCSS,destacarScript,blocoCodigo};", ctx);
-    ctx.api.construirNiveis({ css, html, javascript, typescript, react }[tecnologia]);
+    pagina.dispatchEvent = evento => pagina.disparar(evento.type, evento);
+    const ctx = vm.createContext({ CustomEvent: class { constructor(type, options) { this.type = type; this.detail = options.detail; } }, document, window: { matchMedia: () => mobile }, navigator: { clipboard: { writeText: async texto => { copias.push(texto); } } }, setTimeout: fn => { fn(); return 1; }, clearTimeout() {} });
+    const fonte = readFileSync(new URL("../../js/biblioteca/biblioteca.js", import.meta.url), "utf8").replace(/if \(!central\) iniciarBiblioteca\(\);\s*$/, "").replace(/export (async )?function/g, (_, async) => (async || "") + "function");
+    vm.runInContext(fonte + ";globalThis.api={construirNiveis,selecionarAssunto,pesquisarAssuntos,iniciarPesquisa,destacarCSS,destacarScript,blocoCodigo,construirCatalogoCentral};", ctx);
+    if (central) ctx.api.central = ctx.api.construirCatalogoCentral([html, css, javascript, typescript, react]);
+    else ctx.api.construirNiveis({ css, html, javascript, typescript, react }[tecnologia]);
     return { api: ctx.api, elementos, nav, mobile, copias };
 }
 
