@@ -7,14 +7,14 @@ import * as sessao from '../../js/modules/studio/sessao.js';
 import { criarAbas } from '../../js/modules/studio/abas.js';
 
 class Elemento {
-  constructor() { this.children=[];this.attrs={};this.events={};this.dataset={painel:'editor'};this.hidden=false;this.value='58';this.checked=true;this.textContent='';this.classList={add(){},remove(){}};this.style={setProperty(){}}; }
+  constructor() { this.children=[];this.attrs={};this.events={};this.dataset={painel:'editor'};this.hidden=false;this.value='58';this.checked=true;this.textContent='';this.classList={add(){},remove(){}};this.style={setProperty(k,v){this[k]=v}}; }
   append(...n){this.children.push(...n)} replaceChildren(...n){this.children=n}
   setAttribute(k,v){this.attrs[k]=v} getAttribute(k){return this.attrs[k]??null}
   addEventListener(k,fn){(this.events[k]??=[]).push(fn)} focus(){} setCustomValidity(){} reportValidity(){return true}
 }
 function estado(codigo='',cursor=0,extensions=[]) {
   const linhas=codigo.split('\n');
-  return { codigo, extensions, selection:{main:{head:cursor,anchor:cursor,from:cursor,to:cursor}}, doc:{toString:()=>codigo,length:codigo.length,lines:linhas.length,
+  return { codigo, extensions, facet:()=>"  ", lineBreak:"\n", selection:{main:{head:cursor,anchor:cursor,from:cursor,to:cursor}}, doc:{toString:()=>codigo,length:codigo.length,lines:linhas.length,
     line(n){const from=linhas.slice(0,n-1).reduce((a,b)=>a+b.length+1,0);return{number:n,from,to:from+linhas[n-1].length}},
     lineAt(pos){const n=codigo.slice(0,pos).split('\n').length;return this.line(n)} } };
 }
@@ -28,6 +28,7 @@ function ambiente() {
   const view={state:estado(),scrollDOM:{scrollTop:0,scrollLeft:0,addEventListener(){}},setState(s){this.state=s},requestMeasure(p){p?.write()},focus(){},
     dispatch(t){let codigo=this.state.doc.toString();if(t.changes)for(const c of (Array.isArray(t.changes)?t.changes:[t.changes]).slice().reverse())codigo=codigo.slice(0,c.from)+c.insert+codigo.slice(c.to);const cursor=t.selection?.anchor??this.state.selection.main.head;this.state=estado(codigo,cursor,this.state.extensions);for(const e of this.state.extensions)if(e?.callback)e.callback({view:this,state:this.state,docChanged:Boolean(t.changes),selectionSet:Boolean(t.selection)});}
   };
+  let configuracaoPrevia, execucoesPrevia=0;
   const vazio=()=>[];
   const ctx=vm.createContext({document:documento,window:{events:{},addEventListener(k,fn){this.events[k]=fn},location:{assign(){}}},sessionStorage:globalThis.sessionStorage,
     setTimeout:fn=>{const id=++proximoTimer;temporizadores.set(id,fn);return id},clearTimeout:id=>temporizadores.delete(id),console,
@@ -36,12 +37,12 @@ function ambiente() {
     html:vazio,css:vazio,javascript:vazio,criarSugestoesInline:vazio,criarAutocompletar:vazio,criarFormatacao:vazio,criarValidacaoHTML:vazio,syntaxHighlighting:vazio,lineNumbers:vazio,highlightActiveLine:vazio,highlightActiveLineGutter:vazio,drawSelection:vazio,history:vazio,indentOnInput:vazio,indentUnit:{of:vazio},isolateHistory:{of:valor=>valor}
   });
   let editor=readFileSync(new URL('../../js/modules/studio/editor.js',import.meta.url),'utf8').replace(/^import .*;\r?$/gm,'').replace(/^export \{.*;\r?$/gm,'').replace(/export function/g,'function');
-  vm.runInContext(editor+';globalThis.editorAPI={limparDocumentosEditor,abrirDocumentoEditor,descartarDocumentoEditor,capturarContextoEditor,observarEditor,linguagemArquivo,carregarDocumentoHTML,alterarComHistorico};',ctx);
-  const comp={...ctx.editorAPI,atualizarContextoCaminhos(){},criarEditorHTML:()=>view,criarAbas,criarPreviaHTML:()=>({agendar(){},definirAutomatica(){},atualizar(){}}),criarExplorador:()=>({atualizar(){},focarSelecionado(){}})};
+  vm.runInContext(editor+';globalThis.editorAPI={limparDocumentosEditor,abrirDocumentoEditor,descartarDocumentoEditor,capturarContextoEditor,observarEditor,linguagemArquivo,carregarDocumentoHTML,alterarComHistorico,informacoesEditor};',ctx);
+  const comp={...ctx.editorAPI,atualizarContextoCaminhos(){},criarEditorHTML:()=>view,criarAbas,criarPreviaHTML:(_frame,_vazio,_diagnosticos,opcoes)=>{configuracaoPrevia=opcoes;return{agendar(){execucoesPrevia++},definirAutomatica(){},atualizar(){execucoesPrevia++}}},criarExplorador:()=>({atualizar(){},focarSelecionado(){}})};
   const fonte=readFileSync(new URL('../../js/modules/studio/studio.js',import.meta.url),'utf8').replace(/iniciarStudio\(\);\s*$/,'');
   vm.runInContext(fonte+';globalThis.studioAPI={configurar(servico,sessao,comp){servicoProjetos=servico;sessaoStudio=sessao;carregarComponentes=async()=>comp},abrirProjeto,selecionarArquivo,fecharArquivo,mostrarGerenciamento,salvarProjetoAtual,registrarInterface,abas:()=>abasStudio.ids(),projeto:()=>projetoAtivo,atualizarPrevia};',ctx);
   ctx.studioAPI.configurar(servico,sessao,comp);
-  return{api:ctx.studioAPI,view,elemento,ctx,temporizadores};
+  return{api:ctx.studioAPI,view,elemento,ctx,temporizadores,previa:()=>configuracaoPrevia,execucoes:()=>execucoesPrevia};
 }
 function projetoTeste() {
   let p=servico.criarProjeto('Interface');let r=servico.criarArquivo(p.id,'index.html',null,p.atualizadoEm);p=r.projeto;const html=r.item;
@@ -170,4 +171,31 @@ test('Meus projetos identifica o último aberto, preserva conteúdo ao renomear 
   assert.equal(a.view.state.doc.toString(),antes.find(f=>f.id===html.id).conteudo);
   a.api.mostrarGerenciamento(); a.ctx.window.confirm=()=>true; await acao('excluir');
   assert.equal(servico.buscarProjeto(p.id),null);
+});
+
+
+test('interface visual: dispositivos e painéis mobile preservam código, prévia e histórico',async()=>{
+  const a=ambiente();let retornos=0;a.ctx.window.taskflowNavegacao={voltar(){retornos++}};
+  const {p,js}=projetoTeste();await a.api.abrirProjeto(p.id);
+  const codigo=a.view.state.doc.toString(), registros=JSON.stringify(servico.buscarProjeto(p.id)), execucoes=a.execucoes();
+  for(const [nome,largura] of [['mobile','375px'],['tablet','768px'],['desktop','100%']]) {
+    a.elemento('#studio-dispositivo-'+nome).events.click[0]();
+    assert.equal(a.elemento('#studio-previa-painel').style['--studio-previa-largura'],largura);
+    assert.equal(a.elemento('#studio-dispositivo-'+nome).getAttribute('aria-pressed'),'true');
+  }
+  assert.equal(a.view.state.doc.toString(),codigo);assert.equal(JSON.stringify(servico.buscarProjeto(p.id)),registros);assert.equal(a.execucoes(),execucoes);
+  a.elemento('#studio-abrir-arquivos').events.click[0]();
+  assert.equal(a.elemento('.studio-area-trabalho').dataset.painel,'arquivos');assert.equal(a.elemento('#studio-explorador').open,true);
+  a.api.registrarInterface();assert.equal(sessao.lerSessao(p.id).painel,'editor');
+  a.elemento('#studio-abrir-previa').events.click[0]();assert.equal(a.elemento('#studio-paineis').dataset.painel,'previa');
+  a.elemento('#studio-abrir-editor').events.click[0]();assert.equal(a.elemento('#studio-paineis').dataset.painel,'editor');
+  a.api.selecionarArquivo(js);
+  assert.match(a.elemento('#studio-status-editor').textContent,/javascript.*Linha 1.*2 espaços.*LF/);
+  assert.equal(a.elemento('#studio-ultima-atualizacao').dateTime,p.atualizadoEm);
+  a.previa().aoEstado({pendente:false,executando:true,caminho:'/pages/login.html?tema=azul#entrar'});
+  assert.equal(a.elemento('#studio-endereco-previa').textContent,'/pages/login.html?tema=azul#entrar');
+  a.previa().aoEstado({pendente:true,executando:false,caminho:'/pages/login.html'});
+  assert.equal(a.elemento('#studio-previa-estado').textContent,'Alterações ainda não aplicadas');
+  await a.elemento('#studio-voltar').events.click[0]();assert.equal(a.api.projeto(),null);assert.equal(retornos,0);
+  await a.elemento('#studio-voltar').events.click[0]();assert.equal(retornos,1);
 });

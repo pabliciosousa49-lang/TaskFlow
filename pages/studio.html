@@ -41,26 +41,28 @@
 </head>
 
 <body>
-  <!-- Studio — Cabeçalho - identifica o ambiente e permite retornar à página principal -->
-  <header class="studio-cabecalho">
+  <header class="studio-banner">
     <div class="studio-identidade">
       <img src="../assets/images/mascote-voxel-azul.png" width="60" height="60" alt="Mascote TaskFlow">
-      <div>
-        <span class="studio-marca">TaskFlow <span>Studio</span></span>
-        <p id="studio-projeto" hidden></p>
-      </div>
+      <div><span class="studio-marca">TaskFlow <span>Studio</span></span><p>Laboratório de projetos</p></div>
     </div>
+    <div class="studio-abertura">
+      <span class="studio-etiqueta">ESCREVA. EXPERIMENTE. EVOLUA.</span>
+      <h1 id="titulo-ambiente" tabindex="-1">Seu código ganha <span>vida aqui.</span></h1>
+      <p>HTML, CSS e JavaScript. Crie, teste e veja o resultado em tempo real.</p>
+    </div>
+  </header>
+  <nav class="studio-cabecalho" aria-label="Navegação e projeto do Studio">
+    <button id="studio-voltar" class="studio-retorno" type="button" title="Voltar à tela anterior">← Voltar</button>
+    <p id="studio-projeto" hidden></p>
     <div id="studio-acoes-projeto" class="studio-projeto-acoes" hidden>
       <span id="studio-salvamento" role="status" aria-live="polite"></span>
-      <button id="studio-meus-projetos" class="studio-retorno" type="button">Meus projetos</button>
-      <button id="studio-salvar-projeto" class="studio-retorno studio-acao-principal" type="button" title="Salvar e retornar a Meus projetos" disabled>Salvar
-        projeto</button>
+      <time id="studio-ultima-atualizacao" hidden></time>
+      <button id="studio-meus-projetos" class="studio-retorno" type="button"><i class="fa-regular fa-folder-open" aria-hidden="true"></i> Meus projetos</button>
+      <button id="studio-salvar-projeto" class="studio-retorno studio-acao-principal" type="button" title="Salvar e retornar a Meus projetos" disabled><i class="fa-regular fa-floppy-disk" aria-hidden="true"></i> Salvar projeto</button>
     </div>
-    <nav class="studio-navegacao" aria-label="Retorno do Studio">
-      <button id="studio-voltar" class="studio-retorno" type="button" title="Voltar à página anterior">← Voltar</button>
-      <a class="studio-retorno" href="../index.html" title="Sair do Laboratório e abrir a página principal">Voltar ao TaskFlow</a>
-    </nav>
-  </header>
+    <a class="studio-retorno" href="../index.html" title="Sair do Laboratório e abrir a página principal">Voltar ao TaskFlow</a>
+  </nav>
 
   <main class="studio-conteudo">
     <p id="studio-projetos-aviso" class="studio-projetos-aviso" role="status" hidden></p>
@@ -96,8 +98,8 @@
 
     <!-- Ambiente — Layout - reúne edição, experimentação e materiais de apoio -->
     <section id="studio-ambiente" hidden aria-labelledby="titulo-ambiente">
-      <div class="studio-contexto">
-        <!-- Mentor — Componente - mantém o personagem e a mensagem no topo esquerdo -->
+      <details class="studio-mentor-painel">
+        <summary><i class="fa-solid fa-robot" aria-hidden="true"></i> Mentor Flow</summary>
         <aside id="studio-mentor" class="studio-mentor" aria-labelledby="titulo-mentor">
           <div id="studio-mascote" class="mascote-viewport" aria-hidden="true"></div>
           <div class="studio-mentor-conteudo">
@@ -115,15 +117,9 @@
             </div>
           </div>
         </aside>
-        <div class="studio-abertura">
-          <div>
-            <span class="studio-etiqueta">ESCREVA. EXPERIMENTE. EVOLUA.</span>
-            <h1 id="titulo-ambiente" tabindex="-1">Seu código ganha <span>vida aqui.</span></h1>
-            <p>HTML, CSS e JavaScript. Escreva, execute e investigue o resultado.</p>
-          </div>
-        </div>
-      </div>
+      </details>
       <div class="studio-alternar-paineis" role="group" aria-label="Painel visível no smartphone">
+        <button id="studio-abrir-arquivos" type="button" aria-controls="studio-explorador" aria-pressed="false">Arquivos</button>
         <button id="studio-abrir-editor" type="button" aria-controls="studio-editor-painel"
           aria-pressed="true">Editor</button>
         <button id="studio-abrir-previa" type="button" aria-controls="studio-previa-painel"
@@ -132,8 +128,14 @@
       <label class="studio-divisor">Largura do editor <input id="studio-largura-editor" type="range" min="30" max="75" value="58" step="1"> <output id="studio-largura-valor">58%</output></label>
       <div class="studio-area-trabalho">
         <details id="studio-explorador" class="studio-explorador" open>
-          <summary><span>EXPLORADOR</span><span class="explorador-reticencias" aria-hidden="true">⋯</span></summary>
+          <summary><i class="fa-solid fa-folder explorador-icone-titulo" aria-hidden="true"></i><span>Explorador de arquivos</span><span class="explorador-reticencias" aria-hidden="true">⋯</span></summary>
           <div class="explorador-conteudo">
+            <div class="explorador-novo-barra">
+              <details id="explorador-novo-menu" class="explorador-novo-menu">
+                <summary>+ Novo</summary>
+                <div><button id="explorador-criar-arquivo" type="button">Novo arquivo</button><button id="explorador-criar-pasta" type="button">Nova pasta</button></div>
+              </details>
+            </div>
             <div class="explorador-cabecalho-raiz">
               <button id="explorador-raiz" type="button" aria-pressed="true">Projeto</button>
               <div class="explorador-acoes" role="group" aria-label="Ações de arquivos e pastas">
@@ -153,11 +155,13 @@
         </details>
         <div id="studio-paineis" class="studio-paineis" data-painel="editor">
           <section id="studio-editor-painel" class="studio-painel studio-editor" aria-labelledby="titulo-editor">
+            <div id="studio-abas" class="studio-abas" role="group" aria-label="Arquivos abertos"></div>
             <header class="studio-painel-cabecalho">
               <h2 id="titulo-editor">Editor de código</h2>
               <span class="studio-arquivo"><span aria-hidden="true">&lt;/&gt;</span> <span
                   id="studio-nome-arquivo">Nenhum arquivo</span></span>
               <div class="studio-editor-atalhos" role="group" aria-label="Pesquisa no editor">
+                <button id="studio-nova-aba" type="button" title="Criar arquivo" aria-label="Criar arquivo">+</button>
                 <button id="studio-buscar" type="button" title="Pesquisar no arquivo — Ctrl+F ou ⌘F" aria-label="Pesquisar no arquivo" aria-controls="studio-busca"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i></button>
                 <button id="studio-localizar-abrir" type="button" title="Localizar arquivo — Ctrl+P ou ⌘P" aria-label="Localizar arquivo"><i class="fa-regular fa-folder-open" aria-hidden="true"></i></button>
               </div>
@@ -169,7 +173,6 @@
               <button id="studio-busca-proximo" type="button" title="Próxima — Enter" aria-label="Próxima ocorrência">↓</button>
               <button id="studio-busca-fechar" type="button" title="Fechar pesquisa — Esc" aria-label="Fechar pesquisa">×</button>
             </div>
-            <div id="studio-abas" class="studio-abas" role="group" aria-label="Arquivos abertos"></div>
             <div id="studio-arquivo-aviso" class="studio-reserva">
               <h3 id="studio-arquivo-titulo">Seu projeto começa vazio</h3>
               <p id="studio-arquivo-mensagem">Crie index.html no explorador para iniciar a edição HTML.</p>
@@ -190,19 +193,25 @@
                 navegador. Use Ctrl+Espaço para sugestões; Tab aceita a sugestão e Esc a descarta. Use Esc e depois Tab
                 para sair do editor se a tecla Tab estiver indentando. Ctrl+S/⌘S salva sem sair; Ctrl+F/⌘F busca; Ctrl+P/⌘P localiza arquivos.</p>
             </div>
+            <p id="studio-status-editor" class="studio-status-editor">Nenhum arquivo aberto.</p>
           </section>
           <section id="studio-previa-painel" class="studio-painel studio-previa-painel" aria-labelledby="titulo-previa">
             <header class="studio-painel-cabecalho studio-browser-cabecalho">
               <span class="studio-browser-pontos" aria-hidden="true"><span></span><span></span><span></span></span>
               <h2 id="titulo-previa">Pré-visualização</h2>
-              <span class="studio-browser-endereco" aria-hidden="true">index.html</span>
             </header>
             <div class="studio-ferramentas">
               <button id="studio-atualizar-previa" class="studio-retorno" type="button">Atualizar prévia</button>
               <label><input id="studio-previa-automatica" type="checkbox" checked> Atualização automática</label>
-              <span id="studio-previa-estado" role="status"></span>
+              <div class="studio-dispositivos" role="group" aria-label="Dimensões da prévia">
+                <button id="studio-dispositivo-desktop" type="button" aria-pressed="true" title="Prévia desktop"><i class="fa-solid fa-desktop" aria-hidden="true"></i><span>Desktop</span></button>
+                <button id="studio-dispositivo-tablet" type="button" aria-pressed="false" title="Prévia tablet — 768 pixels"><i class="fa-solid fa-tablet-screen-button" aria-hidden="true"></i><span>Tablet</span></button>
+                <button id="studio-dispositivo-mobile" type="button" aria-pressed="false" title="Prévia mobile — 375 pixels"><i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i><span>Mobile</span></button>
+              </div>
               <p class="studio-ajuda">Atualizar reinicia o JavaScript da prévia. No modo manual, salvar não reinicia a execução.</p>
             </div>
+            <div class="studio-endereco-virtual"><i class="fa-regular fa-file-code" aria-hidden="true"></i><span id="studio-endereco-previa">Nenhum documento em pré-visualização</span></div>
+            <div class="studio-previa-viewport">
             <div id="studio-previa">
               <div id="studio-previa-diagnosticos" class="studio-previa-diagnosticos" role="status" aria-live="polite"
                 hidden></div>
@@ -213,10 +222,11 @@
               <iframe id="studio-previa-iframe" title="Resultado do código HTML" sandbox="allow-scripts" referrerpolicy="no-referrer"
                 hidden></iframe>
             </div>
+            </div>
+            <footer class="studio-previa-rodape"><span id="studio-previa-estado" role="status">Aguardando documento</span></footer>
           </section>
         </div>
       </div>
-      <p id="studio-status-editor" class="studio-status-editor">Nenhum arquivo aberto.</p>
       <details class="studio-console" open>
         <summary>Console da prévia · últimas 200 mensagens</summary>
         <button id="studio-console-limpar" class="studio-retorno" type="button">Limpar console</button>

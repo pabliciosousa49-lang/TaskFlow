@@ -33,8 +33,8 @@ const coresHTML = HighlightStyle.define([
     { tag: tags.keyword, color: "#c586c0" },
     { tag: tags.number, color: "#b5cea8" },
     { tag: tags.bool, color: "#569cd6" },
-    { tag: tags.variableName, color: "#dcdcaa" },
-    { tag: tags.propertyName, color: "#9cdcfe" },
+    { tag: tags.variableName, color: "#9cdcfe" },
+    { tag: tags.propertyName, color: "#36d9ff" },
     { tag: tags.className, color: "#d7ba7d" },
     { tag: tags.operator, color: "#d4d4d4" }
 ]);
@@ -106,6 +106,12 @@ function criarEstadoHTML(codigo, cursor, aoAlterarCodigo, somenteLeitura, lingua
 
 export function linguagemArquivo(nome) {
     return ({ html: "html", htm: "html", css: "css", js: "javascript" })[nome.split(".").at(-1).toLowerCase()] || "texto";
+}
+
+export function informacoesEditor(editor) {
+    const unidade = editor.state.facet(indentUnit);
+    const recuo = unidade.includes("\t") ? "Indentação: Tab" : `${unidade.length} espaços`;
+    return `${recuo} · ${editor.state.lineBreak === "\r\n" ? "CRLF" : "LF"}`;
 }
 
 // Documentos — Estado - conserva histórico, cursor e rolagem por arquivo na mesma view

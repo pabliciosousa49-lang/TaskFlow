@@ -11,6 +11,7 @@ export function criarExplorador(raiz, acoes) {
     let projeto;
     let selecionadoId = null;
     let arquivoAtivoId = null;
+    let pendenteId = null;
 
     function itemSelecionado() { return projeto?.arquivos.find((item) => item.id === selecionadoId); }
     function diretorioAtual() {
@@ -107,6 +108,7 @@ export function criarExplorador(raiz, acoes) {
                 botao.setAttribute("aria-label", `${item.tipo === "pasta" ? "Pasta" : "Arquivo"} ${item.caminho}`);
                 botao.setAttribute("aria-pressed", String(item.id === selecionadoId));
                 if (item.id === arquivoAtivoId) botao.setAttribute("aria-current", "true");
+                botao.dataset.pendente = String(item.id === pendenteId);
                 const simbolo = document.createElement("span");
                 simbolo.className = "explorador-icone";
                 simbolo.setAttribute("aria-hidden", "true");
@@ -165,6 +167,12 @@ export function criarExplorador(raiz, acoes) {
     }
     novoArquivo.addEventListener("click", () => solicitarCriacao("arquivo"));
     novaPasta.addEventListener("click", () => solicitarCriacao("pasta"));
+    for (const [id, botao] of [["#explorador-criar-arquivo", novoArquivo], ["#explorador-criar-pasta", novaPasta]]) {
+        raiz.querySelector(id)?.addEventListener("click", () => {
+            raiz.querySelector("#explorador-novo-menu").open = false;
+            botao.click();
+        });
+    }
     renomear.addEventListener("click", () => {
         const item = itemSelecionado();
         if (!item) return;
@@ -182,6 +190,10 @@ export function criarExplorador(raiz, acoes) {
     });
 
     return {
+        indicarPendencia(id, pendente) {
+            pendenteId = pendente ? id : null;
+            for (const botao of arvore.querySelectorAll("button")) botao.dataset.pendente = String(botao.dataset.item === pendenteId);
+        },
         atualizar(novoProjeto, arquivoAtivo, selecao) {
             if (projeto?.id !== novoProjeto.id) { abertas.clear(); selecionadoId = arquivoAtivo || null; }
             projeto = novoProjeto;

@@ -50,7 +50,7 @@ function registrarInterface() {
     sessaoStudio?.gravarSessao(projetoAtivo.id, {
         abas: abasStudio?.ids() || [], ativo: arquivoEditorAbertoId,
         documentos: componentesStudio?.capturarContextoEditor(editorStudio) || [],
-        painel: document.querySelector("#studio-paineis").dataset.painel,
+        painel: document.querySelector("#studio-paineis").dataset.painel === "arquivos" ? "editor" : document.querySelector("#studio-paineis").dataset.painel,
         automatica: document.querySelector("#studio-previa-automatica").checked,
         largura: Number(document.querySelector("#studio-largura-editor").value)
     });
@@ -61,7 +61,8 @@ function atualizarStatusEditor() {
     if (!item || !editorStudio) { status.textContent = "Nenhum arquivo aberto."; return; }
     const pos = editorStudio.state.selection.main.head;
     const linha = editorStudio.state.doc.lineAt(pos);
-    status.textContent = `${item.caminho} · ${componentesStudio.linguagemArquivo(item.nome)} · Linha ${linha.number}, coluna ${pos - linha.from + 1} · ${estadoSalvamentoStudio.textContent}`;
+    const formato = componentesStudio.informacoesEditor?.(editorStudio);
+    status.textContent = `${item.caminho} · ${componentesStudio.linguagemArquivo(item.nome)} · Linha ${linha.number}, coluna ${pos - linha.from + 1}${formato ? " · " + formato : ""} · ${estadoSalvamentoStudio.textContent}`;
     ferramentasStudio?.atualizar();
 }
 function acompanharEditor() {
@@ -94,14 +95,24 @@ function mostrarAviso(mensagem = "") {
 function indicarSalvamento(estado) {
     estadoSalvamentoStudio.dataset.estado = estado;
     estadoSalvamentoStudio.textContent = { salvando: "Salvando...", salvo: "Salvo", erro: "Erro ao salvar" }[estado];
+    const atualizacao = document.querySelector("#studio-ultima-atualizacao");
+    atualizacao.hidden = !projetoAtivo?.atualizadoEm;
+    if (!atualizacao.hidden) {
+        atualizacao.dateTime = projetoAtivo.atualizadoEm;
+        atualizacao.textContent = `Atualizado em ${new Date(projetoAtivo.atualizadoEm).toLocaleString("pt-BR")}`;
+    }
     if (estado === "erro") mentorStudio?.erro();
     abasStudio?.atualizar(projetoAtivo?.arquivos || [], arquivoSelecionadoId, alteracoesPendentes);
+    exploradorStudio?.indicarPendencia?.(arquivoEditorAbertoId, alteracoesPendentes);
     atualizarStatusEditor();
 }
 
 // Interface — Painéis - alterna a apresentação no mobile sem recriar o documento
 function selecionarPainel(nome) {
     document.querySelector("#studio-paineis").dataset.painel = nome;
+    document.querySelector(".studio-area-trabalho").dataset.painel = nome;
+    document.querySelector("#studio-abrir-arquivos").setAttribute("aria-pressed", String(nome === "arquivos"));
+    if (nome === "arquivos") document.querySelector("#studio-explorador").open = true;
     document.querySelector("#studio-abrir-editor").setAttribute("aria-pressed", String(nome === "editor"));
     document.querySelector("#studio-abrir-previa").setAttribute("aria-pressed", String(nome === "previa"));
     if (nome === "editor") editorStudio?.requestMeasure();
@@ -375,7 +386,8 @@ async function abrirProjeto(id, novo = false, registrarNavegacao = true) {
             document.querySelector("#studio-previa-diagnosticos"), {
                 aoMensagem: mensagem => consoleStudio?.adicionar(mensagem),
                 aoEstado: estado => {
-                    document.querySelector("#studio-previa-estado").textContent = estado.pendente ? "Alterações ainda não aplicadas" : "Prévia atualizada";
+                    document.querySelector("#studio-previa-estado").textContent = estado.pendente ? "Alterações ainda não aplicadas" : estado.caminho ? "Prévia atualizada" : "Aguardando documento";
+                    document.querySelector("#studio-endereco-previa").textContent = estado.caminho || "Nenhum documento em pré-visualização";
                     if (estado.executando) consoleStudio?.adicionar({ nivel: "info", texto: "Nova execução da prévia. O estado JavaScript foi reiniciado." });
                 }
             }
@@ -408,7 +420,7 @@ async function abrirProjeto(id, novo = false, registrarNavegacao = true) {
         selecionarPainel("editor");
         previaStudio.agendar("");
         if (!exploradorStudio) exploradorStudio = componentesStudio.criarExplorador(document.querySelector("#studio-explorador"), {
-            selecionar: selecionarArquivo,
+            selecionar: item => { const aberto = selecionarArquivo(item); if (aberto) selecionarPainel("editor"); return aberto; },
             criar: (tipo, nome, parentId) => operarEstrutura(tipo, null, nome, parentId),
             renomear: (item, nome) => operarEstrutura("renomear", item, nome),
             excluir: (item) => operarEstrutura("excluir", item)
@@ -553,7 +565,15 @@ async function voltarNoStudio() {
 }
 document.querySelector("#studio-voltar").addEventListener("click", voltarNoStudio);
 document.querySelector("#studio-abrir-editor").addEventListener("click", () => selecionarPainel("editor"));
+document.querySelector("#studio-abrir-arquivos").addEventListener("click", () => selecionarPainel("arquivos"));
 document.querySelector("#studio-abrir-previa").addEventListener("click", () => selecionarPainel("previa"));
+document.querySelector("#studio-nova-aba").addEventListener("click", () => document.querySelector("#explorador-novo-arquivo").click());
+for (const [dispositivo, largura] of [["desktop", "100%"], ["tablet", "768px"], ["mobile", "375px"]]) {
+    document.querySelector(`#studio-dispositivo-${dispositivo}`).addEventListener("click", () => {
+        document.querySelector("#studio-previa-painel").style.setProperty("--studio-previa-largura", largura);
+        for (const nome of ["desktop", "tablet", "mobile"]) document.querySelector(`#studio-dispositivo-${nome}`).setAttribute("aria-pressed", String(nome === dispositivo));
+    });
+}
 document.querySelector("#studio-editor-repetir").addEventListener("click", () => {
     if (pedidoAbertura) abrirProjeto(pedidoAbertura.id, pedidoAbertura.novo);
 });

@@ -169,7 +169,7 @@ export function criarPreviaHTML(iframe, mensagemVazia, painelDiagnosticos, { aoE
         if (atual && !arquivo) diagnosticos.push("Arquivo não encontrado: " + atual.caminho);
         iframe.srcdoc = resultado.documento;
         iframe.hidden = !arquivo?.conteudo.trim(); mensagemVazia.hidden = !iframe.hidden;
-        mostrarDiagnosticos(); aoEstado({ pendente: Boolean(pendencia), executando: true });
+        mostrarDiagnosticos(); notificarEstado(true);
     }
     function aplicar() {
         clearTimeout(temporizador);
@@ -211,6 +211,10 @@ export function criarPreviaHTML(iframe, mensagemVazia, painelDiagnosticos, { aoE
         } catch (erro) { diagnosticos.push(erro.message); mostrarDiagnosticos(); }
     }
     window.addEventListener("message", receber);
+    function notificarEstado(executando) {
+        const atual = historico[indice];
+        aoEstado({ pendente: Boolean(pendencia), executando, caminho: atual ? "/" + atual.caminho + atual.consulta + atual.fragmento : "" });
+    }
     return {
         definirAutomatica(valor) {
             automatica = Boolean(valor); clearTimeout(temporizador);
@@ -227,7 +231,7 @@ export function criarPreviaHTML(iframe, mensagemVazia, painelDiagnosticos, { aoE
             pendencia = assinatura === ultimaAssinatura ? null : { codigo, arquivos: itens, caminho: caminhoHTML, id: idProjeto, assinatura };
             clearTimeout(temporizador);
             if (novoContexto) canal = "";
-            aoEstado({ pendente: Boolean(pendencia), executando: false });
+            notificarEstado(false);
             if (pendencia && (automatica || novoContexto)) temporizador = setTimeout(aplicar, 300);
         }
     };

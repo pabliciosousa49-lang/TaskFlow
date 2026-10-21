@@ -419,3 +419,92 @@ body.studio-roleta-aberta .studio-conteudo { padding-right: calc(clamp(320px, ca
     *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
     .studio-retorno:hover:not(:disabled), .studio-criar:hover:not(:disabled), .studio-ferramentas button:hover:not(:disabled), .studio-localizar button:hover, .studio-console button:hover, .studio-retorno:active:not(:disabled), .studio-ferramentas button:active:not(:disabled) { transform: none; }
 }
+
+/* Studio — Composição: banner, barra de projeto e três áreas reutilizadas. */
+:root { --studio-fundo: #020b1d; --studio-superficie: #06162b; --studio-borda: #245c83; --studio-principal: #087cff; --studio-foco: #00cfff; --studio-texto: #f4f8ff; --studio-secundario: #a9bed8; --studio-sucesso: #00d6a0; }
+.studio-banner { display: grid; grid-template-columns: minmax(220px, 300px) minmax(0, 1fr) minmax(130px, 22%); align-items: center; gap: 28px; min-height: 180px; padding: 24px clamp(20px, 3vw, 56px); border-bottom: 1px solid #106f9d; background-color: #03132b; background-image: linear-gradient(90deg, #03132b 35%, #03132bce 65%, #03132b00 90%), url("../../assets/images/studio-banner-cyberpunk.png"); background-position: center, right center; background-size: cover, auto 100%; background-repeat: no-repeat; }
+.studio-banner .studio-identidade { flex: none; gap: 12px; }
+.studio-banner .studio-identidade img { width: 64px; height: 64px; }
+.studio-banner .studio-identidade p { color: var(--studio-secundario); font-size: 13px; margin-top: 4px; }
+.studio-banner .studio-marca { font-size: clamp(20px, 1.8vw, 27px); white-space: nowrap; }
+.studio-banner .studio-marca > span, .studio-banner .studio-abertura h1 > span { color: var(--studio-foco); }
+.studio-banner .studio-abertura h1 { font-size: clamp(24px, 2.1vw, 36px); }
+.studio-banner .studio-abertura p { max-width: 540px; font-size: 13px; }
+.studio-banner .studio-etiqueta { color: #bfefff; }
+.studio-cabecalho { gap: 10px 16px; padding-block: 10px; box-shadow: 0 8px 20px #0004; }
+.studio-cabecalho > #studio-projeto { display: inline-flex; align-items: center; gap: 8px; flex: 1 1 150px; max-width: 360px; margin: 0; color: #eef7ff; font-weight: 600; }
+.studio-cabecalho > #studio-projeto::before { content: ''; flex: 0 0 7px; width: 7px; height: 7px; border-radius: 50%; background: var(--studio-sucesso); box-shadow: 0 0 7px #00d6a055; }
+.studio-projeto-acoes { margin-left: auto; }
+.studio-retorno { gap: 8px; border-color: #2579a0; }
+#studio-ultima-atualizacao { max-width: 210px; padding-right: 10px; color: var(--studio-secundario); border-right: 1px solid #245371; font-size: 11px; }
+.studio-conteudo { max-width: 2000px; padding: 18px clamp(12px, 2vw, 36px) 32px; }
+#studio-ambiente { position: relative; }
+.studio-divisor { margin: 0 150px 14px 0; min-height: 44px; padding: 6px 12px; }
+.studio-mentor-painel { position: absolute; right: 0; top: 0; z-index: 12; width: 138px; }
+.studio-mentor-painel > summary { min-height: 44px; padding: 10px; border: 1px solid #2177a1; border-radius: 8px; background: #061a32; font-size: 12px; cursor: pointer; }
+.studio-mentor-painel > summary i { color: #6ce5ff; margin-right: 5px; }
+.studio-mentor-painel .studio-mentor { position: absolute; right: 0; top: 50px; width: min(390px, calc(100vw - 32px)); box-shadow: 0 12px 36px #0009, 0 0 12px #00cfff30; }
+.studio-area-trabalho { grid-template-columns: minmax(220px, 20%) minmax(0, 1fr); gap: 14px; }
+.studio-area-trabalho:has(> .studio-explorador:not([open])) { grid-template-columns: 160px minmax(0, 1fr); }
+#studio-paineis { grid-template-columns: minmax(0, var(--studio-fracao-editor, 1.4fr)) minmax(0, 1fr); gap: 14px; }
+.studio-explorador > summary { font-size: 12px; letter-spacing: 0; padding: 12px; min-height: 54px; }
+.explorador-icone-titulo { color: #ffc65a; font-size: 17px; }
+.explorador-novo-barra { padding: 8px 10px; border-bottom: 1px solid #173a59; }
+.explorador-novo-menu { position: relative; }
+.explorador-novo-menu > summary { display: inline-flex; width: auto; min-height: 36px; padding: 7px 12px; border: 1px solid #2579a0; border-radius: 6px; color: #eaf7ff; font-size: 12px; }
+.explorador-novo-menu > summary::before { display: none; }
+.explorador-novo-menu[open] > summary { border-bottom: 1px solid #2579a0; }
+.explorador-novo-menu > div { position: absolute; z-index: 5; top: 42px; left: 0; width: 170px; padding: 6px; border: 1px solid #2579a0; border-radius: 6px; background: #061a32; box-shadow: 0 8px 24px #0009; }
+.explorador-novo-menu > div button { display: block; width: 100%; min-height: 44px; text-align: left; padding: 8px; }
+#explorador-arvore .explorador-item[aria-current="true"] { border-radius: 4px; }
+#explorador-arvore .explorador-item[data-pendente="true"]::after { content: '●'; margin-left: auto; color: #ffb360; font-size: 10px; }
+.studio-abas { min-height: 45px; border-radius: 11px 11px 0 0; }
+.studio-aba button[data-abrir] { display: inline-flex; align-items: center; gap: 8px; }
+.studio-aba-icone { order: -1; flex-shrink: 0; font-size: 15px; }
+.studio-aba[data-ativa="true"] { box-shadow: inset 0 2px #00cfff, 0 0 12px #00cfff18; }
+.studio-editor > .studio-painel-cabecalho { border-radius: 0; min-height: 54px; padding: 6px 10px; }
+.studio-editor-atalhos button { width: 36px; min-height: 36px; }
+.studio-arquivo { padding: 5px 8px; font-size: 11px; }
+.studio-painel { background: #06162bf5; }
+.studio-status-editor { margin: 0; padding: 9px 12px; border: 0; border-top: 1px solid #245371; border-radius: 0 0 11px 11px; box-shadow: none; background: #0a213d; font-size: 11px; }
+.studio-browser-pontos span { width: 7px; height: 7px; background: #ff8a1f; box-shadow: 0 0 5px #ff8a1f44; }
+.studio-dispositivos { display: flex; flex-wrap: wrap; gap: 4px; }
+.studio-dispositivos button { display: inline-flex; align-items: center; gap: 5px; }
+.studio-dispositivos button[aria-pressed="true"] { color: #7ceaff; border-color: #00cfff; background: #0b3453; }
+.studio-dispositivos button span { font-size: 10px; }
+.studio-endereco-virtual { display: flex; align-items: center; gap: 8px; margin: 8px; padding: 7px 10px; border: 1px solid #1c4569; border-radius: 6px; background: #020e20; font: 11px/1.5 Consolas, monospace; overflow-wrap: anywhere; }
+.studio-endereco-virtual i { flex-shrink: 0; color: #00cfff; }
+.studio-previa-viewport { min-width: 0; max-width: 100%; overflow: auto; padding: 8px; background: #020c1c; }
+#studio-previa { width: var(--studio-previa-largura, 100%); max-width: none; margin-inline: auto; }
+#studio-previa-iframe { border-radius: 5px; }
+.studio-previa-rodape { padding: 10px 12px; border-top: 1px solid #245371; color: #80ddc6; font-size: 11px; }
+@media (max-width: 1100px) {
+    .studio-banner { grid-template-columns: minmax(190px, 240px) minmax(0, 1fr); gap: 18px; }
+    .studio-banner .studio-abertura { padding-right: 6vw; }
+    .studio-divisor { display: flex; }
+    .studio-area-trabalho, .studio-area-trabalho:has(> .studio-explorador:not([open])) { grid-template-columns: 160px minmax(0, 1fr); }
+    .studio-paineis { min-width: 0; }
+    .studio-cabecalho > #studio-projeto { max-width: 230px; }
+}
+@media (max-width: 768px) {
+    .studio-banner { grid-template-columns: minmax(0, 1fr); min-height: 180px; padding: 20px 16px; gap: 14px; background-size: cover, auto 100%; }
+    .studio-banner .studio-identidade { flex-basis: auto; padding-right: 25%; }
+    .studio-banner .studio-identidade img { width: 45px; height: 45px; }
+    .studio-banner .studio-abertura { padding-right: 0; max-width: 85%; }
+    .studio-banner .studio-abertura p { display: block; font-size: 12px; }
+    .studio-banner .studio-abertura h1 { font-size: 25px; }
+    .studio-cabecalho { gap: 10px; }
+    .studio-projeto-acoes { margin-left: 0; }
+    #studio-ultima-atualizacao { max-width: none; }
+    #studio-salvamento { flex-basis: auto; }
+    .studio-mentor-painel { position: relative; margin: 0 0 12px auto; }
+    .studio-divisor { margin-right: 0; flex-wrap: wrap; gap: 8px; }
+    .studio-divisor input { flex: 1 1 120px; }
+    .studio-area-trabalho, .studio-area-trabalho:has(> .studio-explorador:not([open])) { grid-template-columns: minmax(0, 1fr); }
+    #studio-paineis { display: block; }
+    .studio-area-trabalho[data-painel="arquivos"] > #studio-paineis { display: none; }
+    .studio-area-trabalho[data-painel="editor"] > .studio-explorador, .studio-area-trabalho[data-painel="previa"] > .studio-explorador { display: none; }
+    .studio-editor-atalhos button { width: 44px; min-height: 44px; }
+    .studio-alternar-paineis button { padding-inline: 6px; font-size: 12px; }
+    .studio-conteudo { padding-bottom: 92px; }
+}

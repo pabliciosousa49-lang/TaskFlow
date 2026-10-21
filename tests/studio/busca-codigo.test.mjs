@@ -48,6 +48,8 @@ test("explorador: ações de criação, expansão de pasta, ícones e arquivo at
     ] };
     const api = criarExplorador(raiz, { criar: (...args) => { pedido = args; }, selecionar: item => { arquivoSelecionado = item.id; } });
     api.atualizar(p, "html");
+    controles.get("#explorador-novo-arquivo").click = () => controles.get("#explorador-novo-arquivo").disparar("click");
+    controles.get("#explorador-nova-pasta").click = () => controles.get("#explorador-nova-pasta").disparar("click");
     const arvore = controles.get("#explorador-arvore");
     const item = id => arvore.querySelectorAll("button").find(b => b.dataset.item === id);
     assert.equal(item("html").getAttribute("aria-current"), "true");
@@ -61,9 +63,16 @@ test("explorador: ações de criação, expansão de pasta, ícones e arquivo at
     assert.equal(item("css").children[1].dataset.icone, "css");
     resposta = "layout.css"; controles.get("#explorador-novo-arquivo").disparar("click");
     assert.deepEqual(pedido, ["arquivo", "layout.css", "pasta"]);
+    controles.get("#explorador-criar-arquivo").disparar("click");
+    assert.deepEqual(pedido, ["arquivo", "layout.css", "pasta"]);
+    assert.equal(controles.get("#explorador-novo-menu").open, false);
+    resposta = "componentes"; controles.get("#explorador-criar-pasta").disparar("click");
+    assert.deepEqual(pedido, ["pasta", "componentes", "pasta"]);
     arvore.disparar("click", { target: { closest: () => item("css") } });
     assert.equal(arquivoSelecionado, "css");
     api.atualizar(p, "css", "css"); assert.equal(item("css").getAttribute("aria-current"), "true");
+    api.indicarPendencia("css", true); assert.equal(item("css").dataset.pendente, "true");
+    api.indicarPendencia("css", false); assert.equal(item("css").dataset.pendente, "false");
     arvore.disparar("click", { target: { closest: () => item("pasta") } });
     assert.equal(item("pasta").getAttribute("aria-expanded"), "false");
     assert.equal(item("css"), undefined);

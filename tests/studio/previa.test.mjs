@@ -284,6 +284,7 @@ test("MVP: prévia manual mantém a execução aplicada e usa os dados mais rece
     const estados = [];
     const previa = api.criarPreviaHTML(frame, new Elemento('div'), new Elemento('div'), { aoEstado: e => estados.push(e) });
     previa.agendar(arquivos[0].conteudo, arquivos, 'index.html', 'a'); contexto.timer();
+    assert.equal(estados.at(-1).caminho, '/index.html');
     const inicial = frame.srcdoc;
     previa.definirAutomatica(false);
     const novos = arquivos.map(a => a.caminho === 'css/style.css' ? { ...a, conteudo: 'body{color:magenta}' } : a);
@@ -293,10 +294,12 @@ test("MVP: prévia manual mantém a execução aplicada e usa os dados mais rece
     previa.atualizar(); assert(frame.srcdoc.includes('body{color:magenta}'));
     assert.equal(estados.at(-1).pendente, false);
     const canal = frame.srcdoc.match(/nonce-([^']+)/)[1];
-    eventos.get('message')({ source: frame.contentWindow, origin: 'null', data: { tipo: 'navegar', referencia: 'pages/login.html', canal } });
+    eventos.get('message')({ source: frame.contentWindow, origin: 'null', data: { tipo: 'navegar', referencia: 'pages/login.html?tema=azul#form', canal } });
     assert(frame.srcdoc.includes('Login de teste'));
+    assert.equal(estados.at(-1).caminho, '/pages/login.html?tema=azul#form');
     previa.agendar(arquivos[0].conteudo, arquivos, 'index.html', 'a'); previa.atualizar();
     assert(frame.srcdoc.includes('Login de teste'), 'atualizar conserva a página navegada');
+    assert.equal(estados.at(-1).caminho, '/pages/login.html?tema=azul#form');
 });
 test("MVP: console valida remetente, canal, nível e limites, e resolve localizações conhecidas", async () => {
     const { api, contexto, eventos } = await carregar();

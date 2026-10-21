@@ -19,6 +19,11 @@ export function criarAbas(raiz, acoes) {
             abrir.setAttribute("aria-pressed", String(id === ativo));
             abrir.title = item.caminho;
             abrir.textContent = item.nome + (id === ativo && pendente ? " ●" : "");
+            const icone = document.createElement("i");
+            const extensao = item.nome.split(".").at(-1).toLowerCase();
+            icone.className = "studio-aba-icone " + ({ html: "devicon-html5-plain colored", htm: "devicon-html5-plain colored", css: "devicon-css3-plain colored", js: "devicon-javascript-plain colored", ts: "devicon-typescript-plain colored", json: "fa-solid fa-code" }[extensao] || "fa-regular fa-file-code");
+            icone.setAttribute("aria-hidden", "true");
+            abrir.append(icone);
             abrir.setAttribute("aria-label", `${item.caminho}${id === ativo && pendente ? ", alterações não salvas" : ""}`);
             const fechar = document.createElement("button");
             fechar.type = "button";
