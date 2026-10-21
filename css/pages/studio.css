@@ -39,7 +39,7 @@ button:disabled { opacity: .55; cursor: default; }
 .studio-conteudo { width: 100%; max-width: 1900px; margin: auto; padding: 22px clamp(20px, 4vw, 72px) 40px; }
 
 /* Cabeçalho — Navegação - mantém identidade, projeto e ações sempre reconhecíveis */
-.studio-cabecalho { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; padding: 10px 30px; border-bottom: 1px solid #22628e; background: #031225; box-shadow: 0 8px 28px #0003; }
+.studio-cabecalho { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; padding: 14px clamp(16px, 2vw, 30px); border-bottom: 1px solid #22628e; background: #031225; box-shadow: 0 8px 28px #0003; }
 .studio-identidade { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1 1 200px; }
 .studio-identidade img { flex-shrink: 0; width: 48px; height: 48px; border-radius: 0; object-fit: contain; }
 .studio-identidade > div { min-width: 0; }
@@ -75,7 +75,9 @@ button:disabled { opacity: .55; cursor: default; }
 .studio-biblioteca p { color: var(--studio-secundario); font-size: 13px; }
 .studio-lista-projetos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 16px; margin: 0; padding: 0; list-style: none; }
 .studio-lista-projetos li { min-width: 0; padding: 22px; border: 1px solid var(--studio-borda); border-radius: var(--studio-raio); background: var(--studio-superficie); transition: border-color .18s; }
-.studio-lista-projetos li::before { content: "</> HTML"; display: block; margin-bottom: 20px; color: var(--studio-foco); font: 11px Consolas, monospace; }
+.studio-lista-projetos li::before { content: "</> PROJETO WEB"; display: block; margin-bottom: 16px; color: var(--studio-foco); font: 11px Consolas, monospace; }
+.studio-lista-projetos li[data-aberto="true"] { border-color: #36d9ff; box-shadow: inset 3px 0 #36d9ff, 0 0 14px #00bfff18; }
+.studio-projeto-aberto { display: inline-block; margin-top: 16px; padding: 4px 10px; border: 1px solid #207193; border-radius: 20px; background: #062d44; color: #6ce5ff; font-size: 11px; }
 .studio-lista-projetos strong { display: block; overflow-wrap: anywhere; font-size: 17px; }
 .studio-lista-projetos time { display: block; margin-top: 8px; color: var(--studio-secundario); font-size: 11px; }
 .studio-lista-acoes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
@@ -97,6 +99,10 @@ button:disabled { opacity: .55; cursor: default; }
 .studio-painel h2 { color: var(--studio-texto); font-size: 12px; font-weight: 600; }
 .studio-arquivo { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; padding: 7px 12px; border: 1px solid #20537f; border-bottom: 2px solid var(--studio-foco); border-radius: 6px; background: var(--studio-editor-fundo); color: var(--studio-texto); font: 12px Consolas, monospace; }
 .studio-arquivo > span { color: var(--studio-foco); }
+.studio-arquivo { min-width: 0; max-width: 100%; }
+#studio-nome-arquivo { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.studio-editor-atalhos { display: flex; gap: 4px; margin-left: auto; }
+.studio-editor-atalhos button { display: grid; place-items: center; width: 40px; min-height: 40px; padding: 8px; border: 1px solid #245676; border-radius: 6px; background: #061a32; color: #6ce5ff; cursor: pointer; }
 #studio-editor { min-width: 0; max-width: 100%; overflow: hidden; }
 #studio-editor .cm-editor { height: var(--studio-editor-altura); }
 #studio-editor .cm-scroller { overflow: auto; font: 14px/1.7 Consolas, "Courier New", monospace; }
@@ -171,6 +177,7 @@ button:disabled { opacity: .55; cursor: default; }
 .studio-aba button { min-height: 44px; border: 0; background: transparent; color: var(--studio-secundario); padding: 8px 12px; cursor: pointer; font: 12px Consolas, monospace; }
 .studio-aba[data-ativa="true"] button { color: var(--studio-texto); }
 .studio-aba button[data-fechar] { min-width: 44px; font-size: 18px; }
+.studio-aba button[data-abrir] { max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
 
 /* Explorador — Estrutura - mantém arquivos virtuais ao lado do ambiente existente */
 .studio-area-trabalho { display: grid; grid-template-columns: clamp(220px, 17vw, 280px) minmax(0, 1fr); align-items: start; gap: 12px; }
@@ -201,7 +208,7 @@ button:disabled { opacity: .55; cursor: default; }
 #explorador-arvore ul { margin-left: 12px; border-left: 1px solid #28476570; }
 #explorador-arvore .explorador-item { display: flex; align-items: center; gap: 5px; width: 100%; height: 34px; min-height: 34px; padding: 5px 9px; border: 0; border-radius: 0; text-align: left; }
 #explorador-arvore .explorador-item[aria-pressed="true"] { background: #0d3761; }
-#explorador-arvore .explorador-item[aria-current="true"] { background: #075cb2; box-shadow: inset 3px 0 #36d9ff; color: #ffffff; }
+#explorador-arvore .explorador-item[aria-current="true"] { background: linear-gradient(90deg, #075cb2, #07395e); box-shadow: inset 3px 0 #36d9ff; color: #ffffff; }
 #explorador-arvore .explorador-item[aria-current="true"]::after { content: "•"; margin-left: auto; color: var(--studio-foco); }
 .explorador-seta { flex: 0 0 10px; width: 10px; color: var(--studio-secundario); font-size: 17px; line-height: 1; text-align: center; }
 .explorador-icone { display: grid; place-items: center; flex: 0 0 16px; width: 16px; height: 16px; color: var(--studio-secundario); }
@@ -263,6 +270,12 @@ body.studio-roleta-aberta .studio-conteudo { padding-right: calc(clamp(320px, ca
 .studio-ferramentas input:not([type="checkbox"]), .studio-localizar input { display: block; width: 100%; min-width: 0; min-height: 38px; padding: 6px 8px; border: 1px solid var(--studio-borda); border-radius: 5px; background: var(--studio-editor-fundo); color: var(--studio-texto); font: inherit; }
 .studio-ferramentas button, .studio-localizar button, .studio-console button { min-height: 38px; padding: 6px 10px; border: 1px solid var(--studio-borda); border-radius: 5px; background: var(--studio-editor-fundo); color: var(--studio-texto); cursor: pointer; }
 .studio-ferramentas p { flex-basis: 100%; line-height: 1.6; }
+.studio-barra-busca { gap: 6px; background: #062139; }
+.studio-barra-busca label { flex: 1 1 170px; }
+.studio-barra-busca #studio-busca-status { flex: 0 1 auto; color: #b9d9ed; font-size: 11px; }
+.studio-barra-busca button { flex: 0 0 auto; min-width: 38px; }
+#studio-editor .studio-busca-ocorrencia { background: #73582080; outline: 1px solid #b68a3d; border-radius: 2px; }
+#studio-editor .studio-busca-selecionada { background: #007d9a99; outline: 2px solid #6ce5ff; }
 .studio-divisor { display: flex; align-items: center; gap: 16px; margin: 12px 0; padding: 8px 18px; border: 1px solid #168dc5; border-radius: 8px; box-shadow: 0 0 10px #007ee522; background: #04162c; color: var(--studio-secundario); font-size: 12px; }
 /* Range nativo — Preserva preenchimento e interação atuais, sem JavaScript adicional. */
 .studio-divisor input { width: min(240px, 45%); height: 24px; accent-color: #087bff; color-scheme: dark; cursor: ew-resize; }
@@ -312,6 +325,8 @@ body.studio-roleta-aberta .studio-conteudo { padding-right: calc(clamp(320px, ca
     #studio-mentor-recolher:hover { background: var(--studio-card); color: var(--studio-texto); }
     .studio-aba button:hover { background: #ffffff0a; }
     .studio-explorador button:hover:not(:disabled) { background: #15324e; }
+    .studio-editor-atalhos button:hover { background: #173d5b; border-color: #43bcf2; }
+    .studio-aba button:hover { background: #16446a; }
     .studio-retorno:hover:not(:disabled), .studio-ferramentas button:hover:not(:disabled), .studio-localizar button:hover, .studio-console button:hover { background: #173d5b; border-color: #43bcf2; box-shadow: 0 0 9px #009dff30; transform: translateY(-1px); }
     .studio-acao-principal:hover:not(:disabled), .studio-criar:hover:not(:disabled), .studio-lista-acoes button[data-acao="continuar"]:hover { background: var(--studio-principal-hover); border-color: var(--studio-principal-hover); }
     .studio-lista-projetos li:hover { border-color: #538bb4; }
@@ -353,6 +368,7 @@ body.studio-roleta-aberta .studio-conteudo { padding-right: calc(clamp(320px, ca
     .studio-ferramentas { padding: 8px; gap: 6px; }
     .studio-ferramentas button { flex: 1 1 auto; }
     .studio-ferramentas input:not([type="checkbox"]) { font-size: 16px; }
+    .studio-editor-atalhos button { width: 44px; min-height: 44px; }
     .studio-formatacao { padding: 8px; }
     .studio-abertura .studio-etiqueta { font-size: 9px; }
     .studio-console { padding: 10px; }

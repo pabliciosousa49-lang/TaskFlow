@@ -11,6 +11,8 @@ import { criarEstruturaInicialHTML } from "./documento-html.js";
 import { criarAutocompletar } from "./autocompletar.js";
 import { criarSugestoesInline } from "./sugestoes-inline.js";
 import { criarFormatacao } from "./formatacao.js";
+import { realceBusca } from "./busca-codigo.js";
+export { realcarBusca } from "./busca-codigo.js";
 export { atualizarContextoCaminhos } from "./autocompletar.js";
 export { criarEstruturaInicialHTML } from "./documento-html.js";
 const observadores = new WeakMap();
@@ -73,6 +75,7 @@ function criarEstadoHTML(codigo, cursor, aoAlterarCodigo, somenteLeitura, lingua
                 highlightActiveLine(),
                 highlightActiveLineGutter(),
                 drawSelection(),
+                realceBusca,
                 history(),
                 indentOnInput(),
                 indentUnit.of("  "),

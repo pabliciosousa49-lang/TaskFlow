@@ -27,8 +27,8 @@ export function criarExplorador(raiz, acoes) {
         const desenhos = {
             pasta: "M1.5 4h5l1.5 2h6.5v7.5h-13Z M1.5 4V2.5h5l1.5 1.5",
             "pasta-aberta": "M1.5 6V3.5h5l1.5 2h6V7 M1.5 7h13l-2 6.5h-12Z",
-            html: "m5 4-4 4 4 4 M11 4l4 4-4 4 M9.5 2l-3 12",
-            css: "M2 1.5h8l4 4v9H2Z M10 1.5v4h4 M5 8h6 M5 11h6",
+            html: "M2 1.5h12l-1.1 12L8 15l-4.9-1.5Z M11 4H5l.3 3H11l-.4 4L8 12l-2.5-.8-.2-1.5",
+            css: "M2 1.5h12l-1.1 12L8 15l-4.9-1.5Z M5 4h6l-.3 3H6l4.4.1-.3 4L8 12l-2.5-.8",
             js: "M2 1.5h12v13H2Z",
             json: "M6 3H4v4L2 8l2 1v4h2 M10 3h2v4l2 1-2 1v4h-2",
             imagem: "M1.5 2.5h13v11h-13Z m0 8 4-4 3 3 2-2 4 4 M10 5h.1",

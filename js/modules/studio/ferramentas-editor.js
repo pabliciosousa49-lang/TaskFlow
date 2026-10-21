@@ -20,16 +20,28 @@ export function criarFerramentasEditor(acoes) {
     const obter = acoes.editor;
     const barra = document.querySelector("#studio-busca");
     const campo = document.querySelector("#studio-busca-texto");
-    const troca = document.querySelector("#studio-busca-substituicao");
     const aviso = document.querySelector("#studio-busca-status");
     const dialogo = document.querySelector("#studio-localizar");
     const arquivo = document.querySelector("#studio-localizar-texto");
     const lista = document.querySelector("#studio-localizar-resultados");
     function atualizar() {
         if (!obter() || barra.hidden) return;
-        const total = localizarOcorrencias(obter().state.doc.toString(), campo.value).length;
-        aviso.textContent = !campo.value ? "Busca literal, sensível a maiúsculas." : total ? `${total} ocorrência(s).` : "Nenhuma ocorrência.";
+        const view = obter();
+        const itens = localizarOcorrencias(view.state.doc.toString(), campo.value);
+        const selecao = view.state.selection.main;
+        const indice = itens.findIndex(i => i.from === selecao.from && i.to === selecao.to);
+        aviso.textContent = !campo.value ? "Busca literal, sensível a maiúsculas." : itens.length ? (indice < 0 ? `${itens.length} ocorrências.` : `${indice + 1} de ${itens.length} ocorrências.`) : "Nenhuma ocorrência.";
+        document.querySelector("#studio-busca-anterior").disabled = document.querySelector("#studio-busca-proximo").disabled = !itens.length;
     }
+    function sincronizar() {
+        if (obter()) acoes.realcar(obter(), barra.hidden ? "" : campo.value);
+        atualizar();
+    }
+    function fecharBusca() {
+        barra.hidden = true;
+        sincronizar(); obter()?.focus();
+    }
+
     function encontrar(anterior = false) {
         const view = obter(); if (!view) return;
         const itens = localizarOcorrencias(view.state.doc.toString(), campo.value);
@@ -38,14 +50,7 @@ export function criarFerramentasEditor(acoes) {
         const item = anterior ? itens.filter(i => i.from < atual.from).at(-1) || itens.at(-1) : itens.find(i => i.from >= atual.to) || itens[0];
         view.dispatch({ selection: { anchor: item.from, head: item.to }, scrollIntoView: true }); atualizar();
     }
-    function substituir(todas) {
-        const view = obter(); if (!view || !campo.value) return;
-        let changes = substituicoes(view.state.doc.toString(), campo.value, troca.value, todas, view.state.selection.main);
-        if (!todas && !changes.length) { encontrar(); changes = substituicoes(view.state.doc.toString(), campo.value, troca.value, false, view.state.selection.main); }
-        if (changes.length) acoes.aplicar(view, changes, { anchor: changes[0].from + troca.value.length });
-        atualizar();
-    }
-    function abrirBusca() { if (!obter()) return; barra.hidden = false; campo.focus(); atualizar(); }
+    function abrirBusca() { if (!obter()) return; barra.hidden = false; campo.focus(); sincronizar(); }
     function listar() {
         const itens = filtrarArquivos(acoes.arquivos(), arquivo.value);
         lista.replaceChildren();
@@ -61,13 +66,11 @@ export function criarFerramentasEditor(acoes) {
     document.querySelector("#studio-buscar").addEventListener("click", abrirBusca);
     document.querySelector("#studio-localizar-abrir").addEventListener("click", abrirArquivos);
     document.querySelector("#studio-localizar-fechar").addEventListener("click", () => { dialogo.close(); obter()?.focus(); });
-    document.querySelector("#studio-busca-fechar").addEventListener("click", () => { barra.hidden = true; obter()?.focus(); });
+    document.querySelector("#studio-busca-fechar").addEventListener("click", fecharBusca);
     document.querySelector("#studio-busca-proximo").addEventListener("click", () => encontrar());
     document.querySelector("#studio-busca-anterior").addEventListener("click", () => encontrar(true));
-    document.querySelector("#studio-substituir").addEventListener("click", () => substituir(false));
-    document.querySelector("#studio-substituir-todos").addEventListener("click", () => substituir(true));
-    barra.addEventListener("keydown", e => { if (e.key === "Escape") { e.preventDefault(); barra.hidden = true; obter()?.focus(); } });
-    campo.addEventListener("input", atualizar);
+    barra.addEventListener("keydown", e => { if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); fecharBusca(); } });
+    campo.addEventListener("input", () => { sincronizar(); encontrar(); });
     campo.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); encontrar(e.shiftKey); } });
     arquivo.addEventListener("input", listar);
     dialogo.addEventListener("keydown", event => {
@@ -80,14 +83,19 @@ export function criarFerramentasEditor(acoes) {
     });
     dialogo.addEventListener("cancel", () => obter()?.focus());
     document.addEventListener("keydown", event => {
-        if (event.defaultPrevented || event.shiftKey || !(event.ctrlKey || event.metaKey) || event.altKey || !acoes.ativo()) return;
+        if (event.defaultPrevented || !acoes.ativo()) return;
+        const noEditor = obter()?.dom.contains(event.target) || barra.contains(event.target);
+        if (event.key === "Escape" && noEditor && !barra.hidden) {
+            event.preventDefault(); fecharBusca(); return;
+        }
+        if (event.shiftKey || !(event.ctrlKey || event.metaKey) || event.altKey) return;
         const tecla = event.key.toLowerCase();
-        if (!["s", "p", "f", "h"].includes(tecla)) return;
+        if (!["s", "p", "f"].includes(tecla) || (tecla === "f" && !noEditor)) return;
         if (dialogo.open && tecla !== "p") return;
         event.preventDefault();
         if (tecla === "s") acoes.salvar();
         else if (tecla === "p") abrirArquivos();
-        else { abrirBusca(); if (tecla === "h") troca.focus(); }
+        else abrirBusca();
     });
-    return { atualizar };
+    return { atualizar, sincronizar, fecharBusca };
 }

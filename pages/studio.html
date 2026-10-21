@@ -157,17 +157,17 @@
               <h2 id="titulo-editor">Editor de código</h2>
               <span class="studio-arquivo"><span aria-hidden="true">&lt;/&gt;</span> <span
                   id="studio-nome-arquivo">Nenhum arquivo</span></span>
+              <div class="studio-editor-atalhos" role="group" aria-label="Pesquisa no editor">
+                <button id="studio-buscar" type="button" title="Pesquisar no arquivo — Ctrl+F ou ⌘F" aria-label="Pesquisar no arquivo" aria-controls="studio-busca"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i></button>
+                <button id="studio-localizar-abrir" type="button" title="Localizar arquivo — Ctrl+P ou ⌘P" aria-label="Localizar arquivo"><i class="fa-regular fa-folder-open" aria-hidden="true"></i></button>
+              </div>
             </header>
-            <div class="studio-ferramentas">
-              <button id="studio-buscar" class="studio-retorno" type="button">Buscar / substituir</button>
-              <button id="studio-localizar-abrir" class="studio-retorno" type="button">Localizar arquivo</button>
-            </div>
-            <div id="studio-busca" class="studio-ferramentas" hidden>
-              <label>Buscar <input id="studio-busca-texto" type="search" maxlength="500"></label>
-              <label>Substituir por <input id="studio-busca-substituicao" type="text" maxlength="10000"></label>
-              <button id="studio-busca-anterior" type="button">Anterior</button><button id="studio-busca-proximo" type="button">Próxima</button>
-              <button id="studio-substituir" type="button">Substituir</button><button id="studio-substituir-todos" type="button">Substituir todas</button>
-              <button id="studio-busca-fechar" type="button">Fechar busca</button><p id="studio-busca-status" role="status"></p>
+            <div id="studio-busca" class="studio-ferramentas studio-barra-busca" role="search" aria-label="Pesquisar no arquivo ativo" hidden>
+              <label for="studio-busca-texto">Pesquisar no código <input id="studio-busca-texto" type="search" maxlength="500" autocomplete="off" spellcheck="false" aria-describedby="studio-busca-status"></label>
+              <p id="studio-busca-status" role="status" aria-live="polite"></p>
+              <button id="studio-busca-anterior" type="button" title="Anterior — Shift+Enter" aria-label="Ocorrência anterior">↑</button>
+              <button id="studio-busca-proximo" type="button" title="Próxima — Enter" aria-label="Próxima ocorrência">↓</button>
+              <button id="studio-busca-fechar" type="button" title="Fechar pesquisa — Esc" aria-label="Fechar pesquisa">×</button>
             </div>
             <div id="studio-abas" class="studio-abas" role="group" aria-label="Arquivos abertos"></div>
             <div id="studio-arquivo-aviso" class="studio-reserva">

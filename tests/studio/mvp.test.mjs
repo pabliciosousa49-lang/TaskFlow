@@ -82,6 +82,7 @@ class Elemento {
   addEventListener(k, fn) { (this.events[k] ??= []).push(fn); }
   disparar(k, e = {}) { for (const fn of this.events[k] || []) fn(e); }
   focus() { document.activeElement = this; }
+  contains(alvo) { return this === alvo || this.children.some(c => c.contains(alvo)); }
   showModal() { this.open = true; }
   close() { this.open = false; }
   click() { this.disparar('click'); }
@@ -102,16 +103,34 @@ test('console: texto inerte, níveis, limite de 200 mensagens, limpeza e ação 
   lista.children.at(-1).children[1].click(); assert.equal(aberto.caminho, 'app.js');
   limpar.click(); assert.equal(lista.children.length, 0);
 });
-test('ferramentas: salvar sem sair, próximo/anterior, substituir, filtrar e abrir por teclado', () => {
-  const d = dom(); let codigo = 'a a', salvo = 0, aberto, transacoes = [];
-  const view = { state: { doc: { toString: () => codigo }, selection: { main: { from: 0, to: 0 } } }, focus() {}, dispatch(t) { if (t.selection) this.state.selection.main = { from: Math.min(t.selection.anchor, t.selection.head ?? t.selection.anchor), to: Math.max(t.selection.anchor, t.selection.head ?? t.selection.anchor) }; } };
-  criarFerramentasEditor({ editor: () => view, ativo: () => true, salvar: () => { salvo++; }, arquivos: () => [{ tipo: 'arquivo', caminho: 'a.html' }], abrir: item => { aberto = item; }, aplicar(v, changes, selection) { transacoes.push(changes); for (const c of changes.slice().reverse()) codigo = codigo.slice(0, c.from) + c.insert + codigo.slice(c.to); v.dispatch({ selection }); } });
-  let prevenido = false; d.events.keydown({ key: 's', ctrlKey: true, preventDefault() { prevenido = true; } }); assert(prevenido); assert.equal(salvo, 1);
-  d.querySelector('#studio-busca').hidden = true; d.querySelector('#studio-buscar').click(); assert.equal(d.querySelector('#studio-busca').hidden, false);
-  d.querySelector('#studio-busca-texto').value = 'a'; d.querySelector('#studio-busca-proximo').click(); assert.equal(view.state.selection.main.from, 0);
-  d.querySelector('#studio-busca-proximo').click(); assert.equal(view.state.selection.main.from, 2);
-  d.querySelector('#studio-busca-anterior').click(); assert.equal(view.state.selection.main.from, 0);
-  d.querySelector('#studio-busca-substituicao').value = 'xyz'; d.querySelector('#studio-substituir-todos').click(); assert.equal(codigo, 'xyz xyz'); assert.equal(transacoes.length, 1);
-  d.querySelector('#studio-localizar-abrir').click(); const dialogo = d.querySelector('#studio-localizar'); assert.equal(dialogo.open, true);
+test('ferramentas: Ctrl+F local, resultados, Enter/Shift+Enter, Esc e Ctrl+P/S preservados', () => {
+  const d = dom(); let codigo = 'a a', salvo = 0, aberto, realce = '', transacoes = [];
+  const conteudo = new Elemento(), view = { dom: new Elemento(), state: { doc: { toString: () => codigo }, selection: { main: { from: 0, to: 0 } } }, focus() { conteudo.focus(); }, dispatch(t) { transacoes.push(t); if (t.selection) this.state.selection.main = { from: Math.min(t.selection.anchor, t.selection.head ?? t.selection.anchor), to: Math.max(t.selection.anchor, t.selection.head ?? t.selection.anchor) }; } };
+  view.dom.append(conteudo);
+  const barra = d.querySelector('#studio-busca'), campo = d.querySelector('#studio-busca-texto');
+  barra.append(campo); barra.hidden = true;
+  const ui = criarFerramentasEditor({ editor: () => view, ativo: () => true, salvar: () => { salvo++; }, arquivos: () => [{ tipo: 'arquivo', caminho: 'a.html' }], abrir: item => { aberto = item; }, realcar: (_, termo) => { realce = termo; } });
+  function tecla(key, alvo = conteudo, opcoes = {}) {
+    const e = { key, target: alvo, ctrlKey: true, preventDefault() { this.defaultPrevented = true; }, ...opcoes };
+    d.events.keydown(e); return e;
+  }
+  assert(tecla('s').defaultPrevented); assert.equal(salvo, 1);
+  assert(!tecla('f', new Elemento()).defaultPrevented); assert.equal(barra.hidden, true);
+  assert(tecla('f').defaultPrevented); assert.equal(barra.hidden, false); assert.equal(d.activeElement, campo);
+  campo.value = 'a'; campo.disparar('input'); assert.equal(realce, 'a'); assert.equal(view.state.selection.main.from, 0);
+  assert.equal(d.querySelector('#studio-busca-status').textContent, '1 de 2 ocorrências.');
+  campo.disparar('keydown', { key: 'Enter', preventDefault() {} }); assert.equal(view.state.selection.main.from, 2);
+  assert.equal(d.querySelector('#studio-busca-status').textContent, '2 de 2 ocorrências.');
+  campo.disparar('keydown', { key: 'Enter', shiftKey: true, preventDefault() {} }); assert.equal(view.state.selection.main.from, 0);
+  assert(transacoes.every(t => t.scrollIntoView && !t.changes)); assert.equal(codigo, 'a a');
+  tecla('f', campo); assert.equal(d.activeElement, campo); assert.equal(realce, 'a');
+  codigo = 'outro texto a'; ui.sincronizar(); assert.match(d.querySelector('#studio-busca-status').textContent, /1 ocorrências/);
+  campo.value = 'ausente'; campo.disparar('input'); assert.equal(d.querySelector('#studio-busca-status').textContent, 'Nenhuma ocorrência.');
+  assert.equal(d.querySelector('#studio-busca-proximo').disabled, true);
+  assert(tecla('Escape', campo, {ctrlKey: false}).defaultPrevented); assert.equal(barra.hidden, true); assert.equal(realce, ''); assert.equal(d.activeElement, conteudo);
+  d.querySelector('#studio-buscar').click(); assert.equal(barra.hidden, false);
+  barra.disparar('keydown', { key: 'Escape', preventDefault() {}, stopPropagation() {} }); assert.equal(barra.hidden, true);
+  assert(!tecla('h').defaultPrevented);
+  tecla('p'); const dialogo = d.querySelector('#studio-localizar'); assert.equal(dialogo.open, true);
   dialogo.disparar('keydown', { key: 'Enter', target: d.querySelector('#studio-localizar-texto'), preventDefault() {} }); assert.equal(aberto.caminho, 'a.html'); assert.equal(dialogo.open, false);
 });

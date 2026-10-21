@@ -32,7 +32,7 @@ function ambiente() {
   const ctx=vm.createContext({document:documento,window:{events:{},addEventListener(k,fn){this.events[k]=fn},location:{assign(){}}},sessionStorage:globalThis.sessionStorage,
     setTimeout:fn=>{const id=++proximoTimer;temporizadores.set(id,fn);return id},clearTimeout:id=>temporizadores.delete(id),console,
     EditorView:{theme:vazio,updateListener:{of:callback=>({callback})},contentAttributes:{of:vazio}},EditorState:{create:c=>estado(c.doc,c.selection.anchor,c.extensions),readOnly:{of:vazio}},
-    HighlightStyle:{define:vazio},tags:new Proxy({},{get:()=>''}),keymap:{of:vazio},historyKeymap:[],defaultKeymap:[],indentWithTab:{},
+    realceBusca:[],HighlightStyle:{define:vazio},tags:new Proxy({},{get:()=>''}),keymap:{of:vazio},historyKeymap:[],defaultKeymap:[],indentWithTab:{},
     html:vazio,css:vazio,javascript:vazio,criarSugestoesInline:vazio,criarAutocompletar:vazio,criarFormatacao:vazio,criarValidacaoHTML:vazio,syntaxHighlighting:vazio,lineNumbers:vazio,highlightActiveLine:vazio,highlightActiveLineGutter:vazio,drawSelection:vazio,history:vazio,indentOnInput:vazio,indentUnit:{of:vazio},isolateHistory:{of:valor=>valor}
   });
   let editor=readFileSync(new URL('../../js/modules/studio/editor.js',import.meta.url),'utf8').replace(/^import .*;\r?$/gm,'').replace(/^export \{.*;\r?$/gm,'').replace(/export function/g,'function');
@@ -86,4 +86,24 @@ test('Voltar salva pendências antes do histórico e bloqueia saída quando a gr
   voltar();assert.equal(retornos,0);assert.equal(a.elemento('#studio-salvamento').textContent,'Erro ao salvar');
   localStorage.setItem=gravar;voltar();assert.equal(retornos,1);
   assert.equal(servico.buscarProjeto(p.id).arquivos.find(f=>f.id===html.id).conteudo,'<p>preservado</p>');
+});
+
+test('Meus projetos identifica o último aberto, preserva conteúdo ao renomear e confirma exclusão',async()=>{
+  const a=ambiente(); const {p,html}=projetoTeste();
+  await a.api.abrirProjeto(p.id); a.api.mostrarGerenciamento();
+  const lista=a.elemento('#studio-lista-projetos'), card=lista.children.find(c=>c.dataset.aberto==='true');
+  assert(card); assert.equal(card.children[0].textContent,'Interface');
+  assert.equal(card.children.at(-1).textContent,'Último projeto aberto');
+  assert(card.children[1].textContent.startsWith('Atualizado em '));
+  assert.deepEqual(card.children[2].children.map(b=>b.dataset.acao),['continuar','exportar','renomear','excluir']);
+  const acao=async nome=>lista.events.click[0]({target:{closest:()=>({dataset:{acao:nome,id:p.id}})}});
+  const antes=servico.buscarProjeto(p.id).arquivos;
+  a.ctx.window.prompt=()=> 'Renomeado'; await acao('renomear');
+  assert.equal(servico.buscarProjeto(p.id).titulo,'Renomeado');
+  assert.deepEqual(servico.buscarProjeto(p.id).arquivos,antes);
+  a.ctx.window.confirm=()=>false; await acao('excluir'); assert(servico.buscarProjeto(p.id));
+  await acao('continuar'); assert.equal(a.api.projeto().id,p.id);
+  assert.equal(a.view.state.doc.toString(),antes.find(f=>f.id===html.id).conteudo);
+  a.api.mostrarGerenciamento(); a.ctx.window.confirm=()=>true; await acao('excluir');
+  assert.equal(servico.buscarProjeto(p.id),null);
 });

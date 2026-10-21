@@ -14,6 +14,7 @@ let editorStudio;
 let previaStudio;
 let documentoPreviaSelecionado;
 let projetoAtivo;
+let ultimoProjetoAbertoId;
 let codigoSalvo = "";
 let alteracoesPendentes = false;
 let temporizadorSalvamento;
@@ -113,6 +114,7 @@ function atualizarListaProjetos() {
         }
         for (const projeto of projetos) {
             const item = document.createElement("li");
+            item.dataset.aberto = String(projeto.id === (projetoAtivo?.id || ultimoProjetoAbertoId));
             const titulo = document.createElement("strong");
             titulo.textContent = projeto.titulo;
             const data = document.createElement("time");
@@ -120,7 +122,7 @@ function atualizarListaProjetos() {
             data.textContent = `Atualizado em ${new Date(projeto.atualizadoEm).toLocaleString("pt-BR")}`;
             const acoes = document.createElement("div");
             acoes.className = "studio-lista-acoes";
-            for (const [acao, texto] of [["continuar", "Continuar"], ["exportar", "Exportar backup"], ["renomear", "Renomear"], ["excluir", "Excluir"]]) {
+            for (const [acao, texto] of [["continuar", "Abrir projeto"], ["exportar", "Exportar backup"], ["renomear", "Renomear"], ["excluir", "Excluir"]]) {
                 const botao = document.createElement("button");
                 botao.type = "button";
                 botao.className = "studio-retorno";
@@ -131,6 +133,12 @@ function atualizarListaProjetos() {
                 acoes.append(botao);
             }
             item.append(titulo, data, acoes);
+            if (item.dataset.aberto === "true") {
+                const indicador = document.createElement("span");
+                indicador.className = "studio-projeto-aberto";
+                indicador.textContent = projetoAtivo ? "Projeto aberto" : "Último projeto aberto";
+                item.append(indicador);
+            }
             listaProjetosStudio.append(item);
         }
         return true;
@@ -222,6 +230,7 @@ function atualizarApresentacaoArquivo(item) {
         arquivos: projetoAtivo?.arquivos || []
     }));
     const editavel = arquivoEditavel(item);
+    if (!editavel) ferramentasStudio?.fecharBusca();
     document.querySelector("#studio-nome-arquivo").textContent = item?.caminho || "Nenhum arquivo";
     document.querySelector("#studio-editor-conteudo").hidden = !editavel;
     document.querySelector("#studio-arquivo-aviso").hidden = editavel;
@@ -248,6 +257,7 @@ function selecionarArquivo(item, primeiraAbertura = false) {
     abasStudio.abrir(atual.id);
     abasStudio.atualizar(projetoAtivo.arquivos, atual.id);
     atualizarApresentacaoArquivo(atual);
+    ferramentasStudio?.sincronizar();
     atualizarPrevia();
     exploradorStudio?.atualizar(projetoAtivo, atual.id, atual.id);
     editorStudio.requestMeasure();
@@ -399,6 +409,7 @@ async function abrirProjeto(id, novo = false) {
         botaoSalvarStudio.disabled = false;
         indicarSalvamento("salvo");
         registrarProjetoAtivo(projeto.id);
+        ultimoProjetoAbertoId = projeto.id;
         mostrarAviso();
         status.hidden = true;
         mentorStudio?.ativar(true);
@@ -418,6 +429,7 @@ async function abrirProjeto(id, novo = false) {
 function mostrarGerenciamento() {
     if (abrindoProjeto || !salvarProjetoAtual()) return;
     registrarInterface();
+    ferramentasStudio?.fecharBusca();
     projetoAtivo = null;
     registrarProjetoAtivo(null);
     document.querySelector("#studio-gerenciamento").hidden = false;
@@ -526,7 +538,7 @@ async function iniciarStudio() {
             arquivos: () => projetoAtivo?.arquivos || [],
             abrir: item => { const aberto = selecionarArquivo(item); if (aberto) { selecionarPainel("editor"); editorStudio.focus(); } return aberto; },
             salvar: () => { if (salvarProjetoAtual()) { mostrarAviso("Projeto salvo."); registrarInterface(); } },
-            aplicar: (view, changes, selection) => componentesStudio.alterarComHistorico(view, changes, selection)
+            realcar: (view, termo) => componentesStudio.realcarBusca(view, termo)
         });
     } catch (erro) { mostrarAviso("Ferramentas auxiliares indisponíveis: " + erro.message); }
     try {
