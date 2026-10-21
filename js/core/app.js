@@ -88,6 +88,9 @@ let acessoAgenda = null;
 let fechamentoAgenda = null;
 let posicaoPaginaAgenda = 0;
 let fechamentoEventos = null;
+let filtroCompromissos = "todos";
+let atualizacaoStatusAgenda = null;
+let compromissoEmDestaque = null;
 
 // Datas e horários — Condição - valida valores reais sem conversão de fuso por UTC
 function dataValida(valor) {
@@ -119,6 +122,18 @@ function ordenarCompromissos(lista) {
     return [...lista].sort((primeiro, segundo) => `${primeiro.data}T${primeiro.hora}`.localeCompare(`${segundo.data}T${segundo.hora}`));
 }
 
+// A conclusão é persistida; a expiração depende somente da data/hora local real.
+function statusCompromisso(compromisso, agora = new Date()) {
+    if (compromisso.concluidoEm) return "concluido";
+    return criarDataLocal(compromisso.data, compromisso.hora) < agora ? "expirado" : "pendente";
+}
+function conclusaoValida(valor) {
+    if (valor === undefined) return true;
+    if (typeof valor !== "string") return false;
+    const instante = new Date(valor);
+    return !Number.isNaN(instante.getTime()) && instante.toISOString() === valor;
+}
+
 // Leitura dos compromissos — Processamento - preserva o conteúdo original quando houver erro
 function recuperarCompromissos() {
     try {
@@ -131,7 +146,8 @@ function recuperarCompromissos() {
                 typeof compromisso.titulo !== "string" || !compromisso.titulo.trim() || compromisso.titulo.length > 120 ||
                 typeof compromisso.descricao !== "string" || compromisso.descricao.length > 2000 ||
                 typeof compromisso.data !== "string" || !dataValida(compromisso.data) ||
-                typeof compromisso.hora !== "string" || !horaValida(compromisso.hora)) return false;
+                typeof compromisso.hora !== "string" || !horaValida(compromisso.hora) ||
+                !conclusaoValida(compromisso.concluidoEm)) return false;
             ids.add(compromisso.id);
             return true;
         })) throw new Error("Dados inválidos");
@@ -158,48 +174,118 @@ function salvarCompromissos(novosCompromissos) {
     }
 }
 
+function criarIndicadorStatus(estado) {
+    const status = document.createElement("span"); status.className = "agenda-status";
+    const [rotulo, classe] = { pendente: ["Pendente", "fa-regular fa-clock"], concluido: ["Concluído", "fa-solid fa-circle-check"], expirado: ["Expirado", "fa-solid fa-clock"] }[estado];
+    const icone = document.createElement("i"); icone.className = classe; icone.setAttribute("aria-hidden", "true");
+    const nome = document.createElement("span"); nome.textContent = rotulo; status.append(icone, nome);
+    return status;
+}
+
+// Próximos eventos — apresentação própria; status e dados continuam compartilhados com a Agenda.
+function criarCardProximoEvento(compromisso, agora, exibirAcao) {
+    const item = document.createElement("li"); item.className = "agenda-compromisso eventos-card";
+    item.dataset.compromisso = compromisso.id; item.dataset.status = statusCompromisso(compromisso, agora); item.tabIndex = -1;
+    const cabecalho = document.createElement("header"); cabecalho.className = "eventos-card-cabecalho";
+    const icone = document.createElement("i"); icone.className = "fa-regular fa-calendar-check eventos-card-icone"; icone.setAttribute("aria-hidden", "true");
+    const titulo = document.createElement("h3"); titulo.textContent = compromisso.titulo;
+    cabecalho.append(icone, titulo, criarIndicadorStatus(item.dataset.status));
+    const informacoes = document.createElement("div"); informacoes.className = "eventos-data-hora";
+    for (const [tipo, rotulo, classe, valor] of [["data", "Data", "fa-regular fa-calendar", apresentarData(compromisso.data)], ["hora", "Horário", "fa-regular fa-clock", compromisso.hora]]) {
+        const bloco = document.createElement("div"); bloco.className = "eventos-info eventos-info-" + tipo;
+        const simbolo = document.createElement("i"); simbolo.className = classe; simbolo.setAttribute("aria-hidden", "true");
+        const textos = document.createElement("div"), label = document.createElement("span"), tempo = document.createElement("time");
+        label.textContent = rotulo; tempo.textContent = valor; tempo.dateTime = tipo === "data" ? compromisso.data : `${compromisso.data}T${compromisso.hora}`;
+        textos.append(label, tempo);
+        if (tipo === "data") {
+            const semana = document.createElement("span"); semana.className = "eventos-dia-semana";
+            semana.textContent = criarDataLocal(compromisso.data).toLocaleDateString("pt-BR", { weekday: "long" }); textos.append(semana);
+        }
+        bloco.append(simbolo, textos); informacoes.append(bloco);
+    }
+    const descricao = document.createElement("section"); descricao.className = "eventos-descricao"; descricao.setAttribute("aria-label", "Descrição do compromisso");
+    const tituloDescricao = document.createElement("h4"), documento = document.createElement("i"), nome = document.createElement("span");
+    documento.className = "fa-regular fa-file-lines"; documento.setAttribute("aria-hidden", "true"); nome.textContent = "Descrição";
+    tituloDescricao.append(documento, nome);
+    const texto = document.createElement("p"); texto.className = "eventos-descricao-texto"; texto.tabIndex = 0;
+    texto.textContent = compromisso.descricao.trim() ? compromisso.descricao : "Nenhuma descrição cadastrada";
+    descricao.append(tituloDescricao, texto); item.append(cabecalho, informacoes, descricao);
+    if (exibirAcao) {
+        const acoes = document.createElement("div"); acoes.className = "eventos-card-acoes";
+        const botao = document.createElement("button"); botao.type = "button"; botao.className = "agenda-botao"; botao.dataset.acao = "abrir"; botao.dataset.id = compromisso.id;
+        botao.setAttribute("aria-label", `Abrir na Agenda: ${compromisso.titulo}`); botao.setAttribute("aria-haspopup", "dialog");
+        const abrir = document.createElement("i"); abrir.className = "fa-solid fa-arrow-up-right-from-square"; abrir.setAttribute("aria-hidden", "true");
+        const legenda = document.createElement("span"); legenda.textContent = "Abrir na Agenda"; botao.append(abrir, legenda); acoes.append(botao); item.append(acoes);
+    }
+    return item;
+}
+
 // Conteúdo dos compromissos — Atualização - apresenta textos do aluno sem interpretar HTML
-function criarItemCompromisso(compromisso, permitirEdicao) {
+function criarItemCompromisso(compromisso, permitirEdicao, agora, exibirAcao = true) {
+    if (!permitirEdicao) return criarCardProximoEvento(compromisso, agora, exibirAcao);
     const item = document.createElement("li");
     item.className = "agenda-compromisso";
+    item.dataset.compromisso = compromisso.id;
+    item.dataset.status = statusCompromisso(compromisso, agora);
+    item.dataset.destaque = String(compromisso.id === compromissoEmDestaque);
+    item.tabIndex = -1;
     const titulo = document.createElement("strong");
     titulo.textContent = compromisso.titulo;
     const horario = document.createElement("time");
     horario.dateTime = `${compromisso.data}T${compromisso.hora}`;
-    horario.textContent = `${apresentarData(compromisso.data)} · ${compromisso.hora}`;
-    item.append(titulo, horario);
-    if (permitirEdicao && compromisso.descricao) {
-        const descricao = document.createElement("p");
-        descricao.textContent = compromisso.descricao.length > 160 ? `${compromisso.descricao.slice(0, 160)}…` : compromisso.descricao;
-        item.append(descricao);
+    const iconeData = document.createElement("i"); iconeData.className = "fa-regular fa-calendar"; iconeData.setAttribute("aria-hidden", "true");
+    const data = document.createElement("span"); data.textContent = apresentarData(compromisso.data);
+    const iconeHora = document.createElement("i"); iconeHora.className = "fa-regular fa-clock"; iconeHora.setAttribute("aria-hidden", "true");
+    const hora = document.createElement("span"); hora.textContent = compromisso.hora;
+    horario.append(iconeData, data, iconeHora, hora);
+    const status = criarIndicadorStatus(item.dataset.status);
+    const descricao = document.createElement("p"); descricao.className = "agenda-descricao-resumo";
+    descricao.textContent = compromisso.descricao || "Sem descrição";
+    item.append(titulo, horario, status, descricao);
+    if (item.dataset.status === "expirado") {
+        const mensagem = document.createElement("p"); mensagem.className = "agenda-status-mensagem"; mensagem.textContent = "Horário previsto encerrado"; item.append(mensagem);
     }
-    if (permitirEdicao) {
-        const acoes = document.createElement("div");
-        acoes.className = "agenda-acoes";
-        for (const [acao, texto] of [["editar", "Editar"], ["excluir", "Excluir"]]) {
-            const botao = document.createElement("button");
-            botao.type = "button";
-            botao.className = "agenda-botao";
-            botao.textContent = texto;
-            botao.setAttribute("aria-label", `${texto}: ${compromisso.titulo}`);
-            botao.dataset.acao = acao;
-            botao.dataset.id = compromisso.id;
-            botao.disabled = armazenamentoBloqueado;
-            acoes.append(botao);
-        }
-        item.append(acoes);
+    const detalhes = document.createElement("details"); detalhes.className = "agenda-detalhes";
+    const resumo = document.createElement("summary"); resumo.textContent = "Ver detalhes";
+    const texto = document.createElement("p"); texto.textContent = compromisso.descricao || "Sem descrição";
+    detalhes.append(resumo, texto);
+    if (compromisso.concluidoEm) {
+        const conclusao = document.createElement("time"); conclusao.dateTime = compromisso.concluidoEm;
+        conclusao.textContent = `Concluído em ${new Date(compromisso.concluidoEm).toLocaleString("pt-BR")}`; detalhes.append(conclusao);
     }
+    item.append(detalhes);
+    const acoes = document.createElement("div"); acoes.className = "agenda-acoes";
+    const botoes = permitirEdicao ? [[item.dataset.status === "concluido" ? "reabrir" : "concluir", item.dataset.status === "concluido" ? "Reabrir compromisso" : "Marcar como concluído"], ["editar", "Editar"], ["excluir", "Excluir"]] : [["abrir", "Abrir na Agenda"]];
+    for (const [acao, texto] of botoes) {
+        const botao = document.createElement("button"); botao.type = "button"; botao.className = "agenda-botao"; botao.textContent = texto;
+        botao.setAttribute("aria-label", `${texto}: ${compromisso.titulo}`);
+        botao.dataset.acao = acao; botao.dataset.id = compromisso.id;
+        botao.disabled = permitirEdicao && armazenamentoBloqueado;
+        acoes.append(botao);
+    }
+    item.append(acoes);
     return item;
 }
-function preencherLista(lista, registros, mensagem, permitirEdicao) {
+function preencherLista(lista, registros, mensagem, permitirEdicao, agora) {
+    const detalhesAbertos = new Set([...lista.children].filter(item => item.querySelector("details")?.open).map(item => item.dataset.compromisso));
     lista.replaceChildren();
     if (!registros.length) {
         const vazio = document.createElement("li");
-        vazio.textContent = mensagem;
+        if (permitirEdicao) vazio.textContent = mensagem;
+        else {
+            vazio.className = "eventos-vazio";
+            const icone = document.createElement("i"); icone.className = "fa-regular fa-calendar"; icone.setAttribute("aria-hidden", "true");
+            const texto = document.createElement("p"); texto.textContent = mensagem; vazio.append(icone, texto);
+        }
         lista.append(vazio);
         return;
     }
-    registros.forEach(compromisso => lista.append(criarItemCompromisso(compromisso, permitirEdicao)));
+    registros.forEach(compromisso => {
+        const item = criarItemCompromisso(compromisso, permitirEdicao, agora, registros.length !== 1);
+        const detalhes = item.querySelector("details");
+        if (detalhes) detalhes.open = detalhesAbertos.has(compromisso.id);
+        lista.append(item);
+    });
 }
 
 // Feriados nacionais fixos: Leis 662/1949, 6.802/1980 e 14.759/2023.
@@ -256,20 +342,43 @@ function atualizarCalendario() {
         diasAgenda.append(botao);
     }
 }
-function atualizarProximosEventos() {
-    const agora = new Date();
-    const proximos = ordenarCompromissos(compromissos.filter(compromisso => criarDataLocal(compromisso.data, compromisso.hora) >= agora)).slice(0, 3);
+function atualizarProximosEventos(agora = new Date()) {
+    const proximos = ordenarCompromissos(compromissos.filter(compromisso => statusCompromisso(compromisso, agora) === "pendente")).slice(0, 3);
     preencherLista(document.querySelector("#lista-eventos"), proximos,
-        armazenamentoBloqueado ? "Não foi possível recuperar seus eventos. Abra a agenda para mais informações." : "Nenhum próximo compromisso. Seu próximo passo pode começar na agenda.", false);
+        armazenamentoBloqueado ? "Não foi possível recuperar seus eventos. Abra a agenda para mais informações." : "Nenhum próximo evento encontrado.", false, agora);
+    const abrirUnico = document.querySelector("#evento-abrir-unico");
+    abrirUnico.hidden = proximos.length !== 1;
+    abrirUnico.dataset.id = proximos[0]?.id || "";
+    abrirUnico.setAttribute("aria-label", proximos.length === 1 ? `Abrir na Agenda: ${proximos[0].titulo}` : "Abrir na Agenda");
+    agendarAtualizacaoStatus(agora);
 }
 function atualizarAgenda() {
+    const agora = new Date();
     atualizarCalendario();
     document.querySelector("#agenda-data-selecionada").textContent = apresentarData(dataSelecionada);
     const compromissosDoDia = ordenarCompromissos(compromissos.filter(compromisso => compromisso.data === dataSelecionada));
     document.querySelector("#agenda-quantidade").textContent = `${compromissosDoDia.length} ${compromissosDoDia.length === 1 ? "compromisso" : "compromissos"}`;
-    preencherLista(listaCompromissos, compromissosDoDia, "Nenhum compromisso para este dia.", true);
-    atualizarProximosEventos();
+    const filtrados = compromissosDoDia.filter(c => filtroCompromissos === "todos" || statusCompromisso(c, agora) === filtroCompromissos);
+    if (filtroCompromissos !== "todos") document.querySelector("#agenda-quantidade").textContent = `${filtrados.length} de ${compromissosDoDia.length} compromissos`;
+    preencherLista(listaCompromissos, filtrados, filtroCompromissos === "todos" ? "Nenhum compromisso para este dia." : "Nenhum compromisso com este status para o dia selecionado.", true, agora);
+    atualizarProximosEventos(agora);
 }
+
+// Uma atualização no próximo vencimento basta; expiração não grava nem conclui registros.
+function agendarAtualizacaoStatus(agora) {
+    clearTimeout(atualizacaoStatusAgenda);
+    const proximos = compromissos.filter(c => !c.concluidoEm).map(c => criarDataLocal(c.data, c.hora).getTime()).filter(instante => instante >= agora.getTime());
+    if (proximos.length) atualizacaoStatusAgenda = setTimeout(atualizarStatusVisiveis, Math.min(2147483647, proximos.reduce((menor, instante) => Math.min(menor, instante), Infinity) - agora.getTime() + 1));
+}
+function atualizarStatusVisiveis() {
+    if (painelAgenda.open) atualizarAgenda(); else atualizarProximosEventos();
+}
+document.querySelector("#agenda-filtro-status").addEventListener("change", evento => {
+    const valor = evento.target.value;
+    if (!["todos", "pendente", "concluido", "expirado"].includes(valor)) return;
+    filtroCompromissos = valor;
+    atualizarAgenda();
+});
 
 // Formulário da agenda — Atualização - encerra a edição, oculta o formulário e mantém a data selecionada
 function cancelarEdicao() {
@@ -294,6 +403,7 @@ function mostrarFormulario() {
 function abrirAgenda(evento) {
     if (painelAgenda.open) return;
     acessoAgenda = evento.currentTarget;
+    if (acessoAgenda.id === "agenda-completa") compromissoEmDestaque = null;
     avisoAgenda.textContent = avisoArmazenamento;
     cancelarEdicao();
     atualizarAgenda();
@@ -326,7 +436,8 @@ painelAgenda.addEventListener("close", () => {
     document.documentElement.classList.remove("agenda-aberta");
     document.documentElement.style.removeProperty("--agenda-posicao-pagina");
     window.scrollTo({ top: posicaoPaginaAgenda, behavior: "instant" });
-    if (acessoAgenda) acessoAgenda.focus({ preventScroll: true });
+    if (acessoAgenda && acessoAgenda.isConnected !== false) acessoAgenda.focus({ preventScroll: true });
+    else botaoEventos.focus();
 });
 document.querySelector("#cancelar-compromisso").addEventListener("click", () => {
     cancelarEdicao();
@@ -374,6 +485,7 @@ formularioCompromisso.addEventListener("submit", evento => {
     campoHora.setCustomValidity(horaValida(campoHora.value) ? "" : "Informe um horário válido.");
     if (!formularioCompromisso.reportValidity()) return;
     const compromisso = {
+        ...(idEmEdicao ? compromissos.find(c => c.id === idEmEdicao) : {}),
         id: idEmEdicao || crypto.randomUUID(),
         titulo: campoTitulo.value.trim(), descricao: campoDescricao.value.trim(),
         data: campoData.value, hora: campoHora.value
@@ -403,7 +515,18 @@ listaCompromissos.addEventListener("click", evento => {
         campoHora.value = compromisso.hora;
         document.querySelector("#titulo-formulario").textContent = "Editar compromisso";
         mostrarFormulario();
-    } else if (window.confirm(`Excluir o compromisso "${compromisso.titulo}"?`)) {
+    } else if (["concluir", "reabrir"].includes(botao.dataset.acao)) {
+        const novos = compromissos.map(atual => {
+            if (atual.id !== compromisso.id) return atual;
+            if (botao.dataset.acao === "concluir") return { ...atual, concluidoEm: atual.concluidoEm || new Date().toISOString() };
+            const { concluidoEm, ...reaberto } = atual;
+            return reaberto;
+        });
+        if (!salvarCompromissos(novos)) return;
+        atualizarAgenda();
+        avisoAgenda.textContent = botao.dataset.acao === "concluir" ? "Compromisso concluído." : "Compromisso reaberto.";
+        document.querySelector("#titulo-compromissos").focus();
+    } else if (botao.dataset.acao === "excluir" && window.confirm(`Excluir o compromisso "${compromisso.titulo}"?`)) {
         if (!salvarCompromissos(compromissos.filter(atual => atual.id !== compromisso.id))) return;
         if (idEmEdicao === compromisso.id) cancelarEdicao();
         atualizarAgenda();
@@ -411,6 +534,21 @@ listaCompromissos.addEventListener("click", evento => {
         document.querySelector("#titulo-compromissos").focus();
     }
 });
+
+function abrirEventoNaAgenda(evento) {
+    const botao = evento.target.closest("button[data-acao]");
+    if (!botao || botao.dataset.acao !== "abrir") return;
+    const compromisso = compromissos.find(c => c.id === botao.dataset.id);
+    if (!compromisso) return;
+    dataSelecionada = compromisso.data; mesExibido = compromisso.data.slice(0, 7);
+    compromissoEmDestaque = compromisso.id;
+    filtroCompromissos = "todos"; document.querySelector("#agenda-filtro-status").value = "todos";
+    abrirAgenda({ currentTarget: botao });
+    const item = [...listaCompromissos.children].find(item => item.dataset.compromisso === compromisso.id);
+    item?.focus({ preventScroll: true }); item?.scrollIntoView({ block: "nearest", behavior: "instant" });
+}
+document.querySelector("#lista-eventos").addEventListener("click", abrirEventoNaAgenda);
+document.querySelector("#evento-abrir-unico").addEventListener("click", abrirEventoNaAgenda);
 
 // Janela de próximos eventos — Escuta - alterna a consulta compacta e atualiza ao retornar à aplicação
 function alternarEventos(abrir) {
@@ -420,6 +558,7 @@ function alternarEventos(abrir) {
     botaoEventos.setAttribute("aria-expanded", String(abrir));
     if (abrir) {
         painelEventos.hidden = false;
+        document.querySelector("#fechar-eventos").focus();
     } else {
         const concluirFechamento = () => {
             painelEventos.hidden = true;
@@ -439,9 +578,9 @@ document.querySelector("#fechar-eventos").addEventListener("click", () => altern
 painelEventos.addEventListener("keydown", evento => {
     if (evento.key === "Escape") { evento.preventDefault(); alternarEventos(false); }
 });
-botaoTaskFlow.addEventListener("click", atualizarProximosEventos);
-window.addEventListener("focus", atualizarProximosEventos);
-document.addEventListener("visibilitychange", () => { if (!document.hidden) atualizarProximosEventos(); });
+botaoTaskFlow.addEventListener("click", () => atualizarProximosEventos());
+window.addEventListener("focus", atualizarStatusVisiveis);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) atualizarStatusVisiveis(); });
 
 // Inicialização da agenda — Processamento - recupera dados antes de apresentar o calendário
 recuperarCompromissos();

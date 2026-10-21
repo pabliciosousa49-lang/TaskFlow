@@ -1691,3 +1691,97 @@ html.agenda-aberta body {
     .biblioteca-entrada .area-tecnologia { animation: none; }
     #alternar-eventos, #alternar-eventos .eventos-indicador { transition: none; }
 }
+
+/* Agenda e próximos eventos — consulta e status dos mesmos registros. */
+.agenda-compromisso[data-status] { --agenda-status-cor: #68dcff; min-width: 0; background: #06172c; border: 1px solid #245778; border-left: 3px solid var(--agenda-status-cor); }
+#painel-agenda .agenda-compromisso[data-status] { border-left-color: var(--agenda-status-cor); }
+.agenda-compromisso[data-status="concluido"] { --agenda-status-cor: #67dda8; border-color: #287354; }
+.agenda-compromisso[data-status="expirado"] { --agenda-status-cor: #ffbb65; border-color: #996331; }
+.agenda-compromisso[data-status="concluido"] > strong { opacity: .72; }
+.agenda-compromisso .agenda-status { display: inline-flex; align-items: center; gap: 6px; width: fit-content; margin-top: 8px; padding: 3px 8px; border: 1px solid currentColor; border-radius: 20px; color: var(--agenda-status-cor); font-size: 11px; font-weight: 600; }
+.agenda-compromisso time { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.agenda-compromisso time i { font-size: 12px; }
+.agenda-compromisso .agenda-descricao-resumo { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; white-space: pre-wrap; color: #bdd0e3; line-height: 1.6; }
+.agenda-compromisso .agenda-status-mensagem { color: #ffbb65; font-size: 11px; }
+.agenda-detalhes { min-width: 0; margin-top: 10px; }
+.agenda-detalhes summary { width: fit-content; min-height: 44px; padding-block: 10px; color: #7cddff; font-size: 12px; cursor: pointer; }
+.agenda-detalhes p { white-space: pre-wrap; overflow-wrap: anywhere; padding: 10px; border: 1px solid #245778; border-radius: 6px; background: #031123; }
+.agenda-detalhes time { color: #80dcb0; line-height: 1.5; }
+.agenda-compromisso .agenda-acoes { flex-wrap: wrap; gap: 8px; }
+.agenda-compromisso .agenda-acoes button { white-space: normal; min-height: 44px; }
+.agenda-acoes [data-acao="concluir"] { color: #85e9b5; border-color: #287354; }
+.agenda-acoes [data-acao="reabrir"] { color: #86dfff; }
+#painel-agenda .agenda-compromisso[data-destaque="true"] { outline: 2px solid #61ddff; outline-offset: 2px; }
+.agenda-filtro { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-block: 14px; }
+.agenda-filtro label { color: #adc7df; font-size: 12px; }
+.agenda-filtro select { max-width: 100%; min-height: 44px; padding: 8px 12px; border: 1px solid #28729a; border-radius: 6px; background: #06172c; color: #eff7ff; font: inherit; font-size: 14px; color-scheme: dark; }
+@media (max-width: 600px) {
+    .agenda-compromisso .agenda-acoes { display: grid; grid-template-columns: minmax(0, 1fr); }
+    .agenda-compromisso .agenda-acoes button { width: 100%; }
+    .agenda-filtro select { flex: 1 1 120px; min-width: 0; font-size: 16px; }
+}
+
+/* Próximos eventos — janela de consulta; estilos restritos a este painel. */
+#painel-eventos { position: fixed; top: 50%; left: 50%; right: auto; bottom: auto; z-index: 60; transform: translate(-50%, -50%); display: flex; flex-direction: column; gap: 18px; width: min(600px, calc(100vw - 28px)); max-height: calc(100dvh - 32px); margin: 0; padding: 22px; border: 1px solid #00a8df; border-top: 2px solid #00cfff; border-radius: 18px; background: #020b1d; box-shadow: 0 0 24px #00a8ff25, 0 24px 90px #000b, inset 0 1px #79e5ff20; color: #f4f8ff; overflow: hidden; }
+#painel-eventos[hidden], #painel-eventos [hidden] { display: none !important; }
+#painel-eventos::before { content: ''; position: absolute; top: 9px; right: 82px; width: 4px; height: 4px; background: #00cfff40; box-shadow: 10px 0 #00cfff18, 10px 10px #00cfff18, 20px 0 #00cfff18; pointer-events: none; }
+#painel-eventos:not([hidden]) { animation: eventos-consulta-entrada .18s ease both; }
+#painel-eventos.eventos-fechando { animation: eventos-consulta-saida .15s ease both; }
+#painel-eventos .eventos-cabecalho { display: flex; align-items: flex-start; gap: 12px; flex: 0 0 auto; padding-bottom: 16px; border-bottom: 1px solid #174769; }
+#painel-eventos .eventos-cabecalho > div { flex: 1; min-width: 0; }
+#painel-eventos h2 { margin: 0; font-size: clamp(20px, 3vw, 26px); line-height: 1.3; letter-spacing: -.5px; }
+#painel-eventos h2 span { color: #00cfff; }
+#painel-eventos #eventos-subtitulo { margin-top: 5px; color: #a9bed8; font-size: 12px; line-height: 1.5; }
+#painel-eventos .eventos-calendario-icone { position: relative; display: grid; place-items: center; flex: 0 0 42px; height: 44px; border: 1px solid #167bb1; border-radius: 9px; background: #082644; color: #20ccff; font-size: 27px; }
+#painel-eventos .eventos-calendario-icone::after { content: ''; position: absolute; right: 7px; bottom: 8px; width: 5px; height: 5px; background: #ffbf24; box-shadow: -8px 0 #ffbf24; }
+#painel-eventos #fechar-eventos { display: grid; place-items: center; flex: 0 0 40px; min-width: 40px; min-height: 40px; padding: 0; border: 1px solid #1877a7; border-radius: 8px; background: #06172d; font-size: 25px; }
+#painel-eventos #lista-eventos { flex: 1 1 auto; min-height: 0; max-height: 62dvh; margin: 0; padding: 2px; overflow-y: auto; overscroll-behavior: contain; scrollbar-color: #186992 #041328; }
+#painel-eventos .eventos-card { padding: 18px; border: 1px solid #147fae; border-left: 3px solid #ffbf24; border-radius: 12px; background: #06172d; box-shadow: inset 0 1px #6ce5ff14; }
+#painel-eventos .eventos-card-cabecalho { display: flex; align-items: flex-start; gap: 10px; }
+#painel-eventos .eventos-card-icone { flex: 0 0 24px; margin-top: 3px; color: #00cfff; font-size: 22px; }
+#painel-eventos .eventos-card h3 { flex: 1; min-width: 0; margin: 0; font-size: 18px; line-height: 1.4; overflow-wrap: anywhere; }
+#painel-eventos .agenda-status { flex: 0 0 auto; margin: 0; padding: 4px 8px; font-size: 10px; background: #0a203b; }
+#painel-eventos .eventos-card[data-status="concluido"] { border-color: #287a59; border-left-color: #00d6a0; }
+#painel-eventos .eventos-card[data-status="concluido"] h3 { opacity: .75; }
+#painel-eventos .eventos-card[data-status="expirado"] { border-color: #a4662c; border-left-color: #ff8a1f; }
+#painel-eventos .eventos-data-hora { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); margin-top: 16px; border: 1px solid #1b4267; border-radius: 9px; background: #0a203b; }
+#painel-eventos .eventos-info { display: flex; align-items: flex-start; gap: 10px; min-width: 0; padding: 12px; }
+#painel-eventos .eventos-info > i { margin-top: 4px; font-size: 24px; color: #00d6a0; }
+#painel-eventos .eventos-info > div { min-width: 0; }
+#painel-eventos .eventos-info-hora { border-left: 1px solid #24547b; }
+#painel-eventos .eventos-info-hora > i { color: #ffbf24; }
+#painel-eventos .eventos-info span { display: block; color: #a9bed8; font-size: 11px; }
+#painel-eventos .eventos-info time { display: block; margin-top: 3px; color: #f4f8ff; font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
+#painel-eventos .eventos-info .eventos-dia-semana { margin-top: 3px; text-transform: capitalize; }
+#painel-eventos .eventos-descricao { margin-top: 16px; }
+#painel-eventos .eventos-descricao h4 { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: 13px; font-weight: 600; }
+#painel-eventos .eventos-descricao h4 i { color: #26bfff; font-size: 17px; }
+#painel-eventos .eventos-descricao-texto { display: block; max-height: 190px; margin: 0; padding: 12px; border: 1px solid #1b4267; border-radius: 8px; background: #041226; color: #dbe7f5; font-size: 13px; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; overflow-y: auto; overscroll-behavior: contain; }
+#painel-eventos .eventos-rodape { display: flex; flex-wrap: wrap; gap: 10px; flex: 0 0 auto; padding-top: 16px; border-top: 1px solid #174769; }
+#painel-eventos .agenda-botao { display: inline-flex; justify-content: center; align-items: center; gap: 8px; min-height: 44px; padding: 10px 12px; border-color: #188fbb; border-radius: 8px; background: #06172d; color: #f4f8ff; font-size: 12px; white-space: normal; }
+#painel-eventos .eventos-rodape .agenda-botao { flex: 1 1 180px; }
+#painel-eventos #agenda-completa { width: auto; margin: 0; border-color: #00cfff; background: #087cff; box-shadow: 0 0 12px #087cff30; }
+#painel-eventos .eventos-card-acoes { margin-top: 14px; }
+#painel-eventos .eventos-card-acoes .agenda-botao { width: 100%; }
+#painel-eventos .eventos-vazio { padding: 30px 12px; text-align: center; color: #a9bed8; }
+#painel-eventos .eventos-vazio > i { display: block; margin-bottom: 14px; color: #00cfff; font-size: 36px; }
+#painel-eventos :is(button, .eventos-descricao-texto):focus-visible { outline: 2px solid #ffbf24; outline-offset: 3px; }
+@keyframes eventos-consulta-entrada { from { opacity: 0; transform: translate(-50%, calc(-50% + 6px)); } to { opacity: 1; transform: translate(-50%, -50%); } }
+@keyframes eventos-consulta-saida { to { opacity: 0; transform: translate(-50%, calc(-50% + 6px)); } }
+@media (hover: hover) and (pointer: fine) {
+    #painel-eventos .agenda-botao:hover { border-color: #6ce5ff; box-shadow: 0 0 12px #00cfff30; }
+    #painel-eventos .eventos-card:hover { box-shadow: 0 0 12px #00cfff18, inset 0 1px #6ce5ff14; }
+}
+@media (max-width: 480px) {
+    #painel-eventos { gap: 12px; width: calc(100vw - 20px); max-height: calc(100dvh - 20px); padding: 14px; border-radius: 12px; }
+    #painel-eventos .eventos-calendario-icone { flex-basis: 32px; height: 36px; font-size: 22px; }
+    #painel-eventos .eventos-cabecalho { gap: 8px; }
+    #painel-eventos .eventos-card { padding: 12px; }
+    #painel-eventos .eventos-card-cabecalho { flex-wrap: wrap; }
+    #painel-eventos .agenda-status { margin-left: 34px; }
+    #painel-eventos .eventos-data-hora { grid-template-columns: minmax(0, 1fr); }
+    #painel-eventos .eventos-info-hora { border-left: 0; border-top: 1px solid #24547b; }
+    #painel-eventos .eventos-rodape { flex-direction: column; gap: 8px; }
+    #painel-eventos .eventos-rodape .agenda-botao { flex: 0 0 auto; width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) { #painel-eventos:not([hidden]), #painel-eventos.eventos-fechando { animation: none; } }

@@ -217,14 +217,17 @@
           <aside class="proximos-eventos" aria-label="Próximos eventos">
             <button id="alternar-eventos" class="agenda-botao" type="button" aria-expanded="false"
               aria-controls="painel-eventos"><i class="fa-regular fa-calendar-check" aria-hidden="true"></i> Próximos eventos <span class="eventos-indicador" aria-hidden="true">⌃</span></button>
-            <div id="painel-eventos" class="eventos-conteudo" hidden>
-              <div class="agenda-barra">
-                <h2>Próximos eventos</h2><button id="fechar-eventos" class="agenda-botao" type="button"
-                  aria-label="Fechar próximos eventos">×</button>
-              </div>
+            <div id="painel-eventos" class="eventos-conteudo" role="dialog" aria-modal="false" aria-labelledby="eventos-titulo" aria-describedby="eventos-subtitulo" hidden>
+              <header class="eventos-cabecalho">
+                <span class="eventos-calendario-icone" aria-hidden="true"><i class="fa-regular fa-calendar-days"></i></span>
+                <div><h2 id="eventos-titulo">Próximos <span>eventos</span></h2><p id="eventos-subtitulo">Seus próximos compromissos registrados na agenda.</p></div>
+                <button id="fechar-eventos" class="agenda-botao" type="button" aria-label="Fechar próximos eventos">×</button>
+              </header>
               <ul id="lista-eventos" class="agenda-lista"></ul>
-              <button id="agenda-completa" class="agenda-botao" type="button" aria-haspopup="dialog">Abrir agenda
-                completa</button>
+              <footer class="eventos-rodape">
+                <button id="evento-abrir-unico" class="agenda-botao" type="button" data-acao="abrir" aria-haspopup="dialog" hidden><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> Abrir na Agenda</button>
+                <button id="agenda-completa" class="agenda-botao" type="button" aria-haspopup="dialog"><i class="fa-regular fa-calendar-days" aria-hidden="true"></i> Abrir agenda completa</button>
+              </footer>
             </div>
           </aside>
         </div>
@@ -457,6 +460,15 @@
       <!-- Compromissos do dia — Apresentação - acompanha a data selecionada -->
       <section class="agenda-registros" aria-labelledby="titulo-compromissos">
         <h3 id="titulo-compromissos" tabindex="-1">Compromissos do dia</h3>
+        <div class="agenda-filtro">
+          <label for="agenda-filtro-status">Filtrar compromissos do dia</label>
+          <select id="agenda-filtro-status">
+            <option value="todos">Todos</option>
+            <option value="pendente">Pendentes</option>
+            <option value="concluido">Concluídos</option>
+            <option value="expirado">Expirados</option>
+          </select>
+        </div>
         <p id="agenda-quantidade" class="agenda-quantidade" role="status" aria-live="polite"></p>
         <ul id="lista-compromissos" class="agenda-lista"></ul>
       </section>

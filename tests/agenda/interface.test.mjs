@@ -5,15 +5,20 @@ import { readFileSync } from "node:fs";
 import { Elemento } from "../biblioteca/dom-simulado.mjs";
 
 // Exercita os eventos reais da Agenda em DOM simulado, sem substituir QA visual.
-function iniciar(dados = "[]", urlInicial = "https://taskflow.test/index.html") {
+function iniciar(dados = "[]", urlInicial = "https://taskflow.test/index.html", instante = Date.now()) {
     const fonte = readFileSync(new URL("../../js/core/app.js", import.meta.url), "utf8");
     const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
     const elementos = new Map();
     const eventosDocumento = {}, eventosJanela = {};
     const entradas = [{ url: urlInicial, state: null }];
-    let indice = 0;
-    function elemento() {
-        const e = new Elemento();
+    let indice = 0, agora = instante, proximoTimer = 0;
+    const temporizadores = new Map();
+    class Relogio extends Date {
+        constructor(...args) { super(...(args.length ? args : [agora])); }
+        static now() { return agora; }
+    }
+    function elemento(tag = "div") {
+        const e = new Elemento(tag);
         const classes = new Set();
         e.classList = { add: (...nomes) => nomes.forEach(n => classes.add(n)), remove: (...nomes) => nomes.forEach(n => classes.delete(n)), contains: n => classes.has(n) };
         e.style = { setProperty() {}, removeProperty() {} };
@@ -37,11 +42,13 @@ function iniciar(dados = "[]", urlInicial = "https://taskflow.test/index.html") 
         documentElement: elemento(),
         currentScript: { src: "https://taskflow.test/js/core/navegacao.js" }, referrer: "",
         querySelector: s => elementos.get(s), querySelectorAll: () => [],
-        createElement: () => elemento(), addEventListener: (tipo, fn) => { (eventosDocumento[tipo] ??= []).push(fn); }
+        createElement: tag => elemento(tag), addEventListener: (tipo, fn) => { (eventosDocumento[tipo] ??= []).push(fn); }
     };
     let id = 0;
     const contexto = vm.createContext({
-        document, Date, URL, setTimeout, clearTimeout,
+        document, Date: Relogio, URL,
+        setTimeout: (fn, atraso) => { const id = ++proximoTimer; temporizadores.set(id, { fn, quando: agora + atraso }); return id; },
+        clearTimeout: id => temporizadores.delete(id),
         sessionStorage: { getItem: () => null, removeItem() {}, setItem() {} },
         localStorage: { getItem: k => armazenamento.get(k) ?? null, setItem: (k, v) => armazenamento.set(k, v) },
         crypto: { randomUUID: () => `novo-${++id}` },
@@ -69,9 +76,9 @@ function iniciar(dados = "[]", urlInicial = "https://taskflow.test/index.html") 
         const alvo = elemento(); alvo.dataset.data = data;
         obter("agenda-dias").disparar("click", { target: alvo });
     };
-    const acao = (acao, id) => {
+    const acao = (acao, id, lista = "lista-compromissos") => {
         const alvo = elemento(); alvo.dataset = { acao, id };
-        obter("lista-compromissos").disparar("click", { target: alvo });
+        obter(lista).disparar("click", { target: alvo });
     };
     const salvar = (titulo, data, hora = "10:00") => {
         obter("compromisso-titulo").value = titulo;
@@ -79,7 +86,12 @@ function iniciar(dados = "[]", urlInicial = "https://taskflow.test/index.html") 
         obter("compromisso-hora").value = hora;
         formulario.disparar("submit", { preventDefault() {} });
     };
-    return { obter, clicar, selecionar, acao, salvar, armazenamento, historico: contexto.window.history, location: contexto.window.location };
+    const filtrar = value => { obter("agenda-filtro-status").value = value; obter("agenda-filtro-status").disparar("change", { target: { value } }); };
+    const avancar = ms => {
+        agora += ms;
+        for (const [id, timer] of [...temporizadores]) if (timer.quando <= agora) { temporizadores.delete(id); timer.fn(); }
+    };
+    return { obter, clicar, selecionar, acao, salvar, filtrar, avancar, storage: contexto.localStorage, armazenamento, historico: contexto.window.history, location: contexto.window.location };
 }
 
 test("Agenda filtra por dia, atualiza quantidade e preserva marcadores e navegação mensal", () => {
@@ -213,4 +225,138 @@ test("Agenda navega para 2027, indica feriados e fins de semana sem alterar comp
     assert.ok(ano.validacao);
     assert.match(a.obter("agenda-mes").textContent, /2027/);
     assert.equal(a.armazenamento.get("taskflow.agenda.compromissos.v1"), "[]");
+});
+
+const chaveCompromissos = "taskflow.agenda.compromissos.v1";
+const instanteAgenda = new Date(2040, 1, 2, 10, 0, 0).getTime();
+const eventoAgenda = (id, hora, extras = {}) => ({ id, titulo: id, descricao: "Descrição de " + id, data: "2040-02-02", hora, ...extras });
+const cardsAgenda = (a, lista = "lista-compromissos") => a.obter(lista).children.filter(item => item.dataset.compromisso);
+
+test("eventos exibem descrição completa e segura, ordenam futuros pendentes e abrem a data na Agenda", () => {
+    const descricao = '<script>alert("inofensivo")</script>\n' + "Uma descrição longa com todas as orientações. ".repeat(25);
+    const registros = [eventoAgenda("Tarde", "12:00"), eventoAgenda("Expirado", "09:59"), eventoAgenda("Agora", "10:00", { descricao }),
+        eventoAgenda("Concluído", "13:00", { concluidoEm: new Date(instanteAgenda - 5000).toISOString() }), eventoAgenda("Manhã", "11:00", { descricao: "" }), eventoAgenda("Depois", "14:00")];
+    const texto = JSON.stringify(registros), a = iniciar(texto, undefined, instanteAgenda);
+    assert.deepEqual(cardsAgenda(a, "lista-eventos").map(c => c.dataset.compromisso), ["Agora", "Manhã", "Tarde"]);
+    const card = cardsAgenda(a, "lista-eventos")[0];
+    assert.equal(card.querySelector(".eventos-descricao-texto").textContent, descricao);
+    assert.equal(card.querySelector("details"), null);
+    assert.equal(card.querySelector(".eventos-info-data").querySelector("time").dateTime, "2040-02-02");
+    assert.equal(card.querySelector(".eventos-info-hora").querySelector("time").textContent, "10:00");
+    assert.equal(card.querySelector(".eventos-dia-semana").textContent, new Date(2040, 1, 2, 12).toLocaleDateString("pt-BR", { weekday: "long" }));
+    assert.equal(card.querySelector("script"), null);
+    assert.equal(cardsAgenda(a, "lista-eventos")[1].querySelector(".eventos-descricao-texto").textContent, "Nenhuma descrição cadastrada");
+    assert.equal(a.obter("evento-abrir-unico").hidden, true);
+    for (const item of cardsAgenda(a, "lista-eventos")) assert.equal(item.querySelector("button").dataset.id, item.dataset.compromisso);
+    a.filtrar("concluido");
+    a.acao("abrir", "Agora", "lista-eventos");
+    assert.equal(a.obter("painel-agenda").open, true);
+    assert.equal(a.obter("agenda-filtro-status").value, "todos");
+    assert.equal(cardsAgenda(a).find(c => c.dataset.compromisso === "Agora").dataset.destaque, "true");
+    assert.equal(a.obter("formulario-compromisso").hidden, true);
+    assert.equal(a.armazenamento.get(chaveCompromissos), texto, "consulta não migra nem regrava dados antigos");
+});
+
+test("criação com descrição, conclusão, edição e reabertura persistem sem perder campos ou registros antigos", () => {
+    const antigo = eventoAgenda("Antigo", "13:00", { campoPreservado: "original" });
+    const a = iniciar(JSON.stringify([antigo]), undefined, instanteAgenda);
+    a.obter("compromisso-descricao").value = "Linha um\nLinha dois";
+    a.salvar("Estudar", "2040-02-02", "12:00");
+    assert.match(a.obter("lista-eventos").textContent, /Linha um\nLinha dois/);
+    a.acao("concluir", "novo-1");
+    let salvos = JSON.parse(a.armazenamento.get(chaveCompromissos));
+    assert.equal(salvos.find(c => c.id === "novo-1").concluidoEm, new Date(instanteAgenda).toISOString());
+    assert.deepEqual(salvos[0], antigo);
+    assert(!cardsAgenda(a, "lista-eventos").some(c => c.dataset.compromisso === "novo-1"));
+    a.filtrar("concluido"); assert.equal(cardsAgenda(a).length, 1); assert.equal(cardsAgenda(a)[0].dataset.status, "concluido");
+    a.acao("editar", "novo-1"); a.salvar("Revisar", "2040-02-02", "12:30");
+    salvos = JSON.parse(a.armazenamento.get(chaveCompromissos));
+    assert.equal(salvos[1].descricao, "Linha um\nLinha dois"); assert.equal(salvos[1].concluidoEm, new Date(instanteAgenda).toISOString());
+    const recarregada = iniciar(a.armazenamento.get(chaveCompromissos), undefined, instanteAgenda);
+    assert.equal(cardsAgenda(recarregada).find(c => c.dataset.compromisso === "novo-1").dataset.status, "concluido");
+    recarregada.acao("reabrir", "novo-1");
+    assert.equal(cardsAgenda(recarregada).find(c => c.dataset.compromisso === "novo-1").dataset.status, "pendente");
+    assert(cardsAgenda(recarregada, "lista-eventos").some(c => c.dataset.compromisso === "novo-1"));
+    assert(!Object.hasOwn(JSON.parse(recarregada.armazenamento.get(chaveCompromissos))[1], "concluidoEm"));
+    recarregada.acao("excluir", "novo-1"); assert.deepEqual(JSON.parse(recarregada.armazenamento.get(chaveCompromissos)), [antigo]);
+});
+
+test("expiração usa data/hora local, atualiza automaticamente e conclusão prevalece mesmo depois do prazo", () => {
+    const registros = [eventoAgenda("Limite", "10:00"), eventoAgenda("Realizado", "09:00", { concluidoEm: new Date(instanteAgenda - 3600000).toISOString() })];
+    const texto = JSON.stringify(registros), a = iniciar(texto, undefined, instanteAgenda);
+    a.clicar("abrir-agenda");
+    const card = cardsAgenda(a).find(c => c.dataset.compromisso === "Limite");
+    assert.equal(card.dataset.status, "pendente"); card.querySelector("details").open = true;
+    a.avancar(1);
+    const expirado = cardsAgenda(a).find(c => c.dataset.compromisso === "Limite");
+    assert.equal(expirado.dataset.status, "expirado"); assert.equal(expirado.querySelector("details").open, true);
+    assert.match(expirado.textContent, /Horário previsto encerrado/);
+    assert.equal(cardsAgenda(a).find(c => c.dataset.compromisso === "Realizado").dataset.status, "concluido");
+    assert.equal(cardsAgenda(a, "lista-eventos").length, 0); assert.equal(a.armazenamento.get(chaveCompromissos), texto);
+    a.filtrar("expirado"); assert.equal(cardsAgenda(a).length, 1);
+    a.acao("concluir", "Limite"); assert.equal(cardsAgenda(a).length, 0);
+    a.filtrar("concluido"); assert.equal(cardsAgenda(a).length, 2);
+    a.acao("reabrir", "Limite"); assert.equal(cardsAgenda(a).length, 1);
+    a.filtrar("expirado"); assert.equal(cardsAgenda(a)[0].dataset.status, "expirado");
+    a.filtrar("pendente"); assert.equal(cardsAgenda(a).length, 0);
+    a.filtrar("todos"); assert.equal(cardsAgenda(a).length, 2);
+});
+
+test("falhas de gravação e metadados inválidos preservam os dados e ações desconhecidas não excluem", () => {
+    const texto = JSON.stringify([eventoAgenda("Salvar", "11:00")]), a = iniciar(texto, undefined, instanteAgenda);
+    const gravar = a.storage.setItem; a.storage.setItem = () => { throw new Error("quota"); };
+    a.acao("concluir", "Salvar");
+    assert.equal(a.armazenamento.get(chaveCompromissos), texto); assert.equal(cardsAgenda(a)[0].dataset.status, "pendente");
+    assert.match(a.obter("agenda-aviso").textContent, /Não foi possível salvar/);
+    a.storage.setItem = gravar; a.acao("desconhecida", "Salvar"); assert.equal(a.armazenamento.get(chaveCompromissos), texto);
+    a.acao("concluir", "Salvar"); const concluido = a.armazenamento.get(chaveCompromissos);
+    a.storage.setItem = () => { throw new Error("quota"); }; a.acao("reabrir", "Salvar");
+    assert.equal(a.armazenamento.get(chaveCompromissos), concluido); assert.equal(cardsAgenda(a)[0].dataset.status, "concluido");
+    const invalido = JSON.stringify([eventoAgenda("Inválido", "11:00", { concluidoEm: "inválido" })]);
+    const bloqueada = iniciar(invalido, undefined, instanteAgenda); bloqueada.salvar("Novo", "2040-02-02");
+    assert.equal(bloqueada.armazenamento.get(chaveCompromissos), invalido); assert.equal(bloqueada.obter("salvar-compromisso").disabled, true);
+});
+
+test("janela: evento único usa ação no rodapé, fecha com X/Esc e abre Agenda completa separadamente", () => {
+    const descricao = "Texto completo\n" + "Orientação detalhada. ".repeat(60);
+    const texto = JSON.stringify([eventoAgenda("Único", "11:00", { descricao })]);
+    const a = iniciar(texto, undefined, instanteAgenda);
+    a.clicar("alternar-eventos");
+    assert.equal(a.obter("painel-eventos").hidden, false);
+    assert.equal(a.obter("alternar-eventos").getAttribute("aria-expanded"), "true");
+    assert.equal(a.obter("fechar-eventos").focado, true);
+    assert.equal(a.obter("evento-abrir-unico").hidden, false);
+    assert.equal(a.obter("evento-abrir-unico").dataset.id, "Único");
+    const card = cardsAgenda(a, "lista-eventos")[0];
+    assert.equal(card.querySelector(".eventos-descricao-texto").textContent, descricao);
+    assert.equal(card.querySelectorAll("button").length, 0, "ação única fica apenas no rodapé");
+    assert.doesNotMatch(card.textContent, /Ver detalhes|Mais detalhes/);
+    assert.match(card.textContent, /Pendente/);
+    a.clicar("fechar-eventos"); assert.equal(a.obter("painel-eventos").hidden, true);
+    assert.equal(a.obter("alternar-eventos").focado, true);
+    a.clicar("alternar-eventos");
+    let prevenido = false; a.obter("painel-eventos").disparar("keydown", { key: "Escape", preventDefault() { prevenido = true; } });
+    assert(prevenido); assert.equal(a.obter("painel-eventos").hidden, true);
+    a.clicar("alternar-eventos"); a.acao("abrir", "Único", "evento-abrir-unico");
+    assert.equal(a.obter("painel-agenda").open, true);
+    assert.equal(cardsAgenda(a)[0].dataset.destaque, "true");
+    a.clicar("fechar-agenda"); a.clicar("agenda-completa");
+    assert.equal(a.obter("painel-agenda").open, true);
+    assert.equal(cardsAgenda(a)[0].dataset.destaque, "false");
+    assert.equal(a.armazenamento.get(chaveCompromissos), texto);
+    const recarregada = iniciar(texto, undefined, instanteAgenda);
+    assert.equal(cardsAgenda(recarregada, "lista-eventos")[0].querySelector(".eventos-descricao-texto").textContent, descricao);
+});
+
+test("janela vazia mantém acesso geral, informa ausência e continua excluindo concluídos e expirados", () => {
+    const texto = JSON.stringify([eventoAgenda("Expirado", "09:00"), eventoAgenda("Concluído", "11:00", { concluidoEm: new Date(instanteAgenda).toISOString() })]);
+    const a = iniciar(texto, undefined, instanteAgenda);
+    assert.equal(cardsAgenda(a, "lista-eventos").length, 0);
+    assert.match(a.obter("lista-eventos").textContent, /Nenhum próximo evento encontrado\./);
+    assert(a.obter("lista-eventos").querySelector("i"));
+    assert.equal(a.obter("evento-abrir-unico").hidden, true);
+    a.clicar("alternar-eventos"); a.clicar("agenda-completa");
+    assert.equal(a.obter("painel-agenda").open, true);
+    assert.deepEqual(cardsAgenda(a).map(c => c.dataset.status), ["expirado", "concluido"]);
+    assert.equal(a.armazenamento.get(chaveCompromissos), texto);
 });
