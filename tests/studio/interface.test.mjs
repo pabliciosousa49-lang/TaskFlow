@@ -84,8 +84,72 @@ test('Voltar salva pendências antes do histórico e bloqueia saída quando a gr
   a.view.dispatch({changes:{from:0,to:a.view.state.doc.length,insert:'<p>preservado</p>'}});
   const gravar=localStorage.setItem;localStorage.setItem=()=>{throw new Error('quota')};
   voltar();assert.equal(retornos,0);assert.equal(a.elemento('#studio-salvamento').textContent,'Erro ao salvar');
-  localStorage.setItem=gravar;voltar();assert.equal(retornos,1);
+  localStorage.setItem=gravar;voltar();assert.equal(retornos,0);
+  assert.equal(a.api.projeto(),null);
   assert.equal(servico.buscarProjeto(p.id).arquivos.find(f=>f.id===html.id).conteudo,'<p>preservado</p>');
+  voltar();assert.equal(retornos,1);
+});
+
+test('Voltar percorre telas e projetos na ordem real, restaura contexto e não registra o retorno',async()=>{
+  const a=ambiente(); let retornos=0; a.ctx.window.taskflowNavegacao={voltar(){retornos++}};
+  const {p,js}=projetoTeste(), outro=servico.criarProjeto('Outro');
+  const voltar=()=>a.elemento('#studio-voltar').events.click[0]();
+  await a.api.abrirProjeto(p.id);
+  a.api.selecionarArquivo(js);
+  a.view.dispatch({selection:{anchor:12}}); a.view.scrollDOM.scrollTop=73;
+  a.elemento('#studio-paineis').dataset.painel='previa'; a.api.registrarInterface();
+  a.elemento('#studio-meus-projetos').events.click[0]();
+  await a.api.abrirProjeto(outro.id);
+  await voltar();
+  assert.equal(a.api.projeto(),null); assert.equal(retornos,0);
+  let selecionado=a.elemento('#studio-lista-projetos').children.find(c=>c.dataset.aberto==='true');
+  assert.equal(selecionado.children[0].textContent,'Interface');
+  await voltar();
+  assert.equal(a.api.projeto().id,p.id); assert.equal(a.elemento('#studio-nome-arquivo').textContent,'app.js');
+  assert.equal(a.view.state.selection.main.head,12); assert.equal(a.view.scrollDOM.scrollTop,73);
+  assert.equal(a.elemento('#studio-paineis').dataset.painel,'previa');
+  await voltar(); assert.equal(a.api.projeto(),null); assert.equal(retornos,0);
+  await voltar(); assert.equal(retornos,1);
+});
+
+test('mesma tela, mesmo projeto, edição e salvamento não criam entradas duplicadas',async()=>{
+  const a=ambiente(); let retornos=0; a.ctx.window.taskflowNavegacao={voltar(){retornos++}};
+  const {p,js}=projetoTeste();
+  a.api.mostrarGerenciamento(); a.api.mostrarGerenciamento();
+  await a.api.abrirProjeto(p.id); await a.api.abrirProjeto(p.id);
+  a.api.selecionarArquivo(js); a.view.dispatch({selection:{anchor:3}});
+  a.view.dispatch({changes:{from:0,to:0,insert:'// alteração\n'}}); a.api.salvarProjetoAtual();
+  await a.elemento('#studio-voltar').events.click[0](); assert.equal(a.api.projeto(),null);
+  await a.elemento('#studio-voltar').events.click[0](); assert.equal(retornos,1);
+  assert.match(servico.buscarProjeto(p.id).arquivos.find(f=>f.id===js.id).conteudo,/^\/\/ alteração/);
+});
+
+test('projeto removido e abertura malsucedida não geram ciclos nem entradas falsas',async()=>{
+  const a=ambiente(); let retornos=0; a.ctx.window.taskflowNavegacao={voltar(){retornos++}};
+  const {p}=projetoTeste();
+  await a.api.abrirProjeto(p.id); a.api.mostrarGerenciamento();
+  servico.excluirProjeto(p.id);
+  assert.equal(await a.api.abrirProjeto('inexistente'),false);
+  await a.elemento('#studio-voltar').events.click[0](); assert.equal(a.api.projeto(),null); assert.equal(retornos,1);
+});
+
+test('duplo clique durante restauração não consome duas telas; erro permite tentar novamente',async()=>{
+  const a=ambiente(); let retornos=0; a.ctx.window.taskflowNavegacao={voltar(){retornos++}};
+  const {p}=projetoTeste(); await a.api.abrirProjeto(p.id); a.api.mostrarGerenciamento();
+  const voltar=()=>a.elemento('#studio-voltar').events.click[0]();
+  const primeira=voltar(), segunda=voltar(); await Promise.all([primeira,segunda]);
+  assert.equal(a.api.projeto().id,p.id); assert.equal(retornos,0);
+  await voltar(); assert.equal(a.api.projeto(),null);
+  const ler=localStorage.getItem; localStorage.getItem=()=>{throw new Error('indisponível')};
+  assert.equal(await a.api.abrirProjeto(p.id),false); localStorage.getItem=ler;
+  await voltar(); assert.equal(retornos,1);
+});
+
+test('Voltar ao TaskFlow mantém destino direto separado do retorno interno',()=>{
+  const html=readFileSync(new URL('../../pages/studio.html',import.meta.url),'utf8');
+  assert.match(html,/<a class="studio-retorno" href="\.\.\/index\.html"[^>]*>Voltar ao TaskFlow<\/a>/);
+  const a=ambiente(); let retornos=0; a.ctx.window.taskflowNavegacao={voltar(){retornos++}};
+  a.elemento('#studio-voltar').events.click[0](); assert.equal(retornos,1);
 });
 
 test('Meus projetos identifica o último aberto, preserva conteúdo ao renomear e confirma exclusão',async()=>{

@@ -30,6 +30,21 @@ let trocandoDocumento = false;
 let abasStudio;
 let sessaoStudio, ferramentasStudio, consoleStudio, temporizadorSessao;
 
+// A recepção e Meus projetos compartilham a mesma tela. Só transições reais
+// entram neste histórico local; arquivos e edição ficam na sessão existente.
+const historicoTelasStudio = [];
+let telaStudio = { tipo: "gerenciamento", projetoId: null };
+let voltandoStudio = false;
+function capturarTelaStudio() {
+    return { ...telaStudio, projetoId: telaStudio.tipo === "editor" ? telaStudio.projetoId : ultimoProjetoAbertoId || null };
+}
+function registrarTelaStudio(tipo, projetoId, anterior, registrar) {
+    if (registrar && (anterior.tipo !== tipo || (tipo === "editor" && anterior.projetoId !== projetoId))) {
+        historicoTelasStudio.push(anterior);
+    }
+    telaStudio = { tipo, projetoId };
+}
+
 function registrarInterface() {
     if (!projetoAtivo || !editorStudio || abrindoProjeto) return;
     sessaoStudio?.gravarSessao(projetoAtivo.id, {
@@ -336,8 +351,9 @@ function operarEstrutura(acao, item, nome, parentId) {
 }
 
 // Projetos — Abertura - restaura o código exato e substitui somente a instância anterior
-async function abrirProjeto(id, novo = false) {
-    if (abrindoProjeto || !salvarProjetoAtual()) return;
+async function abrirProjeto(id, novo = false, registrarNavegacao = true) {
+    if (abrindoProjeto || !salvarProjetoAtual()) return false;
+    const telaAnterior = capturarTelaStudio();
     abrindoProjeto = true;
     pedidoAbertura = { id, novo };
     const status = document.querySelector("#studio-editor-status");
@@ -416,9 +432,12 @@ async function abrirProjeto(id, novo = false) {
         mentorStudio?.saudacao();
         if (arquivoEditavel(principal)) editorStudio.focus();
         else document.querySelector("#explorador-novo-arquivo").focus();
+        registrarTelaStudio("editor", projeto.id, telaAnterior, registrarNavegacao);
+        return true;
     } catch (erro) {
         mostrarAviso(`Não foi possível abrir o projeto. ${erro.message} Seus projetos salvos foram preservados.`);
         repetir.hidden = false;
+        return false;
     } finally {
         container.setAttribute("aria-busy", "false");
         abrindoProjeto = false;
@@ -426,8 +445,9 @@ async function abrirProjeto(id, novo = false) {
     }
 }
 
-function mostrarGerenciamento() {
-    if (abrindoProjeto || !salvarProjetoAtual()) return;
+function mostrarGerenciamento(registrarNavegacao = true) {
+    if (abrindoProjeto || !salvarProjetoAtual()) return false;
+    const telaAnterior = capturarTelaStudio();
     registrarInterface();
     ferramentasStudio?.fecharBusca();
     projetoAtivo = null;
@@ -439,6 +459,8 @@ function mostrarGerenciamento() {
     mentorStudio?.ativar(false);
     atualizarListaProjetos();
     document.querySelector("#titulo-projetos").focus();
+    registrarTelaStudio("gerenciamento", ultimoProjetoAbertoId || null, telaAnterior, registrarNavegacao);
+    return true;
 }
 
 campoTituloStudio.addEventListener("input", () => campoTituloStudio.setCustomValidity(""));
@@ -499,14 +521,37 @@ listaProjetosStudio.addEventListener("click", async (event) => {
 });
 
 // Navegação — Retorno - sai do editor somente depois de confirmar o salvamento
-botaoSalvarStudio.addEventListener("click", mostrarGerenciamento);
-document.querySelector("#studio-meus-projetos").addEventListener("click", mostrarGerenciamento);
-document.querySelector("#studio-voltar").addEventListener("click", () => {
-    if (abrindoProjeto || criandoProjeto) return;
+botaoSalvarStudio.addEventListener("click", () => mostrarGerenciamento());
+document.querySelector("#studio-meus-projetos").addEventListener("click", () => mostrarGerenciamento());
+async function voltarNoStudio() {
+    if (voltandoStudio || abrindoProjeto || criandoProjeto) return;
     registrarInterface();
     if (alteracoesPendentes && !salvarProjetoAtual()) return;
-    window.taskflowNavegacao.voltar();
-});
+    voltandoStudio = true;
+    try {
+        // Ignora projetos excluídos e retornos à mesma tela que restarem após essa remoção.
+        while (historicoTelasStudio.length) {
+            const entrada = historicoTelasStudio.at(-1);
+            const mesmaTela = entrada.tipo === telaStudio.tipo && (entrada.tipo !== "editor" || entrada.projetoId === telaStudio.projetoId);
+            if (!mesmaTela && (entrada.tipo !== "editor" || servicoProjetos.buscarProjeto(entrada.projetoId))) break;
+            historicoTelasStudio.pop();
+        }
+        const anterior = historicoTelasStudio.at(-1);
+        if (!anterior) { window.taskflowNavegacao.voltar(); return; }
+        let restaurado;
+        if (anterior.tipo === "editor") restaurado = await abrirProjeto(anterior.projetoId, false, false);
+        else {
+            const ultimo = ultimoProjetoAbertoId;
+            ultimoProjetoAbertoId = anterior.projetoId;
+            restaurado = mostrarGerenciamento(false);
+            if (!restaurado) ultimoProjetoAbertoId = ultimo;
+        }
+        if (restaurado) historicoTelasStudio.pop();
+    } catch (erro) {
+        mostrarAviso(`Não foi possível retornar à tela anterior. ${erro.message}`);
+    } finally { voltandoStudio = false; }
+}
+document.querySelector("#studio-voltar").addEventListener("click", voltarNoStudio);
 document.querySelector("#studio-abrir-editor").addEventListener("click", () => selecionarPainel("editor"));
 document.querySelector("#studio-abrir-previa").addEventListener("click", () => selecionarPainel("previa"));
 document.querySelector("#studio-editor-repetir").addEventListener("click", () => {
