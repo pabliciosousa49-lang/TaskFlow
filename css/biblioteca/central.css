@@ -84,7 +84,6 @@
 #biblioteca-central .biblioteca-conteudos-navegacao button, #biblioteca-central .biblioteca-conteudo section > button { min-height: 44px; margin: 4px; padding: 8px 12px; border: 1px solid #24618b; border-radius: 6px; background: #0b2944; color: #e4f3ff; }
 #biblioteca-central button:disabled { opacity: .5; cursor: default; }
 #biblioteca-central .biblioteca-menu-botao { display: none; }
-.biblioteca-carreira-preservada { max-width: 420px; margin-top: 28px; }
 #view-biblioteca .biblioteca-anotacoes-flutuante { position: fixed; bottom: 20px; right: 20px; z-index: 5; display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 12px 16px; border: 1px solid #00c8ff; border-radius: 14px; color: #b5efff; background: #03182c; box-shadow: 0 0 15px #00c8ff40; }
 html:has(#biblioteca-anotacoes[open]) { overflow: hidden; }
 #biblioteca-anotacoes { width: min(440px, 100%); max-width: none; height: 100dvh; max-height: none; margin: 0 0 0 auto; padding: 20px; border: 1px solid #168fc5; border-radius: 14px 0 0 14px; background: #03182c; color: #e8f6ff; overflow-y: auto; overscroll-behavior: contain; }

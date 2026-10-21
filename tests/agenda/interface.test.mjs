@@ -5,12 +5,12 @@ import { readFileSync } from "node:fs";
 import { Elemento } from "../biblioteca/dom-simulado.mjs";
 
 // Exercita os eventos reais da Agenda em DOM simulado, sem substituir QA visual.
-function iniciar(dados = "[]") {
+function iniciar(dados = "[]", urlInicial = "https://taskflow.test/index.html") {
     const fonte = readFileSync(new URL("../../js/core/app.js", import.meta.url), "utf8");
     const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
     const elementos = new Map();
     const eventosDocumento = {}, eventosJanela = {};
-    const entradas = [{ url: "https://taskflow.test/index.html", state: null }];
+    const entradas = [{ url: urlInicial, state: null }];
     let indice = 0;
     function elemento() {
         const e = new Elemento();
@@ -139,9 +139,9 @@ test("Agenda rejeita campos inválidos e preserva armazenamento ilegível", () =
     assert.equal(bloqueada.armazenamento.get("taskflow.agenda.compromissos.v1"), "dados ilegíveis");
 });
 
-test("Biblioteca abre pelos dois acessos e Carreira revela a área sem duplicar as views", () => {
+test("Biblioteca abre pelos dois acessos sem duplicar as views", () => {
     const a = iniciar();
-    for (const acesso of ["abrir-biblioteca", "acessar-biblioteca", "acessar-carreira"]) {
+    for (const acesso of ["abrir-biblioteca", "acessar-biblioteca"]) {
         a.clicar(acesso);
         assert.ok(a.obter("view-biblioteca").classList.contains("view-ativa"));
         assert.ok(a.obter("view-biblioteca").classList.contains("biblioteca-entrada"));
@@ -151,41 +151,43 @@ test("Biblioteca abre pelos dois acessos e Carreira revela a área sem duplicar 
         assert.ok(a.obter("view-home").classList.contains("view-ativa"));
         assert.equal(a.obter("view-biblioteca").classList.contains("view-ativa"), false);
     }
-    assert.ok(a.obter("taskflow-carreira").ultimaRolagem);
     a.clicar("abrir-home");
     assert.ok(a.obter("view-home").classList.contains("view-ativa"));
     assert.equal(a.obter("view-taskflow").classList.contains("view-ativa"), false);
 });
 
-test("cards da Home reutilizam exploração, Agenda e Carreira com retorno de foco", () => {
+test("cards da Home não direcionam nem abrem a Agenda", () => {
     const a = iniciar();
-    a.clicar("home-explorar");
-    assert.ok(a.obter("view-taskflow").classList.contains("view-ativa"));
-    a.clicar("abrir-home");
-    a.clicar("home-agenda");
-    assert.equal(a.obter("painel-agenda").open, true);
-    a.clicar("fechar-agenda");
-    assert.ok(a.obter("home-agenda").focado);
-    assert.ok(a.obter("view-home").classList.contains("view-ativa"));
-    a.clicar("home-carreira");
-    assert.ok(a.obter("view-biblioteca").classList.contains("view-ativa"));
-    assert.ok(a.obter("taskflow-carreira").ultimaRolagem);
+    const tamanho = a.historico.length;
+    for (const id of ["home-explorar", "home-agenda", "home-carreira"]) {
+        a.clicar(id);
+        assert.ok(a.obter("view-home").classList.contains("view-ativa"));
+        assert.equal(a.obter("painel-agenda").open, undefined);
+        assert.equal(a.historico.length, tamanho);
+    }
+    const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
+    const cards = html.match(/<div[^>]*class="home-guia-card"[^>]*>/g);
+    assert.equal(cards.length, 4);
+    for (const card of cards) assert.doesNotMatch(card, /href=|aria-haspopup=/);
 });
 
-test("Voltar restaura Carreira → TaskFlow → Home e modais não criam páginas", () => {
+test("Voltar restaura Biblioteca → TaskFlow → Home e modais não criam páginas", () => {
     const a = iniciar();
-    a.clicar("abrir-taskflow"); a.clicar("acessar-carreira");
+    a.clicar("abrir-taskflow");
     const tamanho = a.historico.length;
     a.clicar("abrir-agenda"); a.clicar("fechar-agenda");
     assert.equal(a.historico.length, tamanho);
     a.clicar("abrir-biblioteca");
     a.clicar("biblioteca-voltar");
-    assert.ok(a.location.href.endsWith("#taskflow-carreira"));
-    assert.ok(a.obter("view-biblioteca").classList.contains("view-ativa"));
-    a.clicar("biblioteca-voltar");
     assert.ok(a.obter("view-taskflow").classList.contains("view-ativa"));
     a.historico.back();
     assert.ok(a.obter("view-home").classList.contains("view-ativa"));
+});
+
+test("favorito antigo da Carreira abre a página independente preservando parâmetros", () => {
+    const a = iniciar("[]", "https://taskflow.test/index.html?origem=atalho#taskflow-carreira");
+    assert.equal(a.location.href, "https://taskflow.test/pages/carreira.html?origem=atalho");
+    assert.equal(a.historico.length, 1);
 });
 
 test("Agenda navega para 2027, indica feriados e fins de semana sem alterar compromissos", () => {

@@ -4,7 +4,7 @@
     const principal = new URL("index.html", raiz);
     const chave = "__taskflowNavegacao";
     const transicao = "taskflow.navegacao.transicao.v1";
-    const paginas = new Set([raiz.pathname, principal.pathname, new URL("pages/studio.html", raiz).pathname,
+    const paginas = new Set([raiz.pathname, principal.pathname, new URL("pages/studio.html", raiz).pathname, new URL("pages/carreira.html", raiz).pathname,
         ...["html", "css", "javascript", "typescript", "react"].map(id => new URL(`pages/biblioteca/${id}.html`, raiz).pathname)]);
     function interna(valor) {
         try {

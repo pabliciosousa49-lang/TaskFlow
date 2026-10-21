@@ -121,38 +121,38 @@
               <p>Siga o passo a passo e descubra tudo o que você pode fazer.</p>
             </header>
             <div class="home-guia-cards">
-              <a id="home-explorar" class="home-guia-card" data-passo="1" href="#view-taskflow">
+              <div id="home-explorar" class="home-guia-card" data-passo="1">
                 <div class="home-card-ilustracao"><img src="./assets/images/home-explore-voxel.png" width="353" height="242" alt="" loading="lazy"></div>
                 <div class="home-card-conteudo">
                   <h3>Explore as áreas</h3>
                   <p>Acesse a Biblioteca Técnica, Laboratório, Agenda, Área de Carreira e Gestor de IA.</p>
                   <span class="home-card-seta" aria-hidden="true">→</span>
                 </div>
-              </a>
-              <a class="home-guia-card" data-passo="2" href="./pages/studio.html">
+              </div>
+              <div class="home-guia-card" data-passo="2">
                 <div class="home-card-ilustracao"><img src="./assets/images/home-pratique-voxel.png" width="333" height="244" alt="" loading="lazy"></div>
                 <div class="home-card-conteudo">
                   <h3>Estude e pratique</h3>
                   <p>Utilize conteúdos, projetos e exercícios para evoluir com consistência.</p>
                   <span class="home-card-seta" aria-hidden="true">→</span>
                 </div>
-              </a>
-              <a id="home-agenda" class="home-guia-card" data-passo="3" href="#painel-agenda" aria-haspopup="dialog">
+              </div>
+              <div id="home-agenda" class="home-guia-card" data-passo="3">
                 <div class="home-card-ilustracao"><img src="./assets/images/home-agenda-voxel.png" width="338" height="239" alt="" loading="lazy"></div>
                 <div class="home-card-conteudo">
                   <h3>Organize sua jornada</h3>
                   <p>Use a Agenda para planejar seus estudos, definir metas e acompanhar seu progresso.</p>
                   <span class="home-card-seta" aria-hidden="true">→</span>
                 </div>
-              </a>
-              <a id="home-carreira" class="home-guia-card" data-passo="4" href="#taskflow-carreira">
+              </div>
+              <div id="home-carreira" class="home-guia-card" data-passo="4">
                 <div class="home-card-ilustracao"><img src="./assets/images/home-carreira-voxel.png" width="368" height="244" alt="" loading="lazy"></div>
                 <div class="home-card-conteudo">
                   <h3>Prepare seu futuro</h3>
                   <p>Desenvolva suas habilidades na Área de Carreira e conte com o Gestor de IA para tomar decisões mais eficazes.</p>
                   <span class="home-card-seta" aria-hidden="true">→</span>
                 </div>
-              </a>
+              </div>
             </div>
           </section>
           <footer class="home-dica">
@@ -203,7 +203,7 @@
               <button class="taskflow-atalho" data-acesso="agenda" aria-label="Agenda" id="abrir-agenda" type="button" aria-haspopup="dialog">
                 <img src="./assets/images/acesso-agenda-voxel.png" width="279" height="716" alt="" loading="lazy">
               </button>
-              <a class="taskflow-atalho" data-acesso="carreira" aria-label="Área de Carreira" id="acessar-carreira" href="#taskflow-carreira">
+              <a class="taskflow-atalho" data-acesso="carreira" aria-label="Área de Carreira" id="acessar-carreira" href="./pages/carreira.html">
                 <img src="./assets/images/acesso-carreira-voxel.png" width="285" height="712" alt="" loading="lazy">
               </a>
               <button class="taskflow-atalho" data-acesso="ia" aria-label="Gestor de IA — indisponível" type="button" disabled>
@@ -410,40 +410,7 @@
             </form>
             <ul id="anotacoes-lista" aria-label="Anotações salvas"></ul>
           </dialog>
-          <div class="biblioteca-carreira-preservada">
-              <article id="taskflow-carreira" class="area-tecnologia" aria-labelledby="titulo-carreira">
-                <header class="area-cabecalho">
-                  <span class="area-numero" aria-hidden="true">04</span>
-                  <div>
-                    <h3 id="titulo-carreira">Carreira</h3>
-                    <p>Prepare seu próximo passo profissional.</p>
-                  </div>
-                  <i class="fa-solid fa-briefcase area-ilustracao" aria-hidden="true"></i>
-                </header>
-                <div class="area-topicos">
-                  <button class="topico-taskflow topico-carreira" type="button" data-categoria="carreira"
-                    data-topico="linkedin">
-                    <i aria-hidden="true" class="fa-brands fa-linkedin topico-icone icone-linkedin"></i>
-                    <span class="topico-nome">LinkedIn</span>
-                  </button>
-                  <button class="topico-taskflow topico-carreira" type="button" data-categoria="carreira"
-                    data-topico="curriculo">
-                    <i aria-hidden="true" class="fa-regular fa-file topico-icone"></i>
-                    <span class="topico-nome">Currículo</span>
-                  </button>
-                  <button class="topico-taskflow topico-carreira" type="button" data-categoria="carreira"
-                    data-topico="entrevistas">
-                    <i aria-hidden="true" class="fa-regular fa-user topico-icone"></i>
-                    <span class="topico-nome">Entrevistas</span>
-                  </button>
-                  <button class="topico-taskflow topico-carreira" type="button" data-categoria="carreira"
-                    data-topico="processos-seletivos">
-                    <i aria-hidden="true" class="fa-solid fa-list topico-icone"></i>
-                    <span class="topico-nome">Processos seletivos</span>
-                  </button>
-                </div>
-              </article>
-          </div>
+
         </div>
       </section>
 

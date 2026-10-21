@@ -31,21 +31,22 @@ function mostrarView(view, registrar = true, alvo = null) {
         window.scrollTo({ top: 0, behavior: "instant" });
     }
 }
-for (const [id, view] of [["#abrir-home", viewHome], ["#abrir-taskflow", viewTaskFlow], ["#home-explorar", viewTaskFlow], ["#abrir-biblioteca", viewBiblioteca], ["#acessar-biblioteca", viewBiblioteca]]) {
+for (const [id, view] of [["#abrir-home", viewHome], ["#abrir-taskflow", viewTaskFlow], ["#abrir-biblioteca", viewBiblioteca], ["#acessar-biblioteca", viewBiblioteca]]) {
     document.querySelector(id).addEventListener("click", evento => {
         evento.preventDefault();
         mostrarView(view);
     });
 }
-for (const id of ["#acessar-carreira", "#home-carreira"]) document.querySelector(id).addEventListener("click", evento => {
-    evento.preventDefault();
-    mostrarView(viewBiblioteca, true, "taskflow-carreira");
-    document.querySelector("#taskflow-carreira").scrollIntoView({ block: "start", behavior: "instant" });
-});
-
 // A URL restaura a aba também no retorno entre documentos, sem criar outra entrada.
 function restaurarView() {
     const rota = window.taskflowNavegacao.viewAtual();
+    // Mantém favoritos antigos da Carreira válidos após a separação da Biblioteca.
+    if (rota.alvo === "taskflow-carreira") {
+        const destino = new URL("./pages/carreira.html", window.location.href);
+        destino.search = new URL(window.location.href).search;
+        window.location.replace(destino.href);
+        return;
+    }
     const view = { "view-home": viewHome, "view-taskflow": viewTaskFlow, "view-biblioteca": viewBiblioteca }[rota.id] || viewHome;
     mostrarView(view, false);
     if (rota.alvo) document.querySelector(`#${rota.alvo}`)?.scrollIntoView({ block: "start", behavior: "instant" });
@@ -315,10 +316,6 @@ function fecharAgenda() {
 
 // Acessos e fechamento — Escuta - abre o painel, trata Escape e devolve foco ao acesso original
 for (const id of ["#abrir-agenda", "#agenda-completa"]) document.querySelector(id).addEventListener("click", abrirAgenda);
-document.querySelector("#home-agenda").addEventListener("click", evento => {
-    evento.preventDefault();
-    abrirAgenda(evento);
-});
 document.querySelector("#fechar-agenda").addEventListener("click", fecharAgenda);
 painelAgenda.addEventListener("cancel", evento => { evento.preventDefault(); fecharAgenda(); });
 painelAgenda.addEventListener("close", () => {

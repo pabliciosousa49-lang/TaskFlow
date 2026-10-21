@@ -48,6 +48,33 @@ test("histórico nativo retorna CSS → HTML preservando parâmetros e fragmento
     assert.equal(a.retornos, 1);
 });
 
+test("Carreira usa o histórico existente para retornar ao TaskFlow ou à Biblioteca", () => {
+    for (const anterior of [raiz + "index.html?origem=menu#view-taskflow", raiz + "index.html#view-biblioteca"]) {
+        const a = iniciar({ urls: [anterior, raiz + "pages/carreira.html"], nativa: true });
+        a.api.voltar();
+        assert.equal(a.window.location.href, anterior);
+    }
+    const direta = iniciar({ urls: [raiz + "pages/carreira.html"] });
+    direta.api.voltar();
+    assert.equal(direta.window.location.href, raiz + "index.html");
+    const externa = iniciar({ urls: ["https://externo.test/", raiz + "pages/carreira.html"], nativa: true });
+    externa.api.voltar();
+    assert.equal(externa.window.location.href, raiz + "index.html");
+});
+
+test("transição para Carreira preserva retorno sem Navigation API", () => {
+    const origem = raiz + "index.html?origem=card#view-taskflow", carreira = raiz + "pages/carreira.html";
+    const a = iniciar({ urls: [origem] }); a.clicar(carreira);
+    assert.equal(a.memoria.size, 1);
+    const b = iniciar({ urls: [origem, carreira], referrer: origem, memoria: a.memoria });
+    b.api.voltar();
+    assert.equal(b.window.location.href, origem);
+    const destino = iniciar({ urls: [carreira] }); destino.clicar(raiz + "index.html#view-biblioteca");
+    const biblioteca = iniciar({ urls: [carreira, raiz + "index.html#view-biblioteca"], referrer: carreira, memoria: destino.memoria });
+    biblioteca.api.voltar();
+    assert.equal(biblioteca.window.location.href, carreira);
+});
+
 test("retorno externo, outro projeto na mesma origem e entrada direta usam Home sem empilhar", () => {
     for (const anterior of ["https://externo.test/", "https://exemplo.test/outro/index.html", raiz + "pages/desconhecida.html"]) {
         const a = iniciar({ urls: [anterior, raiz + "pages/biblioteca/css.html"], nativa: true });

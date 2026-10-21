@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Área de Carreira | TaskFlow</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <link rel="stylesheet" href="../css/pages/carreira.css">
+  <script src="../js/core/navegacao.js"></script>
+</head>
+<body>
+  <a class="carreira-pular" href="#carreira-recursos">Ir para os recursos profissionais</a>
+  <main class="carreira-pagina">
+    <header class="carreira-apresentacao">
+      <div class="carreira-barra">
+        <p class="carreira-identificacao">TASKFLOW / CARREIRA</p>
+        <a class="carreira-voltar" href="../index.html" data-taskflow-voltar>← Voltar</a>
+      </div>
+      <div class="carreira-introducao">
+        <p class="carreira-etiqueta">SEU PRÓXIMO PASSO PROFISSIONAL</p>
+        <h1>Sua carreira <span>começa aqui.</span></h1>
+        <p>Desenvolva suas habilidades, prepare seu perfil profissional e conquiste novas oportunidades.</p>
+      </div>
+    </header>
+    <section id="carreira-recursos" class="carreira-recursos" aria-labelledby="carreira-recursos-titulo">
+      <h2 id="carreira-recursos-titulo">Recursos profissionais</h2>
+      <p class="carreira-disponibilidade">Os conteúdos destes recursos estão em preparação.</p>
+      <div class="carreira-cards">
+        <article class="carreira-card" aria-labelledby="carreira-linkedin">
+          <span class="carreira-numero" aria-hidden="true">01</span>
+          <i class="fa-brands fa-linkedin carreira-icone" aria-hidden="true"></i>
+          <h3 id="carreira-linkedin">LinkedIn</h3>
+          <p>Prepare sua presença profissional e apresente sua trajetória.</p>
+          <button class="topico-taskflow topico-carreira" type="button" data-categoria="carreira" data-topico="linkedin" disabled aria-describedby="carreira-disponibilidade-linkedin"><i class="fa-brands fa-linkedin" aria-hidden="true"></i> LinkedIn</button>
+          <span id="carreira-disponibilidade-linkedin" class="carreira-pendente">Em preparação</span>
+        </article>
+        <article class="carreira-card" aria-labelledby="carreira-curriculo">
+          <span class="carreira-numero" aria-hidden="true">02</span>
+          <i class="fa-regular fa-file carreira-icone" aria-hidden="true"></i>
+          <h3 id="carreira-curriculo">Currículo</h3>
+          <p>Organize suas experiências, habilidades e projetos profissionais.</p>
+          <button class="topico-taskflow topico-carreira" type="button" data-categoria="carreira" data-topico="curriculo" disabled aria-describedby="carreira-disponibilidade-curriculo"><i class="fa-regular fa-file" aria-hidden="true"></i> Currículo</button>
+          <span id="carreira-disponibilidade-curriculo" class="carreira-pendente">Em preparação</span>
+        </article>
+        <article class="carreira-card" aria-labelledby="carreira-entrevistas">
+          <span class="carreira-numero" aria-hidden="true">03</span>
+          <i class="fa-regular fa-user carreira-icone" aria-hidden="true"></i>
+          <h3 id="carreira-entrevistas">Entrevistas</h3>
+          <p>Prepare-se para apresentar seus conhecimentos e sua experiência.</p>
+          <button class="topico-taskflow topico-carreira" type="button" data-categoria="carreira" data-topico="entrevistas" disabled aria-describedby="carreira-disponibilidade-entrevistas"><i class="fa-regular fa-user" aria-hidden="true"></i> Entrevistas</button>
+          <span id="carreira-disponibilidade-entrevistas" class="carreira-pendente">Em preparação</span>
+        </article>
+        <article class="carreira-card" aria-labelledby="carreira-processos">
+          <span class="carreira-numero" aria-hidden="true">04</span>
+          <i class="fa-solid fa-list carreira-icone" aria-hidden="true"></i>
+          <h3 id="carreira-processos">Processos Seletivos</h3>
+          <p>Conheça as etapas de seleção e prepare seu próximo passo.</p>
+          <button class="topico-taskflow topico-carreira" type="button" data-categoria="carreira" data-topico="processos-seletivos" disabled aria-describedby="carreira-disponibilidade-processos"><i class="fa-solid fa-list" aria-hidden="true"></i> Processos seletivos</button>
+          <span id="carreira-disponibilidade-processos" class="carreira-pendente">Em preparação</span>
+        </article>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
