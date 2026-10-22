@@ -20,7 +20,7 @@ test("central integra os cinco modelos reais em linguagens, níveis e módulos s
     assert.equal(new Set(ids).size, ids.length);
     for (const linguagem of catalogo) {
         assert.equal(api.central.selecionarLinguagem(linguagem.id), true);
-        assert.equal(api.central.selecionado(), null);
+        assert.equal(api.central.selecionado().linguagem, linguagem.id);
         const grupo = niveis.querySelectorAll(".biblioteca-linguagem")[catalogo.indexOf(linguagem)];
         assert.equal(grupo.open, true);
         grupo.querySelector(".biblioteca-assunto").disparar("click");
@@ -75,8 +75,8 @@ test("central inicia vazia e reinicia sem recriar eventos nem manter seleção o
     const guia = elementos["#biblioteca-niveis"];
     const conferirInicio = () => {
         assert.equal(api.central.selecionado(), null);
-        assert.equal(elementos["#biblioteca-vazio-titulo"].textContent, "Explore a Biblioteca Técnica");
-        assert.equal(elementos["#biblioteca-vazio-descricao"].textContent, "Selecione uma linguagem no Guia de Estudos para começar a explorar os conteúdos disponíveis.");
+        assert.equal(elementos["#biblioteca-vazio-titulo"].textContent, "Selecione uma linguagem");
+        assert.equal(elementos["#biblioteca-vazio-descricao"].textContent, "Escolha uma linguagem no Guia de Estudos para consultar sua documentação.");
         assert.equal(elementos["#biblioteca-central-cabecalho"].hidden, true);
         assert.equal(elementos["#biblioteca-estado-vazio"].hidden, false);
         assert.equal(nav.hidden, true);
@@ -86,14 +86,13 @@ test("central inicia vazia e reinicia sem recriar eventos nem manter seleção o
         assert(guia.querySelectorAll(".biblioteca-assunto").every(d => !d.hasAttribute("aria-current")));
     };
     conferirInicio();
-    api.central.selecionarLinguagem("javascript");
-    assert.equal(api.central.selecionado(), null);
     const grupo = guia.querySelectorAll(".biblioteca-linguagem")[2];
+    grupo.querySelector("summary").disparar("click", { preventDefault() {} });
+    assert.equal(api.central.selecionado().linguagem, "javascript");
+    assert.equal(api.central.selecionado().topico, javascript.niveis[0].modulos[0].assuntos[0].id);
     const categoria = grupo.querySelector(".biblioteca-categoria");
-    categoria.disparar("click");
-    assert.equal(categoria.getAttribute("aria-expanded"), "true");
-    assert.equal(api.central.selecionado(), null);
     categoria.disparar("click"); assert.equal(categoria.getAttribute("aria-expanded"), "false");
+    categoria.disparar("click"); assert.equal(categoria.getAttribute("aria-expanded"), "true");
     for (let i = 0; i < 3; i++) {
         grupo.querySelector(".biblioteca-assunto").disparar("click");
         assert.equal(elementos["#biblioteca-central-cabecalho"].hidden, false);
@@ -111,7 +110,7 @@ test("pesquisa central expande linguagens, níveis e módulos temporariamente e 
     const { api, elementos } = iniciar("html", true);
     const guia = elementos["#biblioteca-niveis"], linguagens = guia.querySelectorAll(".biblioteca-linguagem");
     const campo = elementos["#biblioteca-pesquisa-campo"], limpar = elementos["#biblioteca-pesquisa-limpar"];
-    api.central.selecionarLinguagem("javascript");
+    linguagens[2].open = true;
     linguagens[2].querySelector(".biblioteca-categoria").disparar("click");
     linguagens[2].querySelector(".biblioteca-modulo").open = true;
     const estado = () => guia.querySelectorAll("details").map(d => Boolean(d.open));
@@ -159,4 +158,82 @@ test("navegação principal reinicia a Biblioteca sem interferir no histórico o
     }
     assert.equal(reinicios, 2);
     assert.equal(elementos.get("biblioteca-integracao-status").textContent, "");
+});
+
+
+test("clicar na linguagem abre sua introdução na central e recolher não troca o tópico ativo", () => {
+    const { api, elementos } = iniciar("html", true);
+    const grupos = elementos["#biblioteca-niveis"].querySelectorAll(".biblioteca-linguagem");
+    for (const [i, dados] of catalogo.entries()) {
+        api.central.reiniciar();
+        const resumo = grupos[i].querySelector("summary");
+        elementos["#biblioteca-menu"].scrollTop = 130;
+        elementos["#biblioteca-leitura"].scrollTop = 850;
+        let prevenido = false;
+        resumo.disparar("click", { preventDefault() { prevenido = true; } });
+        assert(prevenido); assert.equal(grupos[i].open, true);
+        const primeiro = dados.niveis[0].modulos[0].assuntos[0];
+        assert.equal(api.central.selecionado().linguagem, dados.id);
+        assert.equal(api.central.selecionado().topico, primeiro.id);
+        assert.equal(elementos["#biblioteca-estado-vazio"].hidden, true);
+        assert.equal(elementos["#biblioteca-leitura"].scrollTop, 0);
+        assert.equal(elementos["#biblioteca-menu"].scrollTop, 130);
+        const conteudo = elementos["#biblioteca-leitura"].querySelector(".biblioteca-conteudo");
+        assert(conteudo.textContent.includes(primeiro.explicacao));
+        if (i >= 2) {
+            assert.equal(conteudo.querySelector("h2").textContent, "Conceito");
+            assert(conteudo.querySelectorAll("h2").some(h => h.textContent === "Entenda o exemplo"));
+        }
+        const topicos = grupos[i].querySelectorAll(".biblioteca-assunto");
+        topicos[1].disparar("click");
+        const selecionado = api.central.selecionado().topico;
+        resumo.disparar("click", { preventDefault() {} });
+        assert.equal(grupos[i].open, false);
+        assert.equal(api.central.selecionado().topico, selecionado);
+        assert.equal(elementos["#biblioteca-niveis"].querySelectorAll(".biblioteca-assunto").filter(b => b.getAttribute("aria-current") === "true").length, 1);
+        resumo.disparar("click", { preventDefault() {} });
+        assert.equal(grupos[i].open, true); assert.equal(api.central.selecionado().topico, primeiro.id);
+    }
+});
+
+test("seleções da central e de uma documentação própria não compartilham estado", () => {
+    const central = iniciar("html", true), roleta = iniciar("react");
+    roleta.api.selecionarAssunto(3, false);
+    const tituloRoleta = roleta.elementos["#biblioteca-titulo"].textContent;
+    central.api.central.selecionarLinguagem("javascript");
+    assert.equal(roleta.elementos["#biblioteca-titulo"].textContent, tituloRoleta);
+    assert.equal(central.api.central.selecionado().linguagem, "javascript");
+    const tituloCentral = central.elementos["#biblioteca-titulo"].textContent;
+    roleta.api.selecionarAssunto(5);
+    assert.equal(central.elementos["#biblioteca-titulo"].textContent, tituloCentral);
+    central.api.central.reiniciar();
+    assert.equal(roleta.elementos["#biblioteca-titulo"].textContent, react.niveis[0].modulos.flatMap(m => m.assuntos)[5].titulo);
+});
+
+
+test("ocultar conteúdo limpa a leitura e seleção, preserva guia e pesquisa e permite reabrir tópicos", () => {
+    const { api, elementos, nav } = iniciar("html", true);
+    api.central.selecionarLinguagem("javascript");
+    const guia = elementos["#biblioteca-niveis"], campo = elementos["#biblioteca-pesquisa-campo"];
+    campo.value = "React"; campo.disparar("input");
+    const abertos = guia.querySelectorAll("details").map(d => Boolean(d.open));
+    elementos["#biblioteca-menu"].scrollTop = 220;
+    const ocultar = elementos["#biblioteca-ocultar-conteudo"];
+    for (let i = 0; i < 2; i++) {
+        ocultar.disparar("click");
+        assert.equal(api.central.selecionado(), null);
+        assert.equal(elementos["#biblioteca-central-cabecalho"].hidden, true);
+        assert.equal(elementos["#biblioteca-estado-vazio"].hidden, false);
+        assert.equal(elementos["#biblioteca-leitura"].querySelector(".biblioteca-conteudo").children.length, 0);
+        assert.equal(nav.hidden, true);
+        assert.equal(campo.value, "React");
+        assert.equal(elementos["#biblioteca-menu"].scrollTop, 220);
+        assert.deepEqual(guia.querySelectorAll("details").map(d => Boolean(d.open)), abertos);
+        assert(guia.querySelectorAll(".biblioteca-assunto").every(b => !b.hasAttribute("aria-current")));
+        assert.equal(elementos["#biblioteca-leitura"].opcoesFoco.preventScroll, true);
+        elementos["#biblioteca-pesquisa-resultados"].querySelector("button").disparar("click");
+        assert.equal(elementos["#biblioteca-central-cabecalho"].hidden, false);
+        assert.equal(api.central.selecionado().linguagem, "react");
+    }
+    assert.equal(ocultar.eventos.click.length, 1);
 });

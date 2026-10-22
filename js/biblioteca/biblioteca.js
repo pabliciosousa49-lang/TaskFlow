@@ -622,9 +622,9 @@ async function iniciarBiblioteca() {
 
 // A central usa os mesmos modelos, blocos de código e seleção da documentação original.
 function apresentarConteudoCentral(destino, assunto) {
-    destino.append(blocoLeitura(documentacaoProgramacao ? "Introdução" : "Conceito", assunto.explicacao));
+    destino.append(blocoLeitura(documentacaoProgramacao && !central ? "Introdução" : "Conceito", assunto.explicacao));
     if (assunto.exemploHTML) destino.append(blocoCodigo(assunto.exemploHTML, "HTML de apoio", "html"));
-    destino.append(blocoLeitura("Exemplo de código", assunto.exemploCodigo, true), blocoLeitura(documentacaoProgramacao ? "Explicação do código" : "Entenda o exemplo", assunto.responsabilidadeCodigo));
+    destino.append(blocoLeitura("Exemplo de código", assunto.exemploCodigo, true), blocoLeitura(documentacaoProgramacao && !central ? "Explicação do código" : "Entenda o exemplo", assunto.responsabilidadeCodigo));
     const dica = blocoLeitura("💡 Dica", assunto.boasPraticas.at(-1)); dica.className = "biblioteca-html-dica"; destino.append(dica);
     destino.append(blocoLeitura("Quando usar", assunto.aplicacaoReal));
     if (documentacaoCSS) {
@@ -660,10 +660,40 @@ export function construirCatalogoCentral(catalogo) {
         const icone = document.createElement("img"); icone.src = `./assets/images/biblioteca-${dados.id}.svg`; icone.alt = ""; icone.width = 24; icone.height = 24;
         const nome = document.createElement("span"); nome.textContent = dados.nome;
         resumo.append(icone, nome); linguagem.append(resumo);
+        // Somente a interação com a linguagem carrega sua introdução; a pesquisa apenas expande grupos.
+        resumo.addEventListener("click", evento => {
+            evento.preventDefault();
+            if (linguagem.open) linguagem.open = false;
+            else selecionarLinguagem(dados.id);
+        });
         const conteudo = document.createElement("div"); linguagem.append(conteudo);
         linguagensGuia.set(dados.id, linguagem);
         construirNiveis(dados, conteudo, false); niveis.append(linguagem);
     }
+    function selecionarLinguagem(id) {
+        const indice = assuntosOrdenados.findIndex(registro => registro.tecnologia === id);
+        if (indice < 0) return false;
+        selecionarAssunto(indice, true, true);
+        return true;
+    }
+    function ocultarConteudo() {
+        assuntoAtual = -1;
+        for (const registro of assuntosOrdenados) registro.botao.removeAttribute("aria-current");
+        conteudoLeitura?.replaceChildren();
+        document.querySelector("#biblioteca-central-cabecalho").hidden = true;
+        leitura.setAttribute("aria-labelledby", "biblioteca-vazio-titulo");
+        document.querySelector("#biblioteca-vazio-titulo").textContent = "Selecione uma linguagem";
+        document.querySelector("#biblioteca-vazio-descricao").textContent = "Escolha uma linguagem no Guia de Estudos para consultar sua documentação.";
+        estadoVazio.hidden = false;
+        navegacaoAssuntos.hidden = true;
+        anterior.disabled = proximo.disabled = true;
+        leitura.scrollTop = 0;
+        pagina.dispatchEvent(new CustomEvent("biblioteca:selecao", { detail: null }));
+    }
+    document.querySelector("#biblioteca-ocultar-conteudo").addEventListener("click", () => {
+        ocultarConteudo();
+        leitura.focus({ preventScroll: true });
+    });
     function reiniciar() {
         assuntoAtual = -1;
         limparPesquisaCentral?.();
@@ -674,32 +704,16 @@ export function construirCatalogoCentral(catalogo) {
             registro.categoria.setAttribute("aria-expanded", "false");
             if (registro.detalhes) registro.detalhes.open = false;
         }
-        conteudoLeitura?.replaceChildren();
-        document.querySelector("#biblioteca-central-cabecalho").hidden = true;
-        leitura.setAttribute("aria-labelledby", "biblioteca-vazio-titulo");
-        document.querySelector("#biblioteca-vazio-titulo").textContent = "Explore a Biblioteca Técnica";
-        document.querySelector("#biblioteca-vazio-descricao").textContent = "Selecione uma linguagem no Guia de Estudos para começar a explorar os conteúdos disponíveis.";
-        estadoVazio.hidden = false;
-        navegacaoAssuntos.hidden = true;
-        anterior.disabled = proximo.disabled = true;
         leitura.scrollTop = menu.scrollTop = 0;
         menuAberto = false; atualizarMenu();
-        pagina.dispatchEvent(new CustomEvent("biblioteca:selecao", { detail: null }));
+        ocultarConteudo();
     }
     iniciarPesquisa();
     reiniciar();
     return {
         catalogo,
         reiniciar,
-        selecionarLinguagem(id) {
-            const linguagem = linguagensGuia.get(id);
-            if (!linguagem) return false;
-            linguagem.open = true;
-            menuAberto = true; atualizarMenu();
-            linguagem.querySelector("summary").focus({ preventScroll: true });
-            linguagem.scrollIntoView({ block: "nearest", behavior: "instant" });
-            return true;
-        },
+        selecionarLinguagem,
         selecionado() { const r = assuntosOrdenados[assuntoAtual]; return r ? { linguagem: r.tecnologia, topico: r.assunto.id, titulo: r.assunto.titulo } : null; }
     };
 }
