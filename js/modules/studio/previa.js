@@ -176,7 +176,8 @@ export function criarPreviaHTML(iframe, mensagemVazia, painelDiagnosticos, { aoE
         if (pendencia) {
             const { codigo, arquivos, caminho, id, assinatura } = pendencia;
             arquivosAtuais = arquivos;
-            if (projeto !== id || entrada !== caminho || !codigo) {
+            // Um HTML antes vazio precisa recuperar sua entrada ao receber conteúdo.
+            if (projeto !== id || entrada !== caminho || !codigo || !historico.length) {
                 historico = codigo ? [{ caminho, consulta: "", fragmento: "" }] : []; indice = codigo ? 0 : -1;
             }
             projeto = id; entrada = caminho; ultimaAssinatura = assinatura; pendencia = null;

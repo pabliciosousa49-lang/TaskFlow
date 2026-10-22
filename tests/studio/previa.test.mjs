@@ -149,6 +149,59 @@ test("execução dos módulos transformados: click, input e submit", async () =>
     assert(cancelado); assert.equal(elementos["#status"].textContent, "Submit funcionou");
 });
 
+test("regressão: HTML preenchido após entrada vazia volta a renderizar automaticamente", async () => {
+    const { api, contexto } = await carregar();
+    const frame = new Elemento("iframe"), vazia = new Elemento("div"), estados = [];
+    const previa = api.criarPreviaHTML(frame, vazia, null, { aoEstado: estado => estados.push(estado) });
+    const itens = [{ tipo: "arquivo", caminho: "index.html", conteudo: "" }];
+    previa.agendar("", itens, "index.html", "projeto"); contexto.timer();
+    assert.equal(frame.hidden, true);
+    assert.equal(estados.at(-1).caminho, "");
+    previa.agendar("<h1>HTML preenchido</h1>", itens, "index.html", "projeto"); contexto.timer();
+    assert.equal(frame.hidden, false);
+    assert.equal(vazia.hidden, true);
+    assert.equal(estados.at(-1).caminho, "/index.html");
+    assert(frame.srcdoc.includes("HTML preenchido"));
+});
+
+test("regressão: limpar e reescrever HTML recupera prévia manual, CSS/JS relativos e reabertura", async () => {
+    const { api, contexto } = await carregar();
+    const frame = new Elemento("iframe"), vazia = new Elemento("div"), estados = [];
+    const previa = api.criarPreviaHTML(frame, vazia, null, { aoEstado: estado => estados.push(estado) });
+    const html = '<link rel="stylesheet" href="../css/style.css"><h1 id="resultado">Inicial</h1><script src="../js/script.js"></script>';
+    const itens = [
+        { tipo: "arquivo", caminho: "pages/index.html", conteudo: html },
+        { tipo: "arquivo", caminho: "css/style.css", conteudo: "h1{color:orange}" },
+        { tipo: "arquivo", caminho: "js/script.js", conteudo: 'document.querySelector("#resultado").textContent="JS executado";' }
+    ];
+    previa.agendar(html, itens, "pages/index.html", "projeto"); contexto.timer();
+    assert.equal(frame.hidden, false);
+    previa.agendar("", itens, "pages/index.html", "projeto"); contexto.timer();
+    assert.equal(frame.hidden, true);
+    previa.definirAutomatica(false);
+    previa.agendar(html, itens, "pages/index.html", "projeto");
+    assert.equal(frame.hidden, true, "no modo manual, aguarda Atualizar prévia");
+    previa.atualizar();
+    assert.equal(frame.hidden, false);
+    assert.equal(estados.at(-1).caminho, "/pages/index.html");
+    assert(frame.srcdoc.includes("h1{color:orange}"));
+    const script = [...frame.srcdoc.matchAll(/<script src="([^"]+)"/g)].map(m => decode(m[1])).find(codigo => codigo.includes('"JS executado"'));
+    assert(script, "script conectado incorporado ao documento");
+    const resultado = { textContent: "Inicial" };
+    vm.runInNewContext(script, { document: { querySelector: () => resultado } });
+    assert.equal(resultado.textContent, "JS executado");
+    const editados = itens.map(item => item.caminho === "css/style.css" ? { ...item, conteudo: "h1{color:cyan}" } : item);
+    previa.agendar(html, editados, "pages/index.html", "projeto"); previa.atualizar();
+    assert(frame.srcdoc.includes("h1{color:cyan}"));
+    assert.equal(frame.getAttribute("sandbox"), "allow-scripts");
+    assert(frame.srcdoc.includes("connect-src 'none'"));
+    const reaberto = new Elemento("iframe");
+    const outraPrevia = api.criarPreviaHTML(reaberto, new Elemento("div"), null);
+    outraPrevia.agendar(html, editados, "pages/index.html", "projeto"); contexto.timer();
+    assert.equal(reaberto.hidden, false);
+    assert(reaberto.srcdoc.includes("h1{color:cyan}"));
+});
+
 test("navegação simulada: origem, canal, histórico, atualização e erros", async () => {
     const { api, contexto, eventos } = await carregar();
     const frame = new Elemento("iframe"); frame.contentWindow = {};
