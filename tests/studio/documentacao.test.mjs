@@ -59,8 +59,8 @@ for (const id of ['html', 'css', 'javascript', 'typescript', 'react']) test(`doc
     const html = await p.api.documentoIsolado(id, { niveis: [] }, 'canal');
     const imagens = [...html.matchAll(/<img[^>]*src="(data:[^"]+)"/g)].map(m => m[1]);
     const voxel = id === 'html' || id === 'css';
-    assert.equal(imagens.length, id === 'html' ? 5 : voxel ? 3 : 2);
-    assert.deepEqual(Buffer.from(imagens[0].split(',')[1], 'base64'), readFileSync(new URL(`../../assets/images/${voxel ? 'taskflow-logo-voxel.png' : 'TaskCentro.png'}`, import.meta.url)));
+    assert.equal(imagens.length, id === 'html' ? 5 : voxel ? 3 : 4);
+    assert.deepEqual(Buffer.from(imagens[0].split(',')[1], 'base64'), readFileSync(new URL(`../../assets/images/taskflow-logo-voxel.png`, import.meta.url)));
     assert.deepEqual(Buffer.from(imagens[1].split(',')[1], 'base64'), readFileSync(new URL(`../../assets/images/${voxel ? `biblioteca-${id}-banner-voxel.png` : `biblioteca-${id}.svg`}`, import.meta.url)));
     if (voxel) {
         assert.deepEqual(Buffer.from(imagens.at(-1).split(',')[1], 'base64'), readFileSync(new URL(`../../assets/images/biblioteca-${id}-codigo-voxel.png`, import.meta.url)));

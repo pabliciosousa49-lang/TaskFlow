@@ -26,9 +26,11 @@ const moduloCSS = obter(imports['@lezer/css']);
 await moduloCSS.link((s, ref) => obter(imports[s] || new URL(s, ref.identifier).href));
 await moduloCSS.evaluate();
 test('sintaxe da folha compartilhada e dos três novos temas', () => {
-  const fonte = readFileSync(new URL('../../css/biblioteca/biblioteca.css', import.meta.url), 'utf8');
-  const cursor = moduloCSS.namespace.parser.parse(fonte).cursor();
-  do { assert(!cursor.type.isError, fonte.slice(cursor.from, cursor.to)); } while (cursor.next());
+  for (const arquivo of ['biblioteca.css', 'central.css']) {
+    const fonte = readFileSync(new URL('../../css/biblioteca/' + arquivo, import.meta.url), 'utf8');
+    const cursor = moduloCSS.namespace.parser.parse(fonte).cursor();
+    do { assert(!cursor.type.isError, arquivo + ': ' + fonte.slice(cursor.from, cursor.to)); } while (cursor.next());
+  }
 });
 function assuntos(dados) { return dados.niveis.flatMap(n => n.modulos.flatMap(m => m.assuntos)); }
 function arquivos(assunto) {
@@ -65,13 +67,26 @@ for (const dados of [javascript, typescript, react]) {
     const { api, elementos, nav, copias } = iniciar(dados.id);
     const lista = assuntos(dados);
     for (let i = 0; i < lista.length; i++) {
+      elementos['#biblioteca-menu'].scrollTop = 170;
+      elementos['#biblioteca-leitura'].scrollTop = 600;
       api.selecionarAssunto(i);
       const leitura = elementos['#biblioteca-leitura'];
       assert.equal(elementos['#biblioteca-titulo'].textContent, lista[i].titulo);
+      assert.equal(leitura.scrollTop, 0);
+      assert.equal(elementos['#biblioteca-menu'].scrollTop, 170);
+      assert(elementos['#biblioteca-programacao-breadcrumb'].textContent.startsWith(dados.nome + ' › '));
+      assert(elementos['#biblioteca-programacao-breadcrumb'].textContent.endsWith(lista[i].titulo));
+      const conteudo = leitura.querySelector('.biblioteca-conteudo');
+      const titulos = conteudo.children.filter(e => e.tag === 'section').map(e => e.querySelector('h2')?.textContent);
+      assert.deepEqual(titulos.slice(0, 4), ['Introdução', 'Exemplo de código', 'Explicação do código', '💡 Dica']);
+      assert(conteudo.querySelector('.biblioteca-html-dica').textContent.includes(lista[i].boasPraticas.at(-1)));
+      for (const texto of [lista[i].explicacao, lista[i].aplicacaoReal, lista[i].ambiente, lista[i].resultadoEsperado, ...lista[i].responsabilidadeCodigo, ...lista[i].boasPraticas, ...(lista[i].mapeamento || [])]) assert(conteudo.textContent.includes(texto), texto);
+      assert.equal(elementos['#biblioteca-niveis'].querySelectorAll('.biblioteca-assunto').filter(b => b.getAttribute('aria-current') === 'true').length, 1);
       assert.equal(leitura.querySelector('iframe'), null, 'não cria executor para scripts');
       assert(leitura.textContent.includes('Resultado esperado · não executado aqui'));
       const bloco = leitura.querySelectorAll('.biblioteca-codigo').find(b => b.querySelector('code').textContent === lista[i].exemploCodigo);
       assert(bloco);
+      assert.equal(bloco.querySelector('.biblioteca-html-linhas').textContent, lista[i].exemploCodigo.split('\n').map((_, i) => i + 1).join('\n'));
       assert(bloco.querySelector('.biblioteca-codigo-ferramentas').textContent.includes(dados.id === 'react' ? 'JSX / React' : dados.id.toUpperCase()));
       bloco.querySelector('button').disparar('click'); await Promise.resolve();
       assert.equal(copias.at(-1), lista[i].exemploCodigo);
@@ -144,4 +159,18 @@ test('roteiros ensinam seis etapas com as adaptações de tipos e componentes', 
   const reactMapa = assuntos(react).find(a => a.id === 'mapa-react');
   assert(reactMapa.mapeamento.some(s => s.startsWith('Estado mínimo:')));
   assert(assuntos(typescript).find(a => a.id === 'mapa-tipado').mapeamento.some(s => s.includes('HTMLInputElement')));
+});
+
+
+for (const dados of [javascript, typescript, react]) test(dados.nome + ': guia recolhível e seleção acessível em telas menores', () => {
+  const { api, elementos, mobile } = iniciar(dados.id);
+  mobile.matches = true;
+  const botao = elementos['#biblioteca-alternar-menu'], menu = elementos['#biblioteca-menu'];
+  botao.disparar('click');
+  assert.equal(menu.hidden, false); assert.equal(botao.getAttribute('aria-expanded'), 'true');
+  api.selecionarAssunto(1);
+  assert.equal(menu.hidden, true); assert.equal(botao.getAttribute('aria-expanded'), 'false');
+  assert.equal(elementos['#biblioteca-leitura'].opcoesFoco.preventScroll, true);
+  botao.disparar('click'); assert.equal(menu.hidden, false);
+  botao.disparar('click'); assert.equal(menu.hidden, true);
 });

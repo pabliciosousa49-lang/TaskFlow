@@ -120,3 +120,14 @@ html:has(#biblioteca-anotacoes[open]) { overflow: hidden; }
     #view-biblioteca .biblioteca-anotacoes-flutuante { right: 12px; bottom: 12px; }
     #view-biblioteca .biblioteca-hub { padding-bottom: 90px; }
 }
+
+/* Estado inicial — nenhuma linguagem ou documentação é escolhida automaticamente. */
+#biblioteca-central #biblioteca-estado-vazio {
+    display: grid; justify-items: center; align-content: center; gap: 18px;
+    min-height: 360px; padding: 40px 24px; text-align: center;
+    background: linear-gradient(90deg, #00c8ff05 1px, transparent 1px), linear-gradient(#00c8ff05 1px, transparent 1px), #03182c;
+    background-size: 40px 40px; border-radius: 10px;
+}
+#biblioteca-central #biblioteca-vazio-titulo { font-size: clamp(22px, 2.5vw, 30px); color: #f0f7ff; }
+#biblioteca-central #biblioteca-vazio-descricao { max-width: 460px; color: #afc8dd; }
+#biblioteca-central .biblioteca-vazio-icone { padding: 14px; border: 1px solid #168fc5; color: #00d9ff; background: #061b32; box-shadow: 5px 5px 0 #00c8ff15; font: bold 32px Consolas, monospace; }

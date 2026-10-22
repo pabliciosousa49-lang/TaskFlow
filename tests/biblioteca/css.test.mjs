@@ -169,14 +169,14 @@ for (const linguagem of ["html", "css"]) test(`${linguagem}: troca de tópico re
     assert.equal(leitura.rolagens, rolagens + (linguagem === "html" ? 1 : 0));
 });
 
-test("carga inicial não força rolagem; JavaScript mantém comportamento anterior", () => {
+test("carga inicial não força rolagem; seleção JavaScript retorna ao início", () => {
     const h = iniciar('html'), c = iniciar('javascript');
     h.api.selecionarAssunto(0, false);
     assert.equal(h.elementos['#biblioteca-leitura'].rolagens, undefined);
     c.elementos['#biblioteca-leitura'].scrollTop = 380;
     c.api.selecionarAssunto(1);
-    assert.equal(c.elementos['#biblioteca-leitura'].scrollTop, 380);
-    assert.equal(c.elementos['#biblioteca-leitura'].rolagens, undefined);
+    assert.equal(c.elementos['#biblioteca-leitura'].scrollTop, 0);
+    assert.equal(c.elementos['#biblioteca-leitura'].rolagens, 1);
 });
 
 

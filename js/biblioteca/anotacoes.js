@@ -53,7 +53,7 @@ export function iniciarAnotacoes(catalogo, selecionado) {
     function cancelar() { editando = null; formulario.reset(); formulario.hidden = true; $("anotacoes-nova").focus(); }
     function editar(nota = null) {
         const contexto = selecionado();
-        if (!contexto && !nota) return;
+        if (!contexto && !nota) { status("Selecione um tópico no Guia de Estudos antes de criar uma anotação."); return; }
         formulario.reset(); editando = nota?.id || null;
         $("anotacoes-formulario-titulo").textContent = nota ? "Editar anotação" : "Nova anotação";
         $("anotacoes-linguagem").value = nota?.linguagem || contexto.linguagem; preencherTopicos();

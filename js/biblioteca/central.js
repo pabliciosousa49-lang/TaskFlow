@@ -14,6 +14,11 @@ try {
     }
     document.getElementById("biblioteca-central").addEventListener("biblioteca:selecao", atualizarCategoria);
     atualizarCategoria();
+    for (const id of ["abrir-biblioteca", "acessar-biblioteca"]) document.getElementById(id)?.addEventListener("click", evento => {
+        if (evento.ctrlKey || evento.metaKey || evento.shiftKey || evento.altKey || evento.button > 0) return;
+        biblioteca.reiniciar();
+        status.textContent = "";
+    });
     for (const controle of document.querySelectorAll("#taskflow-categorias [data-topico]")) {
         controle.addEventListener("click", evento => {
             if (evento.ctrlKey || evento.metaKey || evento.shiftKey || evento.altKey || evento.button > 0) return;

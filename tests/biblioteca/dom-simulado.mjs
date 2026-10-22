@@ -34,7 +34,7 @@ export class Elemento {
 export function iniciar(tecnologia, central = false) {
     const copias = [];
     const elementos = {};
-    for (const id of ["biblioteca-central-breadcrumb", "biblioteca-central-icone", "biblioteca-central-original", "biblioteca-html-breadcrumb", "biblioteca-menu", "biblioteca-alternar-menu", "biblioteca-niveis", "biblioteca-leitura", "biblioteca-estado-vazio", "biblioteca-titulo", "biblioteca-nivel", "biblioteca-vazio-titulo", "biblioteca-vazio-descricao", "biblioteca-pesquisa", "biblioteca-pesquisa-campo", "biblioteca-pesquisa-resultados", "biblioteca-pesquisa-status", "biblioteca-pesquisa-formulario", "biblioteca-pesquisa-limpar"]) {
+    for (const id of ["biblioteca-central-cabecalho", "biblioteca-programacao-breadcrumb", "biblioteca-central-breadcrumb", "biblioteca-central-icone", "biblioteca-central-original", "biblioteca-html-breadcrumb", "biblioteca-menu", "biblioteca-alternar-menu", "biblioteca-niveis", "biblioteca-leitura", "biblioteca-estado-vazio", "biblioteca-titulo", "biblioteca-nivel", "biblioteca-vazio-titulo", "biblioteca-vazio-descricao", "biblioteca-pesquisa", "biblioteca-pesquisa-campo", "biblioteca-pesquisa-resultados", "biblioteca-pesquisa-status", "biblioteca-pesquisa-formulario", "biblioteca-pesquisa-limpar"]) {
         elementos["#" + id] = new Elemento(); elementos["#" + id].id = id;
     }
     const pagina = new Elemento("main"); pagina.dataset.tecnologia = tecnologia; if (central) pagina.dataset.bibliotecaCentral = "";

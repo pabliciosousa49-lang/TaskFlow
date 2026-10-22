@@ -53,3 +53,11 @@ test("painel de notas abre, associa ao tópico atual, salva, edita, filtra, pesq
     assert.equal(JSON.parse(a.memoria.get("taskflow.biblioteca.anotacoes.v1")).anotacoes.length, 0);
     a.clicar("anotacoes-fechar"); assert.equal(a.obter("biblioteca-anotacoes").open, false); assert(a.obter("biblioteca-abrir-anotacoes").focado);
 });
+
+
+test("anotações orientam a selecionar um tópico quando a Biblioteca está no estado inicial", async () => {
+    const a = await iniciar(); a.contexto(null); a.clicar("biblioteca-abrir-anotacoes");
+    a.clicar("anotacoes-nova");
+    assert.match(a.obter("anotacoes-status").textContent, /Selecione um tópico/);
+    assert.equal(a.memoria.has("taskflow.biblioteca.anotacoes.v1"), false);
+});

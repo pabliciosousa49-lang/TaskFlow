@@ -10,7 +10,7 @@ let documentacaoCompleta = documentacaoHTML || documentacaoCSS || documentacaoPr
 const menu = document.querySelector("#biblioteca-menu");
 const alternarMenu = document.querySelector("#biblioteca-alternar-menu");
 const niveis = document.querySelector("#biblioteca-niveis");
-const tamanhoMobile = window.matchMedia("(max-width: 760px)");
+const tamanhoMobile = window.matchMedia(documentacaoProgramacao ? "(max-width: 1000px)" : "(max-width: 760px)");
 const modelos = {
     html: () => import("../../data/biblioteca/html/conteudos.js"),
     css: () => import("../../data/biblioteca/css/conteudos.js"),
@@ -26,6 +26,7 @@ const [anterior, proximo] = navegacaoAssuntos.querySelectorAll("button");
 const assuntosOrdenados = [];
 let conteudoLeitura;
 let assuntoAtual = -1;
+let limparPesquisaCentral;
 
 // Menu — Responsividade - mantém navegação no fluxo, sem sobrepor o conteúdo
 function atualizarMenu() {
@@ -212,7 +213,7 @@ function blocoCodigo(valor, titulo, linguagem = documentacaoCSS ? "css" : docume
             }
         });
         ferramentas.append(rotulo, copiar);
-        if (documentacaoHTML || central) {
+        if (documentacaoHTML || documentacaoProgramacao || central) {
             const corpo = document.createElement("div");
             corpo.className = "biblioteca-html-codigo-corpo";
             const linhas = document.createElement("span");
@@ -253,6 +254,8 @@ function selecionarAssunto(indice, focar = true, reiniciarLeitura = false) {
     const registro = assuntosOrdenados[indice];
     if (!registro) return;
     if (central) {
+        document.querySelector("#biblioteca-central-cabecalho").hidden = false;
+        leitura.setAttribute("aria-labelledby", "biblioteca-titulo");
         pagina.dataset.tecnologia = registro.tecnologia;
         documentacaoHTML = registro.tecnologia === "html";
         documentacaoCSS = registro.tecnologia === "css";
@@ -270,6 +273,10 @@ function selecionarAssunto(indice, focar = true, reiniciarLeitura = false) {
     document.querySelector("#biblioteca-titulo").textContent = assunto.titulo;
     if (documentacaoHTML && !central) document.querySelector("#biblioteca-html-breadcrumb").textContent = `HTML › ${nivel.nome} › ${assunto.titulo}`;
     document.querySelector("#biblioteca-nivel").textContent = `${nivel.nome} · ${modulo.titulo || modulo.nome}`;
+    if (documentacaoProgramacao && !central) {
+        const nome = { javascript: "JavaScript", typescript: "TypeScript", react: "React" }[pagina.dataset.tecnologia];
+        document.querySelector("#biblioteca-programacao-breadcrumb").textContent = `${nome} › ${nivel.nome} › ${modulo.titulo || modulo.nome} › ${assunto.titulo}`;
+    }
     for (const item of assuntosOrdenados) item.botao.removeAttribute("aria-current");
     botao.setAttribute("aria-current", "true");
     painel.hidden = false;
@@ -281,31 +288,8 @@ function selecionarAssunto(indice, focar = true, reiniciarLeitura = false) {
         leitura.insertBefore(conteudoLeitura, navegacaoAssuntos);
     }
     conteudoLeitura.replaceChildren();
-    if (central && !documentacaoHTML) {
+    if ((central && !documentacaoHTML) || documentacaoProgramacao) {
         apresentarConteudoCentral(conteudoLeitura, assunto);
-    } else if (documentacaoProgramacao) {
-        conteudoLeitura.append(blocoLeitura("O que é", assunto.explicacao), blocoLeitura("Quando usar", assunto.aplicacaoReal));
-        if (assunto.mapeamento) conteudoLeitura.append(blocoLeitura("Mapa de raciocínio", assunto.mapeamento));
-        conteudoLeitura.append(blocoLeitura("Onde reproduzir", assunto.ambiente));
-        if (assunto.exemploHTML) conteudoLeitura.append(blocoCodigo(assunto.exemploHTML, "HTML de apoio", "html"));
-        conteudoLeitura.append(blocoLeitura("Exemplo de código", assunto.exemploCodigo, true),
-            blocoLeitura("Entenda o código", assunto.responsabilidadeCodigo), blocoLeitura("Resultado esperado · não executado aqui", assunto.resultadoEsperado));
-        const cuidados = blocoLeitura("Cuidados e erros comuns", assunto.boasPraticas);
-        cuidados.className = "biblioteca-observacao";
-        conteudoLeitura.append(cuidados);
-        if (assunto.relacionados.length) {
-            const relacionados = document.createElement("section"); relacionados.className = "biblioteca-programacao-relacionados";
-            const titulo = document.createElement("h2"); titulo.textContent = "Veja também"; relacionados.append(titulo);
-            for (const id of assunto.relacionados) {
-                const i = assuntosOrdenados.findIndex(item => item.assunto.id === id);
-                if (i < 0 || i === indice) continue;
-                const link = document.createElement("button"); link.type = "button"; link.textContent = assuntosOrdenados[i].assunto.titulo;
-                link.addEventListener("click", () => selecionarAssunto(i)); relacionados.append(link);
-            }
-            conteudoLeitura.append(relacionados);
-        }
-        const fonte = document.createElement("a"); fonte.href = assunto.fonte; fonte.textContent = "Consultar documentação de referência"; fonte.className = "biblioteca-fonte";
-        conteudoLeitura.append(fonte);
     } else if (documentacaoCSS) {
         conteudoLeitura.append(blocoLeitura("O que é", assunto.explicacao), blocoLeitura("Quando usar", assunto.aplicacaoReal));
         const exemplo = document.createElement("section");
@@ -405,11 +389,11 @@ function selecionarAssunto(indice, focar = true, reiniciarLeitura = false) {
     if (focar) {
         menuAberto = false;
         atualizarMenu();
-        if (central || documentacaoHTML || documentacaoCSS || reiniciarLeitura) {
+        if (central || documentacaoHTML || documentacaoCSS || documentacaoProgramacao || reiniciarLeitura) {
             // HTML/CSS — Leitura - retorna ao título sem deslocar a rolagem interna do guia.
             const posicaoMenu = menu.scrollTop;
             leitura.focus({ preventScroll: true });
-            if (mudouAssunto || reiniciarLeitura || documentacaoHTML || central) {
+            if (mudouAssunto || reiniciarLeitura || documentacaoHTML || documentacaoProgramacao || central) {
                 leitura.scrollTop = 0;
                 leitura.scrollIntoView({ block: "start", behavior: "instant" });
             }
@@ -519,6 +503,7 @@ function pesquisarAssuntos(consulta) {
         const tags = [...assunto.sintaxe.matchAll(/<([a-z][\w-]*)\b/gi)].map((tag) => tag[1].toLowerCase());
         const titulo = normalizarPesquisa(assunto.titulo);
         const descricao = normalizarPesquisa(assunto.explicacao);
+        const grupo = central ? normalizarPesquisa(`${catalogoCentral.get(registro.tecnologia).nome} ${registro.nivel.nome} ${registro.modulo.titulo || registro.modulo.nome}`) : "";
         let prioridade = Infinity;
         if (palavras.includes(termo)) prioridade = 0;
         else if (tags.includes(termo) || titulo === termo) prioridade = 1;
@@ -526,6 +511,7 @@ function pesquisarAssuntos(consulta) {
         else if (!curtos && palavras.some((palavra) => palavra.includes(termo))) prioridade = 3;
         else if (!curtos && termo.split(" ").every((parte) =>
             (titulo + " " + palavras.join(" ") + " " + descricao).split(/[^a-z0-9:*=-]+/).includes(parte))) prioridade = 4;
+        if (central && termo.split(" ").every(parte => grupo.includes(parte))) prioridade = Math.min(prioridade, 2);
         return { registro, indice, prioridade };
     }).filter((item) => Number.isFinite(item.prioridade));
     // Uma tag curta com associação explícita não deve listar exemplos incidentais.
@@ -542,10 +528,42 @@ function iniciarPesquisa() {
     const lista = pesquisa.querySelector("#biblioteca-pesquisa-resultados");
     const status = pesquisa.querySelector("#biblioteca-pesquisa-status");
     const limpar = pesquisa.querySelector("#biblioteca-pesquisa-limpar");
-    let resultados = [], anuncio;
+    let resultados = [], anuncio, organizacao;
+    function restaurarGrupos() {
+        if (!organizacao) return;
+        for (const [elemento, aberto] of organizacao) {
+            if (elemento.tagName === "BUTTON" || elemento.className === "biblioteca-categoria") {
+                elemento.setAttribute("aria-expanded", String(aberto));
+            } else if (elemento.className === "biblioteca-categoria-conteudo") elemento.hidden = !aberto;
+            else elemento.open = aberto;
+        }
+    }
+    function expandirRegistro(registro) {
+        linguagensGuia.get(registro.tecnologia).open = true;
+        registro.painel.hidden = false;
+        registro.categoria.setAttribute("aria-expanded", "true");
+        if (registro.detalhes) registro.detalhes.open = true;
+    }
+    function organizarResultados() {
+        if (!central) return;
+        const pesquisando = Boolean(normalizarPesquisa(campo.value));
+        if (pesquisando && !organizacao) {
+            organizacao = new Map();
+            for (const elemento of niveis.querySelectorAll("details")) organizacao.set(elemento, Boolean(elemento.open));
+            for (const elemento of niveis.querySelectorAll(".biblioteca-categoria")) organizacao.set(elemento, elemento.getAttribute("aria-expanded") === "true");
+            for (const elemento of niveis.querySelectorAll(".biblioteca-categoria-conteudo")) organizacao.set(elemento, !elemento.hidden);
+        }
+        restaurarGrupos();
+        if (pesquisando) for (const { registro } of resultados) expandirRegistro(registro);
+        else {
+            organizacao = null;
+            if (assuntosOrdenados[assuntoAtual]) expandirRegistro(assuntosOrdenados[assuntoAtual]);
+        }
+    }
     function mostrarResultados() {
         clearTimeout(anuncio);
         resultados = pesquisarAssuntos(campo.value);
+        organizarResultados();
         lista.replaceChildren();
         lista.hidden = !resultados.length;
         limpar.hidden = !campo.value;
@@ -576,6 +594,7 @@ function iniciarPesquisa() {
         else lista.querySelector("button")?.focus();
     });
     limpar.addEventListener("click", () => { campo.value = ""; mostrarResultados(); campo.focus(); });
+    if (central) limparPesquisaCentral = () => { organizacao = null; campo.value = ""; mostrarResultados(); };
     mostrarResultados();
 }
 
@@ -603,9 +622,9 @@ async function iniciarBiblioteca() {
 
 // A central usa os mesmos modelos, blocos de código e seleção da documentação original.
 function apresentarConteudoCentral(destino, assunto) {
-    destino.append(blocoLeitura("Conceito", assunto.explicacao));
+    destino.append(blocoLeitura(documentacaoProgramacao ? "Introdução" : "Conceito", assunto.explicacao));
     if (assunto.exemploHTML) destino.append(blocoCodigo(assunto.exemploHTML, "HTML de apoio", "html"));
-    destino.append(blocoLeitura("Exemplo de código", assunto.exemploCodigo, true), blocoLeitura("Entenda o exemplo", assunto.responsabilidadeCodigo));
+    destino.append(blocoLeitura("Exemplo de código", assunto.exemploCodigo, true), blocoLeitura(documentacaoProgramacao ? "Explicação do código" : "Entenda o exemplo", assunto.responsabilidadeCodigo));
     const dica = blocoLeitura("💡 Dica", assunto.boasPraticas.at(-1)); dica.className = "biblioteca-html-dica"; destino.append(dica);
     destino.append(blocoLeitura("Quando usar", assunto.aplicacaoReal));
     if (documentacaoCSS) {
@@ -645,10 +664,42 @@ export function construirCatalogoCentral(catalogo) {
         linguagensGuia.set(dados.id, linguagem);
         construirNiveis(dados, conteudo, false); niveis.append(linguagem);
     }
-    if (assuntosOrdenados.length) { selecionarAssunto(0, false); iniciarPesquisa(); }
+    function reiniciar() {
+        assuntoAtual = -1;
+        limparPesquisaCentral?.();
+        for (const linguagem of linguagensGuia.values()) linguagem.open = false;
+        for (const registro of assuntosOrdenados) {
+            registro.botao.removeAttribute("aria-current");
+            registro.painel.hidden = true;
+            registro.categoria.setAttribute("aria-expanded", "false");
+            if (registro.detalhes) registro.detalhes.open = false;
+        }
+        conteudoLeitura?.replaceChildren();
+        document.querySelector("#biblioteca-central-cabecalho").hidden = true;
+        leitura.setAttribute("aria-labelledby", "biblioteca-vazio-titulo");
+        document.querySelector("#biblioteca-vazio-titulo").textContent = "Explore a Biblioteca Técnica";
+        document.querySelector("#biblioteca-vazio-descricao").textContent = "Selecione uma linguagem no Guia de Estudos para começar a explorar os conteúdos disponíveis.";
+        estadoVazio.hidden = false;
+        navegacaoAssuntos.hidden = true;
+        anterior.disabled = proximo.disabled = true;
+        leitura.scrollTop = menu.scrollTop = 0;
+        menuAberto = false; atualizarMenu();
+        pagina.dispatchEvent(new CustomEvent("biblioteca:selecao", { detail: null }));
+    }
+    iniciarPesquisa();
+    reiniciar();
     return {
         catalogo,
-        selecionarLinguagem(id) { const indice = assuntosOrdenados.findIndex(r => r.tecnologia === id); if (indice < 0) return false; selecionarAssunto(indice); return true; },
+        reiniciar,
+        selecionarLinguagem(id) {
+            const linguagem = linguagensGuia.get(id);
+            if (!linguagem) return false;
+            linguagem.open = true;
+            menuAberto = true; atualizarMenu();
+            linguagem.querySelector("summary").focus({ preventScroll: true });
+            linguagem.scrollIntoView({ block: "nearest", behavior: "instant" });
+            return true;
+        },
         selecionado() { const r = assuntosOrdenados[assuntoAtual]; return r ? { linguagem: r.tecnologia, topico: r.assunto.id, titulo: r.assunto.titulo } : null; }
     };
 }
