@@ -25,7 +25,7 @@ function ambiente() {
   const ids=new Map(); const elemento=id=>{if(!ids.has(id))ids.set(id,new Elemento());return ids.get(id)};
   const documento={querySelector:elemento,createElement:()=>new Elemento(),body:new Elemento(),events:{},addEventListener(k,fn){this.events[k]=fn},hidden:false};
   globalThis.document=documento;
-  const view={state:estado(),scrollDOM:{scrollTop:0,scrollLeft:0,addEventListener(){}},setState(s){this.state=s},requestMeasure(p){p?.write()},focus(){},
+  const view={state:estado(),scrollDOM:{scrollTop:0,scrollLeft:0,addEventListener(){}},setState(s){this.state=s},requestMeasure(p){if(p){const valor=p.read(this);p.write?.(valor,this)}},focus(){},
     dispatch(t){let codigo=this.state.doc.toString();if(t.changes)for(const c of (Array.isArray(t.changes)?t.changes:[t.changes]).slice().reverse())codigo=codigo.slice(0,c.from)+c.insert+codigo.slice(c.to);const cursor=t.selection?.anchor??this.state.selection.main.head;this.state=estado(codigo,cursor,this.state.extensions);for(const e of this.state.extensions)if(e?.callback)e.callback({view:this,state:this.state,docChanged:Boolean(t.changes),selectionSet:Boolean(t.selection)});}
   };
   let configuracaoPrevia, execucoesPrevia=0;
@@ -60,6 +60,39 @@ test('integração simulada: recarregar restaura abas, arquivo, cursor, rolagem,
   assert.equal(a.elemento('#studio-paineis').dataset.painel,'previa');assert.equal(a.elemento('#studio-previa-automatica').checked,false);assert.equal(a.elemento('#studio-largura-editor').value,'70');
   const salvo=sessao.lerSessao(p.id);assert.equal(salvo.ativo,js.id);assert(!salvo.abas.includes('excluido'));
 });
+test('medição: alternar arquivos restaura cursor e rolagem respeitando read/write do CodeMirror',async()=>{
+  const a=ambiente();const {p,html,js}=projetoTeste();
+  assert.equal(await a.api.abrirProjeto(p.id),true);
+  a.view.dispatch({selection:{anchor:12}});
+  a.view.scrollDOM.scrollTop=80;a.view.scrollDOM.scrollLeft=18;
+  assert.equal(a.api.selecionarArquivo(js),true);
+  assert.equal(a.view.scrollDOM.scrollTop,0);
+  assert.equal(a.view.scrollDOM.scrollLeft,0);
+  a.view.dispatch({selection:{anchor:8}});
+  a.view.scrollDOM.scrollTop=150;a.view.scrollDOM.scrollLeft=10;
+  assert.equal(a.api.selecionarArquivo(html),true);
+  assert.equal(a.view.state.selection.main.head,12);
+  assert.equal(a.view.scrollDOM.scrollTop,80);
+  assert.equal(a.view.scrollDOM.scrollLeft,18);
+  assert.equal(a.api.selecionarArquivo(js),true);
+  assert.equal(a.view.state.selection.main.head,8);
+  assert.equal(a.view.scrollDOM.scrollTop,150);
+  assert.equal(a.view.scrollDOM.scrollLeft,10);
+});
+
+test('medição: retorno atrasado não aplica rolagem de outro arquivo',async()=>{
+  const a=ambiente();const {p,html,js}=projetoTeste();
+  assert.equal(await a.api.abrirProjeto(p.id),true);
+  a.view.scrollDOM.scrollTop=80;a.view.scrollDOM.scrollLeft=18;
+  const pedidos=[];a.view.requestMeasure=pedido=>{if(pedido)pedidos.push(pedido)};
+  a.api.selecionarArquivo(js);
+  a.view.scrollDOM.scrollTop=150;a.view.scrollDOM.scrollLeft=10;
+  a.api.selecionarArquivo(html);
+  for(const pedido of pedidos.slice().reverse())pedido.write(pedido.read(a.view),a.view);
+  assert.equal(a.view.scrollDOM.scrollTop,80);
+  assert.equal(a.view.scrollDOM.scrollLeft,18);
+});
+
 test('integração simulada: trocar arquivo grava pendências e falha de gravação impede saída',async()=>{
   const a=ambiente();const{p,html,js}=projetoTeste();await a.api.abrirProjeto(p.id);
   a.view.dispatch({changes:{from:0,to:a.view.state.doc.length,insert:'<p>novo</p>'}});

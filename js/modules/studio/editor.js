@@ -141,7 +141,8 @@ export function abrirDocumentoEditor(editor, item, aoAlterarCodigo, posicaoCurso
     if (memoria.ativo !== item.id || editor.state !== documento.estado) {
         editor.setState(documento.estado);
         const estado = documento.estado;
-        editor.requestMeasure({ write() {
+        // read é obrigatório na API, mesmo sem medições antes de restaurar a rolagem.
+        editor.requestMeasure({ read() {}, write() {
             if (editor.state !== estado) return;
             editor.scrollDOM.scrollTop = documento.top;
             editor.scrollDOM.scrollLeft = documento.left;
