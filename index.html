@@ -458,11 +458,11 @@
         <ul id="agenda-feriados" class="agenda-feriados" aria-label="Feriados nacionais do mês"></ul>
         <h3 id="agenda-data-selecionada"></h3>
       </section>
-      <!-- Compromissos do dia — Apresentação - acompanha a data selecionada -->
+      <!-- Compromissos — Apresentação - acompanha o filtro de status selecionado -->
       <section class="agenda-registros" aria-labelledby="titulo-compromissos">
-        <h3 id="titulo-compromissos" tabindex="-1">Compromissos do dia</h3>
+        <h3 id="titulo-compromissos" tabindex="-1">Compromissos</h3>
         <div class="agenda-filtro">
-          <label for="agenda-filtro-status">Filtrar compromissos do dia</label>
+          <label for="agenda-filtro-status">Filtrar compromissos</label>
           <select id="agenda-filtro-status">
             <option value="todos">Todos</option>
             <option value="pendente">Pendentes</option>
@@ -498,6 +498,7 @@
   <dialog id="pomodoro-painel" class="pomodoro-painel" aria-labelledby="pomodoro-titulo">
     <header class="pomodoro-cabecalho">
       <h2 id="pomodoro-titulo"><i class="fa-solid fa-stopwatch" aria-hidden="true"></i> Relógio e Pomodoro</h2>
+      <button id="pomodoro-minimizar" class="pomodoro-botao" type="button" aria-label="Minimizar Pomodoro" aria-controls="pomodoro-minimizado">−</button>
       <button id="pomodoro-fechar" class="pomodoro-botao" type="button" aria-label="Fechar Relógio e Pomodoro">×</button>
     </header>
     <div class="pomodoro-conteudo">
@@ -577,6 +578,11 @@
     </div>
   </dialog>
   <p id="pomodoro-notificacao" class="pomodoro-notificacao" role="status" hidden></p>
+  <aside id="pomodoro-minimizado" class="pomodoro-minimizado" aria-label="Tempo do Pomodoro" hidden>
+    <div><strong id="pomodoro-minimizado-modo">Foco</strong><span id="pomodoro-minimizado-status">Pronto</span></div>
+    <time id="pomodoro-minimizado-tempo" role="timer" aria-live="off">25:00</time>
+    <button id="pomodoro-restaurar" type="button" aria-label="Restaurar painel completo do Pomodoro" title="Abrir Pomodoro, Relógio e Estatísticas">Abrir</button>
+  </aside>
   <script src="./js/core/navegacao.js"></script>
   <script src="./js/core/app.js"></script>
   <script type="module" src="./js/modules/pomodoro/pomodoro.js"></script>

@@ -38,12 +38,67 @@ test('backup: dados incompatíveis, caminhos inválidos e JSON inválido não al
   for (const texto of ['{', '{}', JSON.stringify(backup), JSON.stringify({ formato: 'taskflow.studio.backup', versao: 2 })]) assert.throws(() => projetos.importarProjeto(texto));
   assert.equal([...dados.values()][0], anterior);
 });
-test('backup: valida tamanho em bytes e limite de itens antes de gravar', () => {
-  const p = preparar(); const backup = JSON.parse(projetos.exportarProjeto(p.id));
-  assert.throws(() => projetos.importarProjeto('á'.repeat(projetos.limiteBackupBytes)), /2 MiB/);
+test('backup: restaura projetos existentes com 999, 1000 e 1001 itens sem substituir o original', () => {
+  for (const quantidade of [999, 1000, 1001]) {
+    const p = preparar();
+    p.arquivos = Array.from({ length: quantidade }, (_, i) => ({ id: 'f'+i, nome: 'f'+i+'.js', caminho: 'f'+i+'.js', parentId: null, tipo: 'arquivo', conteudo: '// á 😀 '+i }));
+    p.arquivoEditorId = p.arquivos[0].id;
+    dados.set('taskflow.studio.projetos.v1', JSON.stringify([p]));
+    const copia = projetos.importarProjeto(projetos.exportarProjeto(p.id));
+    assert.equal(copia.arquivos.length, quantidade);
+    assert.deepEqual(copia.arquivos.map(a => [a.caminho, a.conteudo]), p.arquivos.map(a => [a.caminho, a.conteudo]));
+    assert.deepEqual(projetos.buscarProjeto(p.id), p);
+  }
+});
+
+test('backup: conteudo abaixo, no limite antigo e acima de 2 MiB pode ser exportado e restaurado', () => {
+  for (const tamanho of [2*1024*1024-1, 2*1024*1024, 2*1024*1024+1]) {
+    const p = preparar(), arquivo = p.arquivos.find(a => a.tipo === 'arquivo');
+    projetos.atualizarConteudoArquivo(p.id, arquivo.id, '');
+    const base = new TextEncoder().encode(projetos.exportarProjeto(p.id)).length;
+    const codigo = 'x'.repeat(tamanho - base);
+    projetos.atualizarConteudoArquivo(p.id, arquivo.id, codigo);
+    const backup = projetos.exportarProjeto(p.id);
+    assert.equal(new TextEncoder().encode(backup).length, tamanho);
+    const copia = projetos.importarProjeto(backup);
+    assert.equal(copia.arquivos.find(a => a.caminho === arquivo.caminho).conteudo, codigo);
+    dados.clear();
+  }
+});
+
+test('backup: muitos itens nao dispensam validacao estrutural nem permitem sobrescrita', () => {
+  const p = preparar(), original = dados.get('taskflow.studio.projetos.v1');
+  const backup = JSON.parse(projetos.exportarProjeto(p.id));
   backup.projeto.arquivos = Array(1001).fill(backup.projeto.arquivos[0]);
-  assert.throws(() => projetos.importarProjeto(JSON.stringify(backup)), /1.000/);
-  assert.equal(projetos.listarProjetos().length, 1);
+  assert.throws(() => projetos.importarProjeto(JSON.stringify(backup)), /inválidos/);
+  assert.equal(dados.get('taskflow.studio.projetos.v1'), original);
+});
+
+test('recuperacao: exporta catalogo bruto invalido exatamente, sem gravar nem reparar', () => {
+  preparar(); dados.set('taskflow.studio.projetos.v1', '{ dados inválidos 😀');
+  assert.throws(() => projetos.listarProjetos(), /inválidos/);
+  localStorage.setItem = () => { throw new Error('nao deve gravar'); };
+  assert.equal(projetos.exportarCatalogoBruto(), '{ dados inválidos 😀');
+  localStorage.getItem = () => { throw new Error('bloqueado'); };
+  assert.throws(() => projetos.exportarCatalogoBruto(), /bloqueou a leitura/);
+});
+
+test('recuperacao: backup pendente independe da leitura e escrita; conflito preserva ambas as versoes', () => {
+  const p = preparar(), arquivo = p.arquivos.find(a => a.tipo === 'arquivo');
+  const memoria = JSON.stringify(p);
+  projetos.atualizarConteudoArquivo(p.id, arquivo.id, 'versao de outra aba');
+  const persistido = dados.get('taskflow.studio.projetos.v1');
+  localStorage.getItem = () => { throw new Error('bloqueado'); };
+  localStorage.setItem = () => { throw new Error('quota'); };
+  const backup = projetos.exportarProjetoPendente(p, arquivo.id, 'alteracao pendente 😀');
+  assert.equal(JSON.stringify(p), memoria);
+  assert.equal(dados.get('taskflow.studio.projetos.v1'), persistido);
+  localStorage.getItem = k => dados.get(k) ?? null;
+  localStorage.setItem = (k,v) => dados.set(k,v);
+  const recuperado = projetos.importarProjeto(backup);
+  assert.equal(recuperado.arquivos.find(a => a.caminho === arquivo.caminho).conteudo, 'alteracao pendente 😀');
+  assert.equal(projetos.buscarProjeto(p.id).arquivos.find(a => a.id === arquivo.id).conteudo, 'versao de outra aba');
+  assert.throws(() => projetos.exportarProjetoPendente(p, 'inexistente', 'texto'));
 });
 test('backup: falha de armazenamento preserva o registro anterior; conflitos não sobrescrevem código', () => {
   const p = preparar(), backup = projetos.exportarProjeto(p.id), anterior = [...dados.values()][0];

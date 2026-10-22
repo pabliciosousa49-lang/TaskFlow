@@ -81,20 +81,36 @@ function gravarProjetos(projetos) {
 }
 
 // Backup — Contrato - somente dados textuais; importação sempre cria outra identidade.
-export const limiteBackupBytes = 2 * 1024 * 1024;
+function serializarBackup(projeto) {
+    validarProjetos([projeto]);
+    return JSON.stringify({ formato: "taskflow.studio.backup", versao: 1, projeto }, null, 2);
+}
+
 export function exportarProjeto(id) {
     const projeto = buscarProjeto(id);
     if (!projeto) throw new Error("Projeto não encontrado.");
-    const texto = JSON.stringify({ formato: "taskflow.studio.backup", versao: 1, projeto }, null, 2);
-    if (new TextEncoder().encode(texto).length > limiteBackupBytes) throw new Error("O backup excede o limite de 2 MiB.");
-    return texto;
+    return serializarBackup(projeto);
+}
+
+// Recuperação não grava nem tenta reparar o catálogo original.
+export function exportarCatalogoBruto() {
+    try { return localStorage.getItem(chaveProjetos) ?? "[]"; }
+    catch { throw new Error("O navegador bloqueou a leitura do catálogo. Mantenha esta página aberta para recuperar o projeto aberto, se disponível."); }
+}
+
+export function exportarProjetoPendente(projeto, arquivoId, codigo) {
+    if (typeof codigo !== "string" || !projeto?.arquivos?.some(item => item.id === arquivoId && item.tipo === "arquivo")) {
+        throw new Error("Não há um arquivo aberto para recuperar.");
+    }
+    return serializarBackup({ ...projeto, arquivos: projeto.arquivos.map(item =>
+        item.id === arquivoId ? { ...item, conteudo: codigo } : { ...item }) });
 }
 
 export function importarProjeto(texto) {
-    if (typeof texto !== "string" || new TextEncoder().encode(texto).length > limiteBackupBytes) throw new Error("Selecione um backup JSON de até 2 MiB.");
+    if (typeof texto !== "string") throw new Error("Selecione um backup JSON textual.");
     let backup;
     try { backup = JSON.parse(texto); } catch { throw new Error("O arquivo não contém JSON válido."); }
-    if (backup?.formato !== "taskflow.studio.backup" || backup.versao !== 1 || !Array.isArray(backup.projeto?.arquivos) || backup.projeto.arquivos.length > 1000) throw new Error("Backup incompatível. Limite: 1.000 arquivos e pastas.");
+    if (backup?.formato !== "taskflow.studio.backup" || backup.versao !== 1 || !Array.isArray(backup.projeto?.arquivos)) throw new Error("Backup incompatível.");
     validarProjetos([backup.projeto]);
     const projetos = lerProjetos();
     const ids = new Set(projetos.flatMap(p => [p.id, ...p.arquivos.map(a => a.id)]));

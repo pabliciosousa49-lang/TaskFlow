@@ -94,7 +94,7 @@ function iniciar(dados = "[]", urlInicial = "https://taskflow.test/index.html", 
     return { obter, clicar, selecionar, acao, salvar, filtrar, avancar, storage: contexto.localStorage, armazenamento, historico: contexto.window.history, location: contexto.window.location };
 }
 
-test("Agenda filtra por dia, atualiza quantidade e preserva marcadores e navegação mensal", () => {
+test("Agenda lista todas as datas e preserva seleção de cadastro, marcadores e navegação mensal", () => {
     const hoje = new Date();
     const data = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, "0")}-${String(hoje.getDate()).padStart(2, "0")}`;
     const registros = [
@@ -102,9 +102,9 @@ test("Agenda filtra por dia, atualiza quantidade e preserva marcadores e navega�
         { id: "b", titulo: "Outra data", descricao: "", data: "2040-02-01", hora: "08:00" }
     ];
     const a = iniciar(JSON.stringify(registros));
-    assert.equal(a.obter("agenda-quantidade").textContent, "1 compromisso");
+    assert.equal(a.obter("agenda-quantidade").textContent, "2 compromissos");
     assert.match(a.obter("lista-compromissos").textContent, /Hoje/);
-    assert.doesNotMatch(a.obter("lista-compromissos").textContent, /Outra data/);
+    assert.match(a.obter("lista-compromissos").textContent, /Outra data/);
     const dia = a.obter("agenda-dias").children.find(e => e.dataset.data === data);
     assert.equal(dia.getAttribute("aria-current"), "date");
     assert.equal(dia.getAttribute("aria-pressed"), "true");
@@ -113,8 +113,8 @@ test("Agenda filtra por dia, atualiza quantidade e preserva marcadores e navega�
     a.clicar("mes-seguinte"); assert.notEqual(a.obter("agenda-mes").textContent, mes);
     a.clicar("mes-anterior"); assert.equal(a.obter("agenda-mes").textContent, mes);
     a.selecionar("2040-02-02");
-    assert.equal(a.obter("agenda-quantidade").textContent, "0 compromissos");
-    assert.equal(a.obter("lista-compromissos").textContent, "Nenhum compromisso para este dia.");
+    assert.equal(a.obter("agenda-quantidade").textContent, "2 compromissos");
+    assert.equal(a.obter("compromisso-data").value, "2040-02-02");
     assert.equal(a.obter("formulario-compromisso").hidden, false);
 });
 
@@ -130,11 +130,11 @@ test("Agenda mantém abertura, cadastro, edição, cancelamento, exclusão e per
     assert.equal(recarregada.obter("agenda-quantidade").textContent, "2 compromissos");
     a.acao("editar", "novo-1"); assert.equal(a.obter("compromisso-titulo").value, "Estudar CSS");
     a.salvar("Revisar CSS", "2040-02-03");
-    assert.equal(a.obter("agenda-quantidade").textContent, "1 compromisso");
+    assert.equal(a.obter("agenda-quantidade").textContent, "2 compromissos");
     a.acao("editar", "novo-1"); a.clicar("cancelar-compromisso");
     assert.equal(a.obter("formulario-compromisso").hidden, true);
     a.acao("excluir", "novo-1");
-    assert.equal(a.obter("agenda-quantidade").textContent, "0 compromissos");
+    assert.equal(a.obter("agenda-quantidade").textContent, "1 compromisso");
     assert.equal(JSON.parse(a.armazenamento.get(chave)).length, 1);
     a.clicar("fechar-agenda"); assert.equal(a.obter("painel-agenda").open, false);
     assert.equal(a.obter("abrir-agenda").focado, true);
@@ -359,4 +359,77 @@ test("janela vazia mantém acesso geral, informa ausência e continua excluindo 
     assert.equal(a.obter("painel-agenda").open, true);
     assert.deepEqual(cardsAgenda(a).map(c => c.dataset.status), ["expirado", "concluido"]);
     assert.equal(a.armazenamento.get(chaveCompromissos), texto);
+});
+
+
+test("Agenda filtra registros de todas as datas em ordem e compartilha dados com próximos eventos", () => {
+    const registros = [eventoAgenda("Tarde", "15:00"), eventoAgenda("Outra data", "08:00", { data: "2040-02-03" }),
+        eventoAgenda("Concluído", "13:00", { concluidoEm: new Date(instanteAgenda).toISOString() }),
+        eventoAgenda("Fim do dia", "17:00"), eventoAgenda("Expirado", "09:00"), eventoAgenda("Manhã", "11:00")];
+    const original = JSON.stringify(registros), a = iniciar(original, undefined, instanteAgenda);
+    a.clicar("abrir-agenda"); a.selecionar("2040-02-02");
+    const ids = (lista = "lista-compromissos") => cardsAgenda(a, lista).map(c => c.dataset.compromisso);
+    assert.deepEqual(ids(), ["Expirado", "Manhã", "Concluído", "Tarde", "Fim do dia", "Outra data"]);
+    assert.equal(a.obter("agenda-quantidade").textContent, "6 compromissos");
+    for (const card of cardsAgenda(a)) {
+        const registro = registros.find(r => r.id === card.dataset.compromisso);
+        assert.equal(card.querySelector("details").querySelector("p").textContent, registro.descricao);
+        assert(card.querySelectorAll("button").every(b => b.dataset.id === registro.id));
+    }
+    assert.deepEqual(ids("lista-eventos"), ["Manhã", "Tarde", "Fim do dia"]);
+    a.filtrar("pendente"); assert.deepEqual(ids(), ["Manhã", "Tarde", "Fim do dia", "Outra data"]);
+    a.filtrar("expirado"); assert.deepEqual(ids(), ["Expirado"]);
+    a.filtrar("concluido"); assert.deepEqual(ids(), ["Concluído"]);
+    a.filtrar("todos"); assert.equal(ids().length, 6);
+    for (const data of ["2040-02-03", "2040-02-04", "2040-02-02"]) {
+        a.selecionar(data); assert.equal(ids().length, 6);
+        assert.equal(a.obter("compromisso-data").value, data);
+    }
+    assert.equal(a.armazenamento.get(chaveCompromissos), original);
+});
+
+test("edição, exclusão, conclusão e novo cadastro afetam apenas o respectivo compromisso da lista múltipla", () => {
+    const registros = [eventoAgenda("primeiro", "11:00", { titulo: "Estudar" }), eventoAgenda("segundo", "12:00", { titulo: "Estudar" }),
+        eventoAgenda("terceiro", "13:00", { titulo: "Estudar" }), eventoAgenda("outro-dia", "14:00", { data: "2040-02-03" })];
+    const a = iniciar(JSON.stringify(registros), undefined, instanteAgenda);
+    const salvos = () => JSON.parse(a.armazenamento.get(chaveCompromissos));
+    a.acao("editar", "segundo");
+    a.salvar("Revisão", "2040-02-02", "10:30");
+    assert.deepEqual(cardsAgenda(a).map(c => c.dataset.compromisso), ["segundo", "primeiro", "terceiro", "outro-dia"]);
+    for (const id of ["primeiro", "terceiro", "outro-dia"]) assert.deepEqual(salvos().find(c => c.id === id), registros.find(c => c.id === id));
+    a.acao("excluir", "primeiro");
+    assert.deepEqual(cardsAgenda(a).map(c => c.dataset.compromisso), ["segundo", "terceiro", "outro-dia"]);
+    assert(!salvos().some(c => c.id === "primeiro"));
+    a.acao("concluir", "terceiro");
+    assert.equal(cardsAgenda(a).find(c => c.dataset.compromisso === "terceiro").dataset.status, "concluido");
+    assert(!cardsAgenda(a, "lista-eventos").some(c => c.dataset.compromisso === "terceiro"));
+    a.salvar("Novo estudo", "2040-02-02", "15:00");
+    assert.deepEqual(cardsAgenda(a).map(c => c.dataset.compromisso), ["segundo", "terceiro", "novo-1", "outro-dia"]);
+    const recarregada = iniciar(a.armazenamento.get(chaveCompromissos), undefined, instanteAgenda);
+    recarregada.selecionar("2040-02-02");
+    assert.deepEqual(cardsAgenda(recarregada).map(c => c.dataset.compromisso), ["segundo", "terceiro", "novo-1", "outro-dia"]);
+    assert.equal(cardsAgenda(recarregada).find(c => c.dataset.compromisso === "terceiro").dataset.status, "concluido");
+    assert.deepEqual(cardsAgenda(recarregada, "lista-eventos").map(c => c.dataset.compromisso), ["segundo", "novo-1", "outro-dia"]);
+    assert.deepEqual(salvos().find(c => c.id === "outro-dia"), registros[3]);
+});
+
+
+test("Todos, Pendentes, Concluídos e Expirados consultam todas as datas sem limite de registros", () => {
+    const concluidoEm = new Date(instanteAgenda).toISOString();
+    const registros = [eventoAgenda("pendente-1", "11:00"), eventoAgenda("pendente-2", "11:00", { data: "2040-02-03" }),
+        eventoAgenda("concluido-1", "12:00", { concluidoEm }), eventoAgenda("concluido-2", "12:00", { data: "2040-02-04", concluidoEm }),
+        eventoAgenda("expirado-1", "09:00"), eventoAgenda("expirado-2", "09:00", { data: "2040-02-01" })];
+    const a = iniciar(JSON.stringify(registros), undefined, instanteAgenda);
+    const ids = () => cardsAgenda(a).map(c => c.dataset.compromisso);
+    assert.equal(ids().length, 6);
+    for (const [filtro, esperados] of [["pendente", ["pendente-1", "pendente-2"]], ["concluido", ["concluido-1", "concluido-2"]], ["expirado", ["expirado-2", "expirado-1"]]]) {
+        a.filtrar(filtro); assert.deepEqual(ids(), esperados);
+        assert.equal(a.obter("agenda-quantidade").textContent, "2 de 6 compromissos");
+        a.selecionar("2040-03-01"); assert.deepEqual(ids(), esperados);
+    }
+    a.filtrar("todos"); assert.equal(ids().length, 6);
+    assert.equal(a.obter("agenda-quantidade").textContent, "6 compromissos");
+    const vazia = iniciar("[]", undefined, instanteAgenda);
+    assert.equal(vazia.obter("lista-compromissos").textContent, "Nenhum compromisso cadastrado.");
+    vazia.filtrar("pendente"); assert.equal(vazia.obter("lista-compromissos").textContent, "Nenhum compromisso com este status.");
 });

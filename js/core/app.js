@@ -356,11 +356,12 @@ function atualizarAgenda() {
     const agora = new Date();
     atualizarCalendario();
     document.querySelector("#agenda-data-selecionada").textContent = apresentarData(dataSelecionada);
-    const compromissosDoDia = ordenarCompromissos(compromissos.filter(compromisso => compromisso.data === dataSelecionada));
-    document.querySelector("#agenda-quantidade").textContent = `${compromissosDoDia.length} ${compromissosDoDia.length === 1 ? "compromisso" : "compromissos"}`;
-    const filtrados = compromissosDoDia.filter(c => filtroCompromissos === "todos" || statusCompromisso(c, agora) === filtroCompromissos);
-    if (filtroCompromissos !== "todos") document.querySelector("#agenda-quantidade").textContent = `${filtrados.length} de ${compromissosDoDia.length} compromissos`;
-    preencherLista(listaCompromissos, filtrados, filtroCompromissos === "todos" ? "Nenhum compromisso para este dia." : "Nenhum compromisso com este status para o dia selecionado.", true, agora);
+    // O filtro de status consulta toda a Agenda; a data do calendário orienta o cadastro.
+    const registros = ordenarCompromissos(compromissos);
+    document.querySelector("#agenda-quantidade").textContent = `${registros.length} ${registros.length === 1 ? "compromisso" : "compromissos"}`;
+    const filtrados = registros.filter(c => filtroCompromissos === "todos" || statusCompromisso(c, agora) === filtroCompromissos);
+    if (filtroCompromissos !== "todos") document.querySelector("#agenda-quantidade").textContent = `${filtrados.length} de ${registros.length} compromissos`;
+    preencherLista(listaCompromissos, filtrados, filtroCompromissos === "todos" ? "Nenhum compromisso cadastrado." : "Nenhum compromisso com este status.", true, agora);
     atualizarProximosEventos(agora);
 }
 

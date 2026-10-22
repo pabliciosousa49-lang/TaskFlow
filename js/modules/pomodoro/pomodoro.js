@@ -7,7 +7,7 @@ export function iniciarPomodoro() {
     let storage;
     try { storage = window.localStorage; } catch { storage = { getItem() { throw new Error("Indisponível"); } }; }
     const registros = criarArmazenamento(storage);
-    let mensagem = "Escolha uma modalidade e inicie sua sessão.", posicao = 0;
+    let mensagem = "Escolha uma modalidade e inicie sua sessão.", posicao = 0, minimizado = false;
     const timer = criarTemporizador({ aoConcluir(sessao) {
         const dia = registros.concluir(sessao);
         mensagem = `${modalidades[sessao.modo].nome} concluído!${sessao.foco && dia.focos % 4 === 0 ? " Quatro ciclos de foco: recomendamos uma pausa longa." : " Pronto para o próximo passo?"}`;
@@ -34,14 +34,27 @@ export function iniciarPomodoro() {
         for (const [indice, ciclo] of [...$("pomodoro-ciclos").children].entries()) ciclo.classList.toggle("concluido", indice < Math.min(dia.focos, 4));
         if ($("pomodoro-armazenamento").textContent !== registros.aviso) $("pomodoro-armazenamento").textContent = registros.aviso;
     }
+    function renderizarMinimizado(estado, tempo) {
+        const compacto = $("pomodoro-minimizado");
+        compacto.hidden = !minimizado || Boolean(painel.open);
+        $("pomodoro-minimizado-modo").textContent = modalidades[estado.modo].nome;
+        $("pomodoro-minimizado-tempo").textContent = tempo;
+        $("pomodoro-minimizado-status").textContent = { inicial: "Pronto", executando: "Em andamento", pausado: "Pausado", concluido: "Concluído" }[estado.estado];
+        // Permanece acessível quando outro painel modal, como a Agenda, está aberto.
+        if (!compacto.hidden) {
+            const destino = [...(document.querySelectorAll?.("dialog[open]") || [])].filter(dialog => dialog !== painel).at(-1) || document.body;
+            if (destino && compacto.parentElement !== destino) destino.append(compacto);
+        }
+    }
     function renderizar() {
         const estado = timer.atualizar();
-        if (!painel.open) return;
         const segundos = Math.ceil(estado.restante / 1000);
         const personalizado = ["personalizado", "pausaPersonalizada"].includes(estado.modo);
         const tempo = personalizado
             ? `${String(Math.floor(segundos / 3600)).padStart(2, "0")}:${String(Math.floor(segundos / 60) % 60).padStart(2, "0")}:${String(segundos % 60).padStart(2, "0")}`
             : `${String(Math.floor(segundos / 60)).padStart(2, "0")}:${String(segundos % 60).padStart(2, "0")}`;
+        renderizarMinimizado(estado, tempo);
+        if (!painel.open) return;
         $("pomodoro-tempo").textContent = tempo;
         $("pomodoro-modalidade").textContent = modalidades[estado.modo].nome;
         $("pomodoro-temporizador").setAttribute("aria-label", `${modalidades[estado.modo].nome}: ${tempo}`);
@@ -63,15 +76,24 @@ export function iniciarPomodoro() {
         $("pomodoro-notificacao").hidden = true;
         renderizar(); return true;
     }
-    acesso.addEventListener("click", () => {
+    function abrirPainel() {
         if (painel.open) return;
         posicao = window.scrollY;
+        minimizado = false;
         painel.showModal();
         document.documentElement.style.setProperty("--pomodoro-rolagem", `${-posicao}px`);
         document.documentElement.classList.add("pomodoro-aberto");
         $("pomodoro-notificacao").hidden = true;
         renderizar();
         $("pomodoro-fechar").focus();
+    }
+    acesso.addEventListener("click", abrirPainel);
+    $("pomodoro-restaurar").addEventListener("click", abrirPainel);
+    $("pomodoro-minimizar").addEventListener("click", () => {
+        minimizado = true;
+        painel.close();
+        renderizar();
+        $("pomodoro-restaurar").focus({ preventScroll: true });
     });
     $("pomodoro-fechar").addEventListener("click", () => painel.close());
     painel.addEventListener("close", () => {

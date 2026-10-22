@@ -90,6 +90,23 @@ function ajustarLargura() {
 function mostrarAviso(mensagem = "") {
     avisoProjetosStudio.textContent = mensagem;
     avisoProjetosStudio.hidden = !mensagem;
+    if (!mensagem) document.querySelector("#studio-recuperacao").hidden = true;
+}
+
+function mostrarRecuperacao() {
+    document.querySelector("#studio-recuperacao").hidden = false;
+    document.querySelector("#studio-recuperar-pendente").disabled = !projetoAtivo || !editorStudio || !arquivoEditorAbertoId;
+}
+
+function baixarTexto(nome, texto, tipo = "application/json") {
+    const url = URL.createObjectURL(new Blob([texto], { type: tipo }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = nome;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 function indicarSalvamento(estado) {
@@ -170,6 +187,7 @@ function atualizarListaProjetos() {
         return true;
     } catch (erro) {
         mostrarAviso(erro.message);
+        mostrarRecuperacao();
         return false;
     }
 }
@@ -198,6 +216,7 @@ function salvarProjetoAtual() {
     } catch (erro) {
         indicarSalvamento("erro");
         mostrarAviso(erro.message);
+        mostrarRecuperacao();
         return false;
     }
 }
@@ -507,9 +526,7 @@ listaProjetosStudio.addEventListener("click", async (event) => {
         if (!projeto) throw new Error("O projeto selecionado não foi encontrado.");
         if (acao === "exportar") {
             if (projetoAtivo?.id === id && !salvarProjetoAtual()) return;
-            const url = URL.createObjectURL(new Blob([servicoProjetos.exportarProjeto(id)], { type: "application/json" }));
-            const link = document.createElement("a"); link.href = url; link.download = "taskflow-" + id + ".json";
-            document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+            baixarTexto("taskflow-" + id + ".json", servicoProjetos.exportarProjeto(id));
             mostrarAviso("Backup preparado para download."); return;
         }
         if (acao === "continuar") {
@@ -640,11 +657,21 @@ document.querySelector("#studio-importar-backup").addEventListener("change", asy
     const campo = event.target; const arquivo = campo.files?.[0]; if (!arquivo || !servicoProjetos) return;
     campo.disabled = true;
     try {
-        if (arquivo.size > servicoProjetos.limiteBackupBytes) throw new Error("Selecione um backup de até 2 MiB.");
         const projeto = servicoProjetos.importarProjeto(await arquivo.text());
         atualizarListaProjetos(); mostrarAviso(`Backup restaurado como “${projeto.titulo}”.`);
     } catch (erro) { mostrarAviso(erro.message); }
     finally { campo.disabled = false; campo.value = ""; }
+});
+document.querySelector("#studio-recuperar-catalogo").addEventListener("click", () => {
+    try {
+        baixarTexto("taskflow-catalogo-bruto.txt", servicoProjetos.exportarCatalogoBruto(), "text/plain;charset=utf-8");
+    } catch (erro) { mostrarAviso(erro.message); }
+});
+document.querySelector("#studio-recuperar-pendente").addEventListener("click", () => {
+    try {
+        const texto = servicoProjetos.exportarProjetoPendente(projetoAtivo, arquivoEditorAbertoId, editorStudio?.state.doc.toString());
+        baixarTexto("taskflow-recuperacao-" + projetoAtivo.id + ".json", texto);
+    } catch (erro) { mostrarAviso(erro.message); }
 });
 document.querySelector("#studio-atualizar-previa").addEventListener("click", () => { atualizarPrevia(); previaStudio?.atualizar(); });
 document.querySelector("#studio-previa-automatica").addEventListener("change", event => { previaStudio?.definirAutomatica(event.target.checked); registrarInterface(); });

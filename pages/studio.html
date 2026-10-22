@@ -59,13 +59,18 @@
       <span id="studio-salvamento" role="status" aria-live="polite"></span>
       <time id="studio-ultima-atualizacao" hidden></time>
       <button id="studio-meus-projetos" class="studio-retorno" type="button"><i class="fa-regular fa-folder-open" aria-hidden="true"></i> Meus projetos</button>
-      <button id="studio-salvar-projeto" class="studio-retorno studio-acao-principal" type="button" title="Salvar e retornar a Meus projetos" disabled><i class="fa-regular fa-floppy-disk" aria-hidden="true"></i> Salvar projeto</button>
+      <button id="studio-salvar-projeto" class="studio-retorno studio-acao-principal" type="button" title="Salvar e retornar a Meus projetos" disabled><i class="fa-regular fa-floppy-disk" aria-hidden="true"></i> Salvar e voltar</button>
     </div>
     <a class="studio-retorno" href="../index.html" title="Sair do Laboratório e abrir a página principal">Voltar ao TaskFlow</a>
   </nav>
 
   <main class="studio-conteudo">
     <p id="studio-projetos-aviso" class="studio-projetos-aviso" role="status" hidden></p>
+    <div id="studio-recuperacao" class="studio-ferramentas" hidden>
+      <button id="studio-recuperar-catalogo" type="button">Baixar catálogo bruto</button>
+      <button id="studio-recuperar-pendente" type="button" disabled>Baixar projeto com alterações pendentes</button>
+      <p class="studio-ajuda">Os downloads não alteram os dados salvos. Guarde o catálogo bruto para recuperação manual; ele não é um backup individual restaurável. Se necessário, mantenha esta página aberta.</p>
+    </div>
     <div id="studio-gerenciamento">
       <!-- Projeto — Criação - solicita o título antes de apresentar o ambiente -->
       <section id="studio-inicio" class="studio-inicio" aria-labelledby="titulo-inicio">
@@ -87,7 +92,7 @@
           <span class="studio-etiqueta">CONTINUE DE ONDE PAROU</span>
           <h2 id="titulo-projetos" tabindex="-1">Meus projetos</h2>
           <label class="studio-retorno studio-importacao">Restaurar backup JSON <input id="studio-importar-backup" type="file" disabled accept=".json,application/json"></label>
-          <p class="studio-ajuda">Backup textual: até 2 MiB e 1.000 arquivos/pastas. A restauração cria uma cópia.</p>
+          <p class="studio-ajuda">Backup textual JSON. A restauração cria uma cópia e depende do espaço disponível neste navegador. Arquivos grandes podem demorar.</p>
           <p>Seus projetos ficam neste navegador, prontos para o próximo passo.</p>
         </div>
         <ul id="studio-lista-projetos" class="studio-lista-projetos">

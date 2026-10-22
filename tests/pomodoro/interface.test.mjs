@@ -151,3 +151,49 @@ test("pausa inválida não aplica a configuração ou interrompe a sessão ativa
     assert.equal(a.obter("pomodoro-modalidade").textContent, "Foco");
     assert.equal(a.obter("pomodoro-tempo").textContent, "24:59");
 });
+
+
+test("minimizar mantém o foco contando e restaurar preserva todas as funções do painel original", async () => {
+    const a = await iniciar(); a.clicar("abrir-pomodoro"); a.clicar("pomodoro-iniciar"); a.avancar(60000);
+    a.clicar("pomodoro-minimizar");
+    assert.equal(a.obter("pomodoro-painel").open, false);
+    assert.equal(a.obter("pomodoro-minimizado").hidden, false);
+    assert.equal(a.obter("pomodoro-minimizado-tempo").textContent, "24:00");
+    assert.equal(a.obter("pomodoro-minimizado-modo").textContent, "Foco");
+    a.avancar(1000); assert.equal(a.obter("pomodoro-minimizado-tempo").textContent, "23:59");
+    a.clicar("pomodoro-restaurar");
+    assert.equal(a.obter("pomodoro-painel").open, true);
+    assert.equal(a.obter("pomodoro-minimizado").hidden, true);
+    assert.equal(a.obter("pomodoro-tempo").textContent, "23:59");
+    a.abas[1].disparar("click"); assert.equal(a.obter("pomodoro-tab-relogio").hidden, false);
+    a.abas[2].disparar("click"); assert.equal(a.obter("pomodoro-tab-estatisticas").hidden, false);
+    a.abas[0].disparar("click"); a.modos[3].disparar("click");
+    assert.equal(a.obter("pomodoro-personalizado").hidden, false);
+    assert.equal(a.obter("pomodoro-estudo").value, "00:25");
+    assert.equal(a.obter("pomodoro-pausa").value, "00:05");
+});
+
+for (const [indice, tempo] of [[1, "04:59"], [2, "14:59"]]) test(`pausa ${indice} mantém tempo visível ao minimizar`, async () => {
+    const a = await iniciar(); a.clicar("abrir-pomodoro"); a.modos[indice].disparar("click");
+    a.clicar("pomodoro-iniciar"); a.clicar("pomodoro-minimizar"); a.avancar(1000);
+    assert.equal(a.obter("pomodoro-minimizado-tempo").textContent, tempo);
+    assert.equal(a.obter("pomodoro-minimizado-modo").textContent, indice === 1 ? "Pausa curta" : "Pausa longa");
+    a.clicar("pomodoro-restaurar"); a.clicar("pomodoro-iniciar"); a.clicar("pomodoro-minimizar"); a.avancar(60000);
+    assert.equal(a.obter("pomodoro-minimizado-tempo").textContent, tempo);
+    assert.equal(a.obter("pomodoro-minimizado-status").textContent, "Pausado");
+});
+
+test("descanso personalizado conta somente após iniciar e continua ao minimizar", async () => {
+    const a = await iniciar(); a.clicar("abrir-pomodoro"); a.modos[3].disparar("click");
+    a.obter("pomodoro-estudo").value = "00:01"; a.obter("pomodoro-pausa").value = "00:02";
+    a.obter("pomodoro-personalizado").disparar("submit", { preventDefault() {} });
+    a.clicar("pomodoro-iniciar"); a.clicar("pomodoro-minimizar"); a.avancar(60000);
+    assert.equal(a.obter("pomodoro-minimizado-modo").textContent, "Pausa personalizada");
+    assert.equal(a.obter("pomodoro-minimizado-tempo").textContent, "00:02:00");
+    a.avancar(60000); assert.equal(a.obter("pomodoro-minimizado-tempo").textContent, "00:02:00");
+    a.clicar("pomodoro-restaurar"); assert.equal(a.obter("pomodoro-personalizado").hidden, false);
+    a.clicar("pomodoro-iniciar"); a.clicar("pomodoro-minimizar"); a.avancar(1000);
+    assert.equal(a.obter("pomodoro-minimizado-tempo").textContent, "00:01:59");
+    a.clicar("pomodoro-restaurar"); assert.equal(a.obter("pomodoro-focos").textContent, "1");
+    assert.equal(a.obter("pomodoro-pausas").textContent, "0");
+});

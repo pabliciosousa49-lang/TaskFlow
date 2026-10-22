@@ -71,6 +71,36 @@ test('integração simulada: trocar arquivo grava pendências e falha de gravaç
   assert(a.api.projeto());assert.equal(a.elemento('#studio-salvamento').textContent,'Erro ao salvar');assert.equal(a.view.state.doc.toString(),'console.log(2);');
   localStorage.setItem=gravar;assert.equal(a.api.salvarProjetoAtual(),true);a.api.mostrarGerenciamento();assert.equal(a.api.projeto(),null);
 });
+
+test('recuperacao na interface: falha oferece download pendente sem gravar, sair ou perder codigo', async()=>{
+  const a=ambiente(); const {p,html}=projetoTeste(); await a.api.abrirProjeto(p.id);
+  const salvo=localStorage.getItem('taskflow.studio.projetos.v1');
+  a.view.dispatch({changes:{from:0,to:a.view.state.doc.length,insert:'<p>pendente 😀</p>'}});
+  localStorage.setItem=()=>{throw new Error('quota')};
+  assert.equal(a.api.salvarProjetoAtual(),false);
+  assert.equal(a.elemento('#studio-recuperacao').hidden,false);
+  assert.equal(a.elemento('#studio-recuperar-pendente').disabled,false);
+  vm.runInContext('baixarTexto=(nome,texto,tipo)=>{globalThis.downloadTeste={nome,texto,tipo}}',a.ctx);
+  a.elemento('#studio-recuperar-pendente').events.click[0]();
+  const backup=JSON.parse(a.ctx.downloadTeste.texto);
+  assert.equal(backup.projeto.arquivos.find(f=>f.id===html.id).conteudo,'<p>pendente 😀</p>');
+  assert.equal(localStorage.getItem('taskflow.studio.projetos.v1'),salvo);
+  assert.equal(a.api.mostrarGerenciamento(),false);
+  assert.equal(a.view.state.doc.toString(),'<p>pendente 😀</p>');
+  assert.equal(a.elemento('#studio-ambiente').hidden,false);
+});
+
+test('recuperacao na interface: catalogo invalido fica disponivel para download exato', async()=>{
+  const a=ambiente();
+  localStorage.setItem('taskflow.studio.projetos.v1','{ catalogo invalido');
+  vm.runInContext('atualizarListaProjetos(); baixarTexto=(nome,texto,tipo)=>{globalThis.downloadTeste={nome,texto,tipo}}',a.ctx);
+  assert.equal(a.elemento('#studio-recuperacao').hidden,false);
+  assert.equal(a.elemento('#studio-recuperar-pendente').disabled,true);
+  a.elemento('#studio-recuperar-catalogo').events.click[0]();
+  assert.equal(a.ctx.downloadTeste.texto,'{ catalogo invalido');
+  assert.equal(a.ctx.downloadTeste.tipo,'text/plain;charset=utf-8');
+  assert.equal(localStorage.getItem('taskflow.studio.projetos.v1'),'{ catalogo invalido');
+});
 test('integração simulada: fechar todas as abas é restaurado sem criar documentos',async()=>{
   const a=ambiente();const{p}=projetoTeste();await a.api.abrirProjeto(p.id);
   for(const id of [...a.api.abas()])a.api.fecharArquivo(id);
