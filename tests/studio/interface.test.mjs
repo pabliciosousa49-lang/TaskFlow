@@ -223,7 +223,7 @@ test('Meus projetos identifica o último aberto, preserva conteúdo ao renomear 
   assert(card); assert.equal(card.children[0].textContent,'Interface');
   assert.equal(card.children.at(-1).textContent,'Último projeto aberto');
   assert(card.children[1].textContent.startsWith('Atualizado em '));
-  assert.deepEqual(card.children[2].children.map(b=>b.dataset.acao),['continuar','exportar','renomear','excluir']);
+  assert.deepEqual(card.children[2].children.map(b=>b.dataset.acao),['continuar','exportar','exportar-zip','renomear','excluir']);
   const acao=async nome=>lista.events.click[0]({target:{closest:()=>({dataset:{acao:nome,id:p.id}})}});
   const antes=servico.buscarProjeto(p.id).arquivos;
   a.ctx.window.prompt=()=> 'Renomeado'; await acao('renomear');

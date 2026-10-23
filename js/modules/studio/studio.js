@@ -165,7 +165,7 @@ function atualizarListaProjetos() {
             data.textContent = `Atualizado em ${new Date(projeto.atualizadoEm).toLocaleString("pt-BR")}`;
             const acoes = document.createElement("div");
             acoes.className = "studio-lista-acoes";
-            for (const [acao, texto] of [["continuar", "Abrir projeto"], ["exportar", "Exportar backup"], ["renomear", "Renomear"], ["excluir", "Excluir"]]) {
+            for (const [acao, texto] of [["continuar", "Abrir projeto"], ["exportar", "Exportar backup"], ["exportar-zip", "Exportar ZIP"], ["renomear", "Renomear"], ["excluir", "Excluir"]]) {
                 const botao = document.createElement("button");
                 botao.type = "button";
                 botao.className = "studio-retorno";
@@ -529,6 +529,17 @@ listaProjetosStudio.addEventListener("click", async (event) => {
             baixarTexto("taskflow-" + id + ".json", servicoProjetos.exportarProjeto(id));
             mostrarAviso("Backup preparado para download."); return;
         }
+        if (acao === "exportar-zip") {
+            if (projetoAtivo?.id === id && !salvarProjetoAtual()) return;
+            botao.disabled = true;
+            try {
+                const { exportarProjetoZIP } = await import("../../services/projetos-zip.js");
+                const nome = projeto.titulo.replace(/[<>:"/\\|?*\x00-\x1f]/g, "-").replace(/[. ]+$/g, "") || "projeto";
+                baixarTexto("taskflow-" + nome + ".zip", exportarProjetoZIP(id), "application/zip");
+                mostrarAviso("ZIP preparado com os arquivos originais do projeto.");
+            } finally { botao.disabled = false; }
+            return;
+        }
         if (acao === "continuar") {
             await abrirProjeto(id);
             return;
@@ -645,6 +656,7 @@ async function iniciarStudio() {
         }
         botaoCriarStudio.disabled = false;
         document.querySelector("#studio-importar-backup").disabled = false;
+        document.querySelector("#studio-importar-zip").disabled = false;
         let id;
         try { id = sessionStorage.getItem(chaveProjetoAtivo); } catch { /* Sessão opcional. */ }
         if (id && servicoProjetos.buscarProjeto(id)) await abrirProjeto(id);
@@ -659,6 +671,19 @@ document.querySelector("#studio-importar-backup").addEventListener("change", asy
     try {
         const projeto = servicoProjetos.importarProjeto(await arquivo.text());
         atualizarListaProjetos(); mostrarAviso(`Backup restaurado como “${projeto.titulo}”.`);
+    } catch (erro) { mostrarAviso(erro.message); }
+    finally { campo.disabled = false; campo.value = ""; }
+});
+
+document.querySelector("#studio-importar-zip").addEventListener("change", async event => {
+    const campo = event.target, arquivo = campo.files?.[0]; if (!arquivo || !servicoProjetos) return;
+    campo.disabled = true;
+    try {
+        const { importarProjetoZIP, limitesZIP } = await import("../../services/projetos-zip.js");
+        if (arquivo.size > limitesZIP.compactado) throw new Error("Selecione um ZIP de até 5 MiB.");
+        mostrarAviso("Importando ZIP…");
+        const projeto = importarProjetoZIP(new Uint8Array(await arquivo.arrayBuffer()), arquivo.name);
+        atualizarListaProjetos(); mostrarAviso(`ZIP importado como “${projeto.titulo}”. Nenhum projeto existente foi substituído.`);
     } catch (erro) { mostrarAviso(erro.message); }
     finally { campo.disabled = false; campo.value = ""; }
 });
