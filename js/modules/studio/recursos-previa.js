@@ -44,6 +44,59 @@ function aplicarAlteracoes(codigo, alteracoes) {
     return codigo;
 }
 
+// Adapta somente acessos diretos ao window global; o código do projeto não é alterado.
+function adaptarNavegacao(codigo, arvore, alteracoes, diagnosticos, caminho) {
+    const nos = [];
+    const cursor = arvore.cursor();
+    do { nos.push(cursor.node); } while (cursor.next());
+    // Escopos dinâmicos não permitem identificar window com segurança estaticamente.
+    if (nos.some(no => no.type.isError || no.name === "WithStatement" ||
+        (no.name === "CallExpression" && no.firstChild?.name === "VariableName" &&
+            codigo.slice(no.firstChild.from, no.firstChild.to) === "eval"))) {
+        diagnosticos.push(`${caminho}: navegação JavaScript não adaptada em código com erro sintático, with ou eval direto.`);
+        return;
+    }
+    const funcoes = new Set(["FunctionDeclaration", "FunctionExpression", "ArrowFunction", "MethodDeclaration"]);
+    const escopos = new Set(["Script", "Block", "CatchClause", "ForStatement", "ForInStatement", ...funcoes]);
+    const sombras = nos.filter(no => no.name === "VariableDefinition" && textoLiteral('"' + codigo.slice(no.from, no.to) + '"') === "window").map(no => {
+        let pai = no.parent, declaracao = pai;
+        while (declaracao && !escopos.has(declaracao.name) && declaracao.name !== "VariableDeclaration") declaracao = declaracao.parent;
+        const varHoist = declaracao?.name === "VariableDeclaration" && declaracao.firstChild?.name === "var";
+        // Nomes de declarações de função pertencem também ao escopo que as contém.
+        if (funcoes.has(pai?.name) && pai.name !== "ArrowFunction") pai = pai.parent;
+        while (pai && !(varHoist ? funcoes.has(pai.name) || pai.name === "Script" : escopos.has(pai.name))) pai = pai.parent;
+        return pai || arvore.topNode;
+    });
+    function propriedade(no, nome) {
+        return no?.name === "MemberExpression" && no.firstChild?.nextSibling?.name === "." &&
+            no.lastChild?.name === "PropertyName" && codigo.slice(no.lastChild.from, no.lastChild.to) === nome;
+    }
+    function localizacao(no) {
+        if (!propriedade(no, "location")) return false;
+        const base = no.firstChild;
+        return base.name === "VariableName" && codigo.slice(base.from, base.to) === "window" &&
+            !sombras.some(escopo => escopo.from <= base.from && escopo.to >= base.to);
+    }
+    for (const no of nos) {
+        if (no.name === "AssignmentExpression" && propriedade(no.firstChild, "href") &&
+            localizacao(no.firstChild.firstChild) && no.firstChild.nextSibling?.name === "Equals") {
+            const membro = no.firstChild;
+            alteracoes.push({ from: membro.firstChild.lastChild.from, to: membro.firstChild.lastChild.to, texto: "TaskFlow" });
+            alteracoes.push({ from: membro.lastChild.from, to: membro.lastChild.to, texto: "definirDestino" });
+            alteracoes.push({ from: membro.nextSibling.from, to: membro.nextSibling.to, texto: "(" });
+            alteracoes.push({ from: no.to, to: no.to, texto: ")" });
+        } else if (no.name === "CallExpression") {
+            const membro = no.firstChild;
+            if (!localizacao(membro?.firstChild)) continue;
+            const metodo = propriedade(membro, "assign") ? "atribuirDestino" : propriedade(membro, "replace") ? "substituirDestino" : "";
+            if (metodo) {
+                alteracoes.push({ from: membro.firstChild.lastChild.from, to: membro.firstChild.lastChild.to, texto: "TaskFlow" });
+                alteracoes.push({ from: membro.lastChild.from, to: membro.lastChild.to, texto: metodo });
+            }
+        }
+    }
+}
+
 // Recursos — Montagem - interpreta sintaxe com os parsers que o editor já utiliza.
 export function criarRecursosPrevia(arquivos, diagnosticos) {
     const imports = {};
@@ -107,7 +160,9 @@ export function criarRecursosPrevia(arquivos, diagnosticos) {
         if (visitados.has(chave)) return chave;
         visitados.add(chave);
         const alteracoes = [];
-        const cursor = parserJavaScript.parse(codigo).cursor();
+        const arvore = parserJavaScript.parse(codigo);
+        adaptarNavegacao(codigo, arvore, alteracoes, diagnosticos, caminho);
+        const cursor = arvore.cursor();
         do {
             const node = cursor.node;
             if (node.name === "DynamicImport" && !node.getChild("String")) {

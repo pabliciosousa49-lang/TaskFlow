@@ -78,6 +78,246 @@ async function carregar() {
     return { api: modulo.namespace, recursos, contexto, eventos };
 }
 
+test("regressão: submit respeita handlers do document, GET e bloqueio POST", () => {
+    const documento = {}, janela = {}, mensagens = [];
+    class DadosFormulario {
+        constructor(form) { this.valores = [...form.valores]; }
+        append(nome, valor) { this.valores.push([nome, valor]); }
+        [Symbol.iterator]() { return this.valores[Symbol.iterator](); }
+    }
+    const contexto = vm.createContext({
+        parent: { postMessage: msg => mensagens.push(msg) },
+        window: { addEventListener: (tipo, fn) => janela[tipo] = fn },
+        document: { addEventListener: (tipo, fn) => documento[tipo] = fn },
+        FormData: DadosFormulario, URLSearchParams, console: { ...console }
+    });
+    vm.runInContext(codigoNavegacaoPrevia("canal", "pages/login.html"), contexto);
+    assert.equal(documento.submit, undefined, "a ponte não antecipa handlers delegados no document");
+    assert.equal(typeof janela.submit, "function");
+    const form = { dataset: { taskflowAction: "./dash.html#inicio" }, valores: [["email", "teste@example.com"]], getAttribute: () => "get" };
+    const evento = () => ({ target: form, defaultPrevented: false,
+        submitter: { name: "acao", value: "entrar" }, preventDefault() { this.defaultPrevented = true; } });
+    documento.submit = event => { event.preventDefault(); contexto.window.TaskFlow.definirDestino("./dash.html"); };
+    const cancelado = evento(); documento.submit(cancelado); janela.submit(cancelado);
+    assert.equal(mensagens.length, 1, "preventDefault não cria uma segunda navegação automática");
+    assert.equal(mensagens[0].referencia, "./dash.html");
+    const padrao = evento(); janela.submit(padrao);
+    assert(padrao.defaultPrevented);
+    assert.equal(mensagens[1].referencia, "./dash.html?email=teste%40example.com&acao=entrar#inicio");
+    form.getAttribute = () => "post";
+    janela.submit(evento());
+    assert.equal(mensagens[2].tipo, "erro");
+    assert(mensagens[2].referencia.includes("POST"));
+});
+
+test("regressão: formulários conservam CSP de envio e demais restrições", async () => {
+    const pagina = readFileSync(new URL("../../pages/studio.html", import.meta.url), "utf8");
+    const sandbox = pagina.match(/<iframe[^>]*id="studio-previa-iframe"[^>]*sandbox="([^"]+)"/)[1];
+    assert.equal(sandbox, "allow-scripts allow-forms");
+    const { api } = await carregar();
+    const { documento } = api.montarDocumentoPrevia('<form action="https://externo.test" method="post"><input type="email" required><button type="submit">Entrar</button></form>');
+    assert(documento.includes("form-action 'none'"));
+    assert(documento.includes("connect-src 'none'"));
+    assert(documento.includes("frame-src 'none'"));
+    assert(documento.includes("base-uri 'none'"));
+    assert(documento.includes('type="email" required=""'));
+    assert(documento.includes('type="submit"'));
+    assert(!documento.includes('<form action="https://externo.test"'));
+});
+
+async function executarNavegacao(codigo, extras = {}) {
+    const { recursos } = await carregar();
+    const diagnosticos = [], mensagens = [], handlers = {};
+    const montagem = recursos.criarRecursosPrevia(extras.arquivos || [], diagnosticos);
+    const chave = montagem.modulo(codigo, "js/script.js");
+    const contexto = vm.createContext({ ...extras.globais, parent: { postMessage: msg => mensagens.push(msg) },
+        document: extras.document || { addEventListener: (tipo, fn) => handlers[tipo] = fn },
+        console: { ...console }, URLSearchParams, FormData });
+    contexto.window = contexto;
+    contexto.addEventListener = () => {};
+    vm.runInContext(codigoNavegacaoPrevia("canal", "pages/index.html"), contexto);
+    const modulos = new Map();
+    function get(key) {
+        if (!modulos.has(key)) modulos.set(key, new vm.SourceTextModule(decode(montagem.imports[key]), { context: contexto, identifier: key }));
+        return modulos.get(key);
+    }
+    if (extras.modulo) { const principal = get(chave); await principal.link(get); await principal.evaluate(); }
+    else vm.runInContext(decode(montagem.imports[chave]), contexto);
+    return { mensagens, contexto, diagnosticos, transformado: decode(montagem.imports[chave]), montagem };
+}
+
+for (const [codigo, tipo] of [
+    ['window.location.href = "./dash.html";', "navegar"],
+    ['window.location.assign("./pasta/dash.html?origem=login#inicio");', "navegar"],
+    ['window.location.replace("../dash.html");', "substituir"]
+]) {
+    test("navegação JavaScript convencional: " + codigo, async () => {
+        const resultado = await executarNavegacao(codigo);
+        assert.equal(resultado.mensagens.length, 1);
+        assert.equal(resultado.mensagens[0].tipo, tipo);
+        assert.equal(resultado.mensagens[0].referencia, codigo.match(/"([^"]+)"/)[1]);
+        assert.equal(resultado.diagnosticos.length, 0);
+    });
+}
+
+test("navegação: expressões executam uma vez, na ordem e preservam valores de retorno", async () => {
+    const { contexto, mensagens } = await executarNavegacao(`
+        let chamadas = 0;
+        const proximo = () => (++chamadas, "./dash.html");
+        const objeto = { toString() { chamadas++; return "/dash.html"; } };
+        window.resultado = window.location.href = objeto;
+        window.atribuido = window.location.assign(proximo(), chamadas++);
+        window.substituido = window.location.replace(proximo());
+        window.contador = chamadas;
+        window.mesmoObjeto = window.resultado === objeto;
+    `);
+    assert.equal(contexto.contador, 4);
+    assert.equal(contexto.mesmoObjeto, true);
+    assert.equal(contexto.atribuido, undefined);
+    assert.equal(contexto.substituido, undefined);
+    assert.deepEqual(mensagens.map(m => m.referencia), ["/dash.html", "./dash.html", "./dash.html"]);
+});
+
+test("navegação: strings, comentários, nomes semelhantes e window local são preservados", async () => {
+    const codigo = `
+        const texto = 'window.location.href = "fake.html"';
+        // window.location.assign("fake.html");
+        const outro = { location: { href: "" } }; outro.location.href = "local";
+        function teste(window) { window.location.href = "parametro"; }
+        teste(outro);
+        { const window = outro; window.location.href = "bloco"; }
+        function comVar() { window.location.href = "var"; var window = outro; }
+        function destruturado({ window }) { window.location.replace("local"); }
+        window.location.assign("./dash.html");
+    `;
+    const { mensagens, transformado } = await executarNavegacao(codigo);
+    assert.equal(mensagens.length, 1);
+    assert.equal(mensagens[0].referencia, "./dash.html");
+    assert(transformado.includes(`const texto = 'window.location.href = "fake.html"'`));
+    assert(transformado.includes('// window.location.assign("fake.html");'));
+    assert(transformado.includes('window.location.href = "parametro"'));
+    assert(transformado.includes('window.location.href = "bloco"'));
+    assert(transformado.includes('window.location.href = "var"'));
+    assert(transformado.includes('window.location.replace("local")'));
+});
+
+for (const fonte of [
+    'import window from "./local.js"; window.location.href = "local";',
+    'const { window } = local; window.location.assign("local");',
+    'try {} catch(window) { window.location.replace("local"); }',
+    'const f = window => window.location.assign("local");',
+    'const \\u0077indow = local; window.location.assign("local");',
+    'import { window } from "./local.js"; window.location.replace("local");'
+]) {
+    test("navegação: bindings locais não são reescritos: " + fonte, async () => {
+        const { recursos } = await carregar();
+        const montagem = recursos.criarRecursosPrevia([], []);
+        const chave = montagem.modulo(fonte, "script.js");
+        assert(!decode(montagem.imports[chave]).includes("window.TaskFlow"));
+    });
+}
+
+test("navegação: comentários e imports dentro de expressões permanecem válidos", async () => {
+    const { contexto, mensagens, transformado } = await executarNavegacao(`
+        let contador = 0;
+        window.retorno = window.location.href = /* destino calculado */ (++contador, "./dash.html");
+        window.location.assign(/* manter comentário */ "../index.html");
+        window.vezes = contador;
+    `);
+    assert.equal(contexto.vezes, 1);
+    assert.equal(contexto.retorno, "./dash.html");
+    assert.equal(mensagens.length, 2);
+    assert(transformado.includes("/* destino calculado */"));
+    assert(transformado.includes("/* manter comentário */"));
+    const { recursos } = await carregar();
+    const montagem = recursos.criarRecursosPrevia([
+        { tipo: "arquivo", caminho: "js/destino.js", conteudo: 'export const destino="./dash.html";' }
+    ], []);
+    const codigo = decode(montagem.imports[montagem.modulo('window.location.href = (await import("./destino.js")).destino;', "js/script.js")]);
+    assert(codigo.includes('import("taskflow:/js/destino.js")'));
+    assert(codigo.includes('window.TaskFlow.definirDestino'));
+    assert.doesNotThrow(() => new vm.SourceTextModule(codigo));
+});
+
+test("navegação: formas ambíguas ficam intactas e escopos dinâmicos são diagnosticados", async () => {
+    const { recursos } = await carregar();
+    for (const fonte of ['eval("var window"); window.location.href = "a.html";',
+        'with (obj) { window.location.assign("a.html"); }', 'window.location.href = ;']) {
+        const diagnosticos = [], montagem = recursos.criarRecursosPrevia([], diagnosticos);
+        const chave = montagem.modulo(fonte, "script.js");
+        assert.equal(decode(montagem.imports[chave]), fonte);
+        assert(diagnosticos.some(m => m.includes("não adaptada")));
+    }
+    const fonte = 'const loc = window.location; loc.assign("a.html"); window["location"].href="a.html";';
+    const montagem = recursos.criarRecursosPrevia([], []);
+    assert.equal(decode(montagem.imports[montagem.modulo(fonte, "script.js")]), fonte);
+});
+
+test("navegação: módulos e imports relativos preservam identidade e usam a ponte", async () => {
+    const locais = [{ tipo: "arquivo", caminho: "js/destino.js", conteudo: 'export const destino = "../dash.html?q=1#titulo";' }];
+    const { mensagens, diagnosticos, montagem } = await executarNavegacao(
+        'import { destino } from "./destino.js"; window.location.href = destino;', { modulo: true, arquivos: locais });
+    assert.equal(mensagens[0].referencia, "../dash.html?q=1#titulo");
+    assert.equal(diagnosticos.length, 0);
+    assert(montagem.imports["taskflow:/js/destino.js"]);
+});
+
+test("navegação: login por submit e click mantêm listeners e preventDefault", async () => {
+    const listeners = {};
+    const document = { addEventListener() {}, querySelector: () => ({ addEventListener: (tipo, fn) => listeners[tipo] = fn }) };
+    const { mensagens } = await executarNavegacao(`
+        const formulario = document.querySelector("#loginForm");
+        formulario.addEventListener("submit", event => { event.preventDefault(); window.location.href = "./dash.html"; });
+        formulario.addEventListener("click", () => window.location.assign("/dash.html"));
+    `, { document });
+    let cancelado = false;
+    listeners.submit({ preventDefault() { cancelado = true; } }); listeners.click();
+    assert(cancelado);
+    assert.deepEqual(mensagens.map(m => m.referencia), ["./dash.html", "/dash.html"]);
+});
+
+test("navegação: histórico distingue assign e replace, valida destinos e isola projetos", async () => {
+    const { api, contexto, eventos } = await carregar();
+    const frame = new Elemento("iframe"); frame.contentWindow = {};
+    const painel = new Elemento("div"); let estado;
+    const previa = api.criarPreviaHTML(frame, new Elemento("div"), painel, { aoEstado: valor => estado = valor });
+    const locais = [
+        { tipo: "arquivo", caminho: "index.html", conteudo: "<h1>Início</h1>" },
+        { tipo: "arquivo", caminho: "pages/login.html", conteudo: "<h1>Login</h1>" },
+        { tipo: "arquivo", caminho: "pages/dash.html", conteudo: '<h1>Dashboard</h1><link rel="stylesheet" href="../style.css"><script src="../script.js" defer></script>' },
+        { tipo: "arquivo", caminho: "style.css", conteudo: "h1{color:cyan}" },
+        { tipo: "arquivo", caminho: "script.js", conteudo: "window.carregado = true;" }
+    ];
+    const originais = JSON.stringify(locais);
+    previa.agendar(locais[0].conteudo, locais, "index.html", "p"); contexto.timer();
+    function mensagem(tipo, referencia, extra = {}) {
+        eventos.get("message")({ source: frame.contentWindow, origin: "null", data: {
+            tipo, referencia, canal: frame.srcdoc.match(/nonce-([^']+)/)[1], ...extra
+        } });
+    }
+    mensagem("navegar", "./pages/login.html");
+    mensagem("substituir", "./dash.html?q=1#titulo");
+    assert.equal(estado.caminho, "/pages/dash.html?q=1#titulo");
+    assert(frame.srcdoc.includes("h1{color:cyan}"));
+    assert([...frame.srcdoc.matchAll(/src="(data:text\/javascript[^\"]+)"/g)].some(m => decode(m[1]).includes("window.carregado = true")));
+    mensagem("voltar"); assert.equal(estado.caminho, "/index.html");
+    mensagem("navegar", "/pages/login.html");
+    mensagem("navegar", "./dash.html");
+    mensagem("voltar"); assert.equal(estado.caminho, "/pages/login.html");
+    mensagem("navegar", "../index.html"); assert.equal(estado.caminho, "/index.html");
+    const antes = frame.srcdoc;
+    for (const referencia of ["https://externo.test/a.html", "//externo.test/a.html", "../fora.html", "/inexistente.html", "/style.css", "javascript:alert(1)"]) {
+        mensagem("substituir", referencia); assert.equal(frame.srcdoc, antes);
+    }
+    mensagem("substituir", 42); assert.equal(frame.srcdoc, antes);
+    mensagem("substituir", "/pages/dash.html", { canal: "invalido" }); assert.equal(frame.srcdoc, antes);
+    previa.agendar(locais[0].conteudo, locais, "index.html", "outro"); contexto.timer();
+    mensagem("voltar"); assert.equal(estado.caminho, "/index.html");
+    assert.equal(JSON.stringify(locais), originais);
+    assert.equal(frame.getAttribute("sandbox"), "allow-scripts allow-forms");
+    assert(frame.srcdoc.includes("connect-src 'none'"));
+});
+
 test("recursos: CSS, SVG, imports, comentários, ciclos e diagnósticos", async () => {
     const { recursos } = await carregar();
     const erros = [];
@@ -193,7 +433,7 @@ test("regressão: limpar e reescrever HTML recupera prévia manual, CSS/JS relat
     const editados = itens.map(item => item.caminho === "css/style.css" ? { ...item, conteudo: "h1{color:cyan}" } : item);
     previa.agendar(html, editados, "pages/index.html", "projeto"); previa.atualizar();
     assert(frame.srcdoc.includes("h1{color:cyan}"));
-    assert.equal(frame.getAttribute("sandbox"), "allow-scripts");
+    assert.equal(frame.getAttribute("sandbox"), "allow-scripts allow-forms");
     assert(frame.srcdoc.includes("connect-src 'none'"));
     const reaberto = new Elemento("iframe");
     const outraPrevia = api.criarPreviaHTML(reaberto, new Elemento("div"), null);
@@ -208,7 +448,7 @@ test("navegação simulada: origem, canal, histórico, atualização e erros", a
     const painel = new Elemento("div"), vazia = new Elemento("div");
     const previa = api.criarPreviaHTML(frame, vazia, painel);
     previa.agendar(arquivos[0].conteudo, arquivos, "index.html", "projeto"); contexto.timer();
-    assert.equal(frame.getAttribute("sandbox"), "allow-scripts");
+    assert.equal(frame.getAttribute("sandbox"), "allow-scripts allow-forms");
     function canal() { return frame.srcdoc.match(/nonce-([^']+)/)[1]; }
     function mensagem(tipo, referencia, extra = {}) {
         eventos.get("message")({ source: frame.contentWindow, origin: "null", data: { tipo, referencia, canal: canal() }, ...extra });
@@ -237,7 +477,7 @@ test("ponte: API explícita, clique e respeito a submit já cancelado", () => {
     const contexto = vm.createContext({ parent: { postMessage: msg => enviados.push(msg) }, window: {},
         document: { addEventListener: (tipo, fn) => handlers[tipo] = fn },
         URLSearchParams, FormData, console: { ...console } });
-    contexto.window.addEventListener = () => {};
+    contexto.window.addEventListener = (tipo, fn) => { if (tipo === "submit") handlers.submit = fn; };
     vm.runInContext(codigoNavegacaoPrevia("canal", "pages/login.html?usuario=1#titulo"), contexto);
     contexto.window.TaskFlow.navegar("./dashboard.html");
     assert.equal(enviados[0].referencia, "./dashboard.html");

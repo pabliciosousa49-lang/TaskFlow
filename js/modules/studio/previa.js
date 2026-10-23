@@ -147,7 +147,8 @@ export function prepararDocumentoPrevia(codigo) {
 export function criarPreviaHTML(iframe, mensagemVazia, painelDiagnosticos, { aoEstado = () => {}, aoMensagem = () => {} } = {}) {
     let temporizador, ultimaAssinatura = "", assinaturaPedida = "", canal = "", arquivosAtuais = [], entrada = "", projeto = "";
     let historico = [], indice = -1, diagnosticos = [], fontes = new Map(), pendencia, automatica = true, recebidas = 0;
-    iframe.setAttribute("sandbox", "allow-scripts");
+    // Habilita validação e submit nativos; form-action 'none' continua impedindo envios de rede.
+    iframe.setAttribute("sandbox", "allow-scripts allow-forms");
     function mostrarDiagnosticos() {
         if (!painelDiagnosticos) return;
         diagnosticos = diagnosticos.slice(-100);
@@ -194,7 +195,7 @@ export function criarPreviaHTML(iframe, mensagemVazia, painelDiagnosticos, { aoE
             const coluna = Number.isSafeInteger(dados.coluna) && dados.coluna > 0 && dados.coluna < 10000000 ? dados.coluna : undefined;
             aoMensagem({ nivel: dados.nivel, texto: dados.texto, caminho, linha, coluna }); return;
         }
-        if (!["navegar", "voltar", "erro"].includes(dados.tipo)) return;
+        if (!["navegar", "substituir", "voltar", "erro"].includes(dados.tipo)) return;
         if (dados.tipo === "voltar") {
             if (indice > 0) { indice--; clearTimeout(temporizador); renderizar(); } return;
         }
@@ -207,7 +208,8 @@ export function criarPreviaHTML(iframe, mensagemVazia, painelDiagnosticos, { aoE
             const destino = resolverReferenciaVirtual(dados.referencia, atual.caminho);
             const arquivo = resolverArquivoVirtual(arquivosAtuais, dados.referencia, atual.caminho);
             if (!/\.html?$/i.test(arquivo.caminho)) throw new Error("A navegação deve apontar para um arquivo HTML.");
-            historico = historico.slice(0, indice + 1); historico.push(destino); indice++;
+            if (dados.tipo === "substituir") historico[indice] = destino;
+            else { historico = historico.slice(0, indice + 1); historico.push(destino); indice++; }
             clearTimeout(temporizador); renderizar();
         } catch (erro) { diagnosticos.push(erro.message); mostrarDiagnosticos(); }
     }

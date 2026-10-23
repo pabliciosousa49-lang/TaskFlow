@@ -2,6 +2,10 @@
 export function codigoNavegacaoPrevia(canal, caminho) {
     return `(() => {
         const enviar = (tipo, referencia) => parent.postMessage({ tipo, referencia, canal: ${JSON.stringify(canal)} }, "*");
+        function destino(referencia, substituir, quantidade) {
+            if (!quantidade) throw new TypeError("A navegação requer um destino.");
+            enviar(substituir ? "substituir" : "navegar", String(referencia));
+        }
         // Console — Transporte - texto limitado, sem executar comandos ou ler o DOM do pai.
         let mensagens = 0;
         function resumir(valor, profundidade = 0, vistos = new WeakSet()) {
@@ -31,6 +35,9 @@ export function codigoNavegacaoPrevia(canal, caminho) {
         }
         Object.defineProperty(window, "TaskFlow", { value: Object.freeze({
             navegar: referencia => enviar("navegar", String(referencia)),
+            definirDestino: referencia => { destino(referencia, false, 1); return referencia; },
+            atribuirDestino: function (referencia) { destino(referencia, false, arguments.length); },
+            substituirDestino: function (referencia) { destino(referencia, true, arguments.length); },
             voltar: () => enviar("voltar"),
             caminho: ${JSON.stringify(caminho.split(/[?#]/)[0])},
             consulta: ${JSON.stringify((caminho.match(/\?[^#]*/) || [""])[0])},
@@ -42,7 +49,9 @@ export function codigoNavegacaoPrevia(canal, caminho) {
             event.preventDefault();
             enviar("navegar", link.dataset.taskflowDestino);
         });
-        document.addEventListener("submit", event => {
+        // A propagação pelo window ocorre depois dos handlers do formulário e do document.
+        // Mesmo se um handler interromper a propagação, a CSP bloqueia o envio nativo.
+        window.addEventListener("submit", event => {
             if (event.defaultPrevented) return;
             event.preventDefault();
             if (event.target.dataset.taskflowAction) {
