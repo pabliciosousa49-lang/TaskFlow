@@ -29,6 +29,26 @@ let projetoEditorAbertoId = null;
 let trocandoDocumento = false;
 let abasStudio;
 let sessaoStudio, ferramentasStudio, consoleStudio, temporizadorSessao;
+let servicoMiniaturas, capturaMiniaturas, miniaturaEmAndamento = false, geracaoMiniaturas = 0;
+const urlsMiniaturas = new Set();
+
+async function preencherMiniatura(container, projeto, geracao) {
+    if (!servicoMiniaturas) return;
+    try {
+        const registro = await servicoMiniaturas.lerMiniatura(projeto.id);
+        if (!registro || geracao !== geracaoMiniaturas || !container.isConnected) return;
+        const url = URL.createObjectURL(registro.blob), imagem = document.createElement("img");
+        urlsMiniaturas.add(url);
+        imagem.alt = `Miniatura do projeto ${projeto.titulo}`;
+        imagem.onload = () => {
+            if (geracao === geracaoMiniaturas && container.isConnected) {
+                container.replaceChildren(imagem); container.setAttribute("aria-hidden", "false");
+            }
+        };
+        imagem.onerror = () => { URL.revokeObjectURL(url); urlsMiniaturas.delete(url); };
+        imagem.src = url;
+    } catch { /* A imagem é opcional; a listagem e os projetos continuam disponíveis. */ }
+}
 
 // A recepção e Meus projetos compartilham a mesma tela. Só transições reais
 // entram neste histórico local; arquivos e edição ficam na sessão existente.
@@ -149,6 +169,9 @@ function registrarProjetoAtivo(id) {
 function atualizarListaProjetos() {
     try {
         const projetos = servicoProjetos.listarProjetos();
+        const geracao = ++geracaoMiniaturas;
+        for (const url of urlsMiniaturas) URL.revokeObjectURL(url);
+        urlsMiniaturas.clear();
         listaProjetosStudio.replaceChildren();
         if (!projetos.length) {
             const vazio = document.createElement("li");
@@ -157,6 +180,7 @@ function atualizarListaProjetos() {
         }
         for (const projeto of projetos) {
             const item = document.createElement("li");
+            item.className = "studio-projeto-card";
             item.dataset.aberto = String(projeto.id === (projetoAtivo?.id || ultimoProjetoAbertoId));
             const titulo = document.createElement("strong");
             titulo.textContent = projeto.titulo;
@@ -175,7 +199,14 @@ function atualizarListaProjetos() {
                 botao.setAttribute("aria-label", `${texto} projeto ${projeto.titulo}`);
                 acoes.append(botao);
             }
-            item.append(titulo, data, acoes);
+            const miniatura = document.createElement("div");
+            miniatura.className = "studio-projeto-miniatura";
+            miniatura.setAttribute("aria-hidden", "true");
+            miniatura.textContent = "</>";
+            const tipo = document.createElement("span");
+            tipo.className = "studio-projeto-tipo";
+            tipo.textContent = "PROJETO WEB";
+            item.append(titulo, data, acoes, miniatura, tipo);
             if (item.dataset.aberto === "true") {
                 const indicador = document.createElement("span");
                 indicador.className = "studio-projeto-aberto";
@@ -183,6 +214,7 @@ function atualizarListaProjetos() {
                 item.append(indicador);
             }
             listaProjetosStudio.append(item);
+            preencherMiniatura(miniatura, projeto, geracao);
         }
         return true;
     } catch (erro) {
@@ -551,6 +583,8 @@ listaProjetosStudio.addEventListener("click", async (event) => {
         } else if (acao === "excluir") {
             if (!window.confirm(`Excluir o projeto “${projeto.titulo}”? Esta ação não pode ser desfeita.`)) return;
             servicoProjetos.excluirProjeto(id);
+            try { await servicoMiniaturas?.excluirMiniatura(id); }
+            catch { mostrarAviso("Projeto excluído. A miniatura local não pôde ser removida."); atualizarListaProjetos(); return; }
         }
         mostrarAviso();
         atualizarListaProjetos();
@@ -657,6 +691,16 @@ async function iniciarStudio() {
         botaoCriarStudio.disabled = false;
         document.querySelector("#studio-importar-backup").disabled = false;
         document.querySelector("#studio-importar-zip").disabled = false;
+        try {
+            [servicoMiniaturas, capturaMiniaturas] = await Promise.all([
+                import("../../services/miniaturas-studio.js"), import("./miniaturas.js")
+            ]);
+            document.querySelector("#studio-atualizar-miniatura").disabled = !capturaMiniaturas.capturaDisponivel();
+            document.querySelector("#studio-miniatura-estado").textContent = capturaMiniaturas.capturaDisponivel()
+                ? "Miniatura: autorize a própria aba no seletor do navegador. Apenas o recorte visível da prévia será salvo neste dispositivo."
+                : "Miniaturas: captura indisponível neste navegador. Requer HTTPS ou localhost e Region Capture em desktop.";
+            atualizarListaProjetos();
+        } catch { document.querySelector("#studio-miniatura-estado").textContent = "Miniaturas indisponíveis. Seus projetos continuam sendo salvos normalmente."; }
         let id;
         try { id = sessionStorage.getItem(chaveProjetoAtivo); } catch { /* Sessão opcional. */ }
         if (id && servicoProjetos.buscarProjeto(id)) await abrirProjeto(id);
@@ -699,6 +743,24 @@ document.querySelector("#studio-recuperar-pendente").addEventListener("click", (
     } catch (erro) { mostrarAviso(erro.message); }
 });
 document.querySelector("#studio-atualizar-previa").addEventListener("click", () => { atualizarPrevia(); previaStudio?.atualizar(); });
+document.querySelector("#studio-atualizar-miniatura").addEventListener("click", async () => {
+    if (miniaturaEmAndamento || !projetoAtivo || !capturaMiniaturas || !servicoMiniaturas) return;
+    const botao = document.querySelector("#studio-atualizar-miniatura"), status = document.querySelector("#studio-miniatura-estado");
+    const iframe = document.querySelector("#studio-previa-iframe"), id = projetoAtivo.id, documento = iframe.srcdoc;
+    if (!salvarProjetoAtual()) { status.textContent = "Salve o projeto antes de atualizar a miniatura."; return; }
+    miniaturaEmAndamento = true; botao.disabled = true;
+    status.textContent = "Selecione a própria aba do Studio. O compartilhamento será encerrado após a captura.";
+    try {
+        const blob = await capturaMiniaturas.capturarMiniatura(iframe);
+        if (projetoAtivo?.id !== id || iframe.srcdoc !== documento || !servicoProjetos.buscarProjeto(id)) {
+            throw new Error("O projeto ou a prévia mudou durante a captura. Atualize a miniatura novamente.");
+        }
+        await servicoMiniaturas.salvarMiniatura(id, blob);
+        status.textContent = "Miniatura atualizada e salva neste dispositivo. Não é incluída nos backups JSON ou ZIP.";
+        atualizarListaProjetos();
+    } catch (erro) { status.textContent = erro.message; }
+    finally { miniaturaEmAndamento = false; botao.disabled = !capturaMiniaturas.capturaDisponivel(); }
+});
 document.querySelector("#studio-previa-automatica").addEventListener("change", event => { previaStudio?.definirAutomatica(event.target.checked); registrarInterface(); });
 document.querySelector("#studio-largura-editor").addEventListener("input", ajustarLargura);
 

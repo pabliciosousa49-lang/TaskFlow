@@ -50,6 +50,11 @@
       <span class="studio-etiqueta">ESCREVA. EXPERIMENTE. EVOLUA.</span>
       <h1 id="titulo-ambiente" tabindex="-1">Seu código ganha <span>vida aqui.</span></h1>
       <p>HTML, CSS e JavaScript. Crie, teste e veja o resultado em tempo real.</p>
+      <div class="studio-recursos-resumo">
+        <div><i class="fa-solid fa-code" aria-hidden="true"></i><p><strong>Escreva seu código</strong><span>Editor completo e intuitivo</span></p></div>
+        <div><i class="fa-solid fa-play" aria-hidden="true"></i><p><strong>Veja o resultado</strong><span>Pré-visualização em tempo real</span></p></div>
+        <div><i class="fa-regular fa-folder-open" aria-hidden="true"></i><p><strong>Organize seus projetos</strong><span>Salve e continue quando quiser</span></p></div>
+      </div>
     </div>
   </header>
   <nav class="studio-cabecalho" aria-label="Navegação e projeto do Studio">
@@ -62,6 +67,7 @@
       <button id="studio-salvar-projeto" class="studio-retorno studio-acao-principal" type="button" title="Salvar e retornar a Meus projetos" disabled><i class="fa-regular fa-floppy-disk" aria-hidden="true"></i> Salvar e voltar</button>
     </div>
     <a class="studio-retorno" href="../index.html" title="Sair do Laboratório e abrir a página principal">Voltar ao TaskFlow</a>
+    <p class="studio-dica-local"><i class="fa-regular fa-lightbulb" aria-hidden="true"></i><span><strong>Dica:</strong> seus projetos ficam salvos <strong>neste navegador e dispositivo.</strong></span></p>
   </nav>
 
   <main class="studio-conteudo">
@@ -74,29 +80,51 @@
     <div id="studio-gerenciamento">
       <!-- Projeto — Criação - solicita o título antes de apresentar o ambiente -->
       <section id="studio-inicio" class="studio-inicio" aria-labelledby="titulo-inicio">
-        <span class="studio-etiqueta">SEU LABORATÓRIO WEB</span>
-        <h1 id="titulo-inicio">Uma ideia.<br>Seu próximo projeto.</h1>
-        <p>Escreva, experimente e veja sua página ganhar forma. Comece dando um nome à sua ideia.</p>
+        <span class="studio-etiqueta">NOVO PROJETO</span>
+        <div class="studio-criacao-cubos" aria-hidden="true"><span></span><span></span><span></span></div>
+        <h1 id="titulo-inicio">Uma ideia.<br><span>Seu próximo<br>projeto.</span></h1>
+        <p>Escreva, experimente e veja sua página ganhar forma.</p>
         <form id="studio-formulario">
           <label for="studio-titulo">Título do projeto</label>
           <input id="studio-titulo" name="titulo" type="text" required maxlength="120"
             placeholder="Ex.: Minha primeira página" aria-describedby="studio-aviso">
           <p id="studio-aviso" class="studio-ajuda" role="status">Os projetos são salvos neste navegador e neste
             dispositivo.</p>
-          <button id="studio-criar-projeto" class="studio-criar" type="submit" disabled>Criar projeto</button>
+          <button id="studio-criar-projeto" class="studio-criar" type="submit" disabled><i class="fa-solid fa-plus" aria-hidden="true"></i> Criar projeto</button>
         </form>
+        <div class="studio-tecnologias-resumo">
+          <h2>O que você pode criar?</h2>
+          <ul>
+            <li><i class="devicon-html5-plain" aria-hidden="true"></i><span><strong>HTML</strong>Estrutura</span></li>
+            <li><i class="devicon-css3-plain" aria-hidden="true"></i><span><strong>CSS</strong>Estilo</span></li>
+            <li><i class="devicon-javascript-plain" aria-hidden="true"></i><span><strong>JavaScript</strong>Interatividade</span></li>
+          </ul>
+        </div>
         <noscript>Ative o JavaScript no navegador para criar o projeto.</noscript>
       </section>
       <section class="studio-biblioteca" aria-labelledby="titulo-projetos">
         <div class="studio-biblioteca-cabecalho">
-          <span class="studio-etiqueta">CONTINUE DE ONDE PAROU</span>
+          <i class="fa-solid fa-folder-open studio-biblioteca-icone" aria-hidden="true"></i>
           <h2 id="titulo-projetos" tabindex="-1">Meus projetos</h2>
-          <label class="studio-retorno studio-importacao">Restaurar backup JSON <input id="studio-importar-backup" type="file" disabled accept=".json,application/json"></label>
-          <label class="studio-retorno studio-importacao">Importar ZIP <input id="studio-importar-zip" type="file" disabled accept=".zip,application/zip,application/x-zip-compressed"></label>
+          <p>Continue de onde parou. Abra, restaure ou importe um projeto.</p>
+        </div>
+        <div class="studio-importacoes">
+          <article class="studio-importar-card studio-importar-json">
+            <i class="fa-solid fa-cloud-arrow-up" aria-hidden="true"></i>
+            <div><h3 id="studio-importar-json-titulo">Restaurar backup JSON</h3><p>Restaure seu projeto salvo em JSON.</p></div>
+            <label class="studio-importacao"><span class="studio-importar-rotulo">Restaurar backup JSON</span><input id="studio-importar-backup" type="file" aria-labelledby="studio-importar-json-titulo" disabled accept=".json,application/json"></label>
+          </article>
+          <article class="studio-importar-card studio-importar-zip">
+            <i class="fa-solid fa-file-zipper" aria-hidden="true"></i>
+            <div><h3 id="studio-importar-zip-titulo">Importar ZIP</h3><p>Importe um projeto compactado.</p></div>
+            <label class="studio-importacao"><span class="studio-importar-rotulo">Importar ZIP</span><input id="studio-importar-zip" type="file" aria-labelledby="studio-importar-zip-titulo" disabled accept=".zip,application/zip,application/x-zip-compressed"></label>
+          </article>
+        </div>
+        <details class="studio-importar-orientacoes">
+          <summary>Limites e orientações de importação</summary>
           <p class="studio-ajuda">ZIP textual UTF-8: até 5 MiB compactados, 10 MiB extraídos, 2 MiB por arquivo e 500 itens (arquivos e pastas). A importação cria uma cópia; binários não são suportados.</p>
           <p class="studio-ajuda">Backup textual JSON. A restauração cria uma cópia e depende do espaço disponível neste navegador. Arquivos grandes podem demorar.</p>
-          <p>Seus projetos ficam neste navegador, prontos para o próximo passo.</p>
-        </div>
+        </details>
         <ul id="studio-lista-projetos" class="studio-lista-projetos">
           <li>Carregando projetos…</li>
         </ul>
@@ -209,6 +237,7 @@
             </header>
             <div class="studio-ferramentas">
               <button id="studio-atualizar-previa" class="studio-retorno" type="button">Atualizar prévia</button>
+              <button id="studio-atualizar-miniatura" class="studio-retorno" type="button" disabled aria-describedby="studio-miniatura-estado">Atualizar miniatura</button>
               <label><input id="studio-previa-automatica" type="checkbox" checked> Atualização automática</label>
               <div class="studio-dispositivos" role="group" aria-label="Dimensões da prévia">
                 <button id="studio-dispositivo-desktop" type="button" aria-pressed="true" title="Prévia desktop"><i class="fa-solid fa-desktop" aria-hidden="true"></i><span>Desktop</span></button>
@@ -216,6 +245,7 @@
                 <button id="studio-dispositivo-mobile" type="button" aria-pressed="false" title="Prévia mobile — 375 pixels"><i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i><span>Mobile</span></button>
               </div>
               <p class="studio-ajuda">Atualizar reinicia o JavaScript da prévia. No modo manual, salvar não reinicia a execução.</p>
+              <p id="studio-miniatura-estado" class="studio-ajuda" role="status" aria-live="polite">Miniaturas: verificando compatibilidade do navegador.</p>
             </div>
             <div class="studio-endereco-virtual"><i class="fa-regular fa-file-code" aria-hidden="true"></i><span id="studio-endereco-previa">Nenhum documento em pré-visualização</span></div>
             <div class="studio-previa-viewport">

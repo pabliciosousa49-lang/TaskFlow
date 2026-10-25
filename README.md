@@ -1,112 +1,599 @@
+
 # TaskFlow
 
-Plataforma educacional para reunir estudo, prática e organização em um só lugar. O objetivo do MVP é ajudar estudantes a aprender desenvolvimento web, experimentar código e acompanhar sua rotina, com identidade visual pixel/voxel.
+### Estude. Organize. Desenvolva.
 
-## Funcionalidades
+O **TaskFlow** é uma plataforma educacional desenvolvida para reunir **organização, aprendizado e prática de programação em um único ambiente**.
 
-- Home com guia de utilização e acessos às áreas.
-- Biblioteca Técnica com documentação, pesquisa por tópicos e anotações locais.
-- Laboratório TaskFlow Studio: projetos HTML/CSS/JavaScript, arquivos e pastas virtuais, abas, sugestões, busca, prévia isolada e console.
-- Agenda com compromissos, filtros, calendário e Próximos Eventos.
-- Relógio e Pomodoro com tempos personalizados, alertas, estatísticas e visualização minimizada.
-- Área de Carreira com conteúdos de preparação profissional.
+O projeto nasceu de uma dificuldade comum durante o aprendizado de desenvolvimento web: organizar os estudos, consultar documentações, acompanhar compromissos e colocar os conhecimentos em prática utilizando diferentes ferramentas.
 
-Gestor de IA está indisponível; Comunidade é um acesso visual sem integração funcional. A plataforma não oferece autenticação nem sincronização em nuvem.
+Pensando nisso, desenvolvi o TaskFlow, uma aplicação que integra recursos de produtividade, materiais de apoio e um laboratório de programação diretamente no navegador.
 
-## Tecnologias
+Desenvolvido com **HTML5, CSS3 e JavaScript**, o projeto representa um MVP criado para o **Concurso de Projetos do DevClub**, com foco na experiência do usuário, na organização do código e na construção de funcionalidades reais.
 
-HTML5, CSS3 e JavaScript, sem framework ou build obrigatório. O Studio utiliza CodeMirror 6 e parsers Lezer via import map com versões fixadas em CDN. Ícones utilizam Devicon e Font Awesome. É necessário acesso à internet para carregar recursos externos.
+---
 
-## Executar localmente
+## 🖼️ Apresentação do Projeto
 
-Sirva a raiz do repositório por HTTP; abrir o HTML diretamente por `file://` não é o fluxo suportado para módulos e documentação.
+<!--
+Adicione a imagem oficial em:
+assets/images/readme/taskflow-apresentacao.png
 
-Use um servidor estático já disponível, como o Live Server do VS Code. Se Python estiver instalado, execute na raiz:
+Depois de adicionar o arquivo, remova esta abertura de comentário e o fechamento abaixo.
 
-```powershell
-py -m http.server 8000 --bind 127.0.0.1
-```
+<p align="center">
+  <img
+    src="./assets/images/readme/taskflow-apresentacao.png"
+    alt="Apresentação oficial do TaskFlow"
+    width="100%"
+  />
+</p>
 
-Abra [http://127.0.0.1:8000](http://127.0.0.1:8000). Não é necessário instalar pacotes do projeto. O Python ou a extensão são apenas opções de servidor local, não dependências da aplicação.
+-->
 
-## Versão publicada
+---
 
-O repositório configura GitHub Pages por GitHub Actions, publicando a raiz a partir da branch `main`.
+## 💡 Problemática e Objetivo
 
-Endereço: [TaskFlow no GitHub Pages](https://pabliciosousa49-lang.github.io/TaskFlow-DevClub/). A consulta HTTP desta rodada confirmou resposta 200 da Home, Studio, Carreira, documentação HTML/CSS e recursos principais, além das 20 dependências do import map. Isso comprova disponibilidade HTTP, não execução funcional no navegador. Confira a configuração em **Settings → Pages** e as publicações em **Actions**.
+Durante o processo de aprendizagem em programação, é comum utilizar diferentes ferramentas para estudar, consultar conteúdos, organizar atividades e desenvolver projetos.
 
-As alterações locais desta rodada ainda precisam passar por commit e publicação pelo responsável. Nenhum push ou deploy foi executado pelo Codex.
+Essa separação pode dificultar a organização da rotina e interromper o fluxo de aprendizagem.
 
-## Uso básico do Laboratório
+O **TaskFlow** foi desenvolvido com a proposta de concentrar essas atividades em uma única plataforma.
 
-1. Acesse TaskFlow → Laboratório e crie um projeto.
-2. Crie `index.html`, as pastas `css` e `js`, e os arquivos `style.css` e `app.js` dentro delas.
-3. Conecte os arquivos no HTML com `./css/style.css` e `./js/app.js`.
-4. Edite e confira a prévia. Ctrl+P localiza arquivos; Ctrl+F pesquisa; Ctrl+S salva sem sair.
-5. O salvamento automático ocorre após uma breve pausa na digitação. Confira o indicador **Salvo**.
-6. **Salvar e voltar** retorna a Meus projetos. **Voltar** percorre as telas internas; **Voltar ao TaskFlow** sai diretamente.
-7. Exporte um backup JSON em Meus projetos. Restaurar cria outra identidade e mantém o projeto original.
+Seu objetivo é oferecer ao estudante um ambiente onde seja possível:
 
-## Dados, backup e recuperação
+- Organizar compromissos e atividades.
+- Gerenciar sessões de estudo.
+- Consultar materiais técnicos.
+- Praticar programação.
+- Criar e testar projetos.
+- Acompanhar o próprio desenvolvimento.
 
-Os dados ficam no navegador e na origem atual; não são enviados para um servidor. Limpar dados do site, trocar navegador, dispositivo, domínio ou protocolo não transfere os projetos. Faça backups antes dessas mudanças.
+A proposta não é substituir ferramentas profissionais, mas oferecer um ambiente complementar para **estudar, praticar e desenvolver**.
 
-O backup individual mantém o formato `taskflow.studio.backup`, versão 1. Não há o antigo corte artificial de 1.000 itens ou 2 MiB: um backup exportado válido pode ser lido pelo mesmo importador. Restaurar exige espaço para uma cópia adicional no navegador. A quota real varia e arquivos grandes podem consumir memória ou demorar; prefira projetos pequenos no MVP.
+---
 
-Se ocorrer falha de gravação, conflito ou catálogo inválido, os controles de recuperação permitem:
-- **Baixar catálogo bruto:** copia exatamente o registro em um arquivo TXT, sem validar ou reparar. Esse arquivo exige recuperação manual e não entra no restaurador de backups individuais.
-- **Baixar projeto com alterações pendentes:** produz um backup individual com o código aberto em memória, sem sobrescrever a versão salva. Pode ser restaurado como cópia quando houver armazenamento disponível.
+## 🚀 Funcionalidades
 
-Não recarregue nem feche a página antes de salvar essa recuperação. Se a leitura do armazenamento estiver bloqueada, o catálogo bruto não poderá ser lido; o projeto já aberto ainda pode ser exportado da memória.
+### 🏠 Home
 
-## Limitações conhecidas
+A página principal apresenta a plataforma e facilita o acesso às suas funcionalidades.
 
-- Arquivos do Studio são virtuais e textuais; não há importação de imagens binárias, ZIP, terminal, backend ou instalação de pacotes.
-- A prévia restringe rede, HTML e recursos por segurança. Use eventos JavaScript com `addEventListener`; atributos como `onclick` são removidos.
-- Atualizar a prévia reinicia o estado JavaScript. Scripts podem continuar ativos quando a área é ocultada.
-- Renomear arquivos não atualiza referências escritas no código; há aviso antes da operação.
-- Formatar seleção ajusta indentação. Diagnósticos integrados se concentram em HTML; busca não oferece substituição na interface.
-- Conflitos entre abas são rejeitados na gravação; não há mesclagem automática ou histórico de versões.
-- Alertas do sistema e áudio dependem de suporte, permissões e interação do usuário.
-- Homologação completa em navegador real, mobile e publicação permanece pendente; testes simulados não a substituem.
+**Recursos:**
 
-## Estrutura
+- Apresentação do TaskFlow.
+- Guia inicial de utilização.
+- Navegação entre as áreas.
+- Acesso às ferramentas de estudo e desenvolvimento.
+- Interface responsiva com identidade visual própria.
+
+### ⏱️ Pomodoro
+
+Ferramenta de gerenciamento de tempo voltada à organização das sessões de estudo.
+
+**Recursos:**
+
+- Cronômetro de foco.
+- Intervalos de descanso.
+- Configuração de duração.
+- Controles de execução.
+- Alertas.
+- Visualização minimizada.
+- Estatísticas de utilização.
+
+### 📅 Agenda
+
+Ambiente para organizar compromissos e acompanhar atividades.
+
+**Recursos:**
+
+- Cadastro de compromissos.
+- Calendário.
+- Listagem de atividades.
+- Filtros de organização.
+- Acompanhamento de próximos eventos.
+- Gerenciamento dos compromissos registrados.
+
+### 📚 Biblioteca Técnica
+
+Área destinada à consulta de conteúdos de programação.
+
+Os materiais são organizados por linguagem e tópicos, permitindo que o estudante consulte explicações e exemplos durante seu aprendizado.
+
+**Recursos:**
+
+- Conteúdos técnicos por linguagem.
+- Materiais de HTML, CSS, JavaScript e outras tecnologias disponíveis.
+- Organização por tópicos.
+- Pesquisa de conteúdos.
+- Exemplos de código.
+- Documentações de referência.
+- Anotações locais.
+
+A Biblioteca Técnica funciona como um material de apoio para estudo e consulta.
+
+### 💻 Laboratório — TaskFlow Studio
+
+O **Laboratório** é uma das principais funcionalidades do TaskFlow.
+
+Ele permite que o usuário desenvolva projetos diretamente pelo navegador, utilizando um ambiente de edição com arquivos, pastas e pré-visualização.
+
+**Recursos:**
+
+- Criação de projetos.
+- Gerenciamento de projetos existentes.
+- Criação de arquivos e pastas virtuais.
+- Editor de código.
+- Desenvolvimento com HTML, CSS e JavaScript.
+- Organização de arquivos em abas.
+- Sugestões durante a escrita.
+- Busca e navegação entre arquivos.
+- Pré-visualização da aplicação.
+- Console e diagnósticos.
+- Testes de funcionalidades.
+- Identificação e correção de erros.
+- Salvamento local dos projetos.
+- Recursos de backup e recuperação.
+
+O ambiente também oferece ferramentas auxiliares de aprendizagem.
+
+**Documentação e exemplos de código**
+
+Durante o desenvolvimento, o usuário pode consultar materiais técnicos e exemplos para auxiliar na compreensão de conceitos e na resolução de dúvidas.
+
+**Roleta de recursos**
+
+A roleta oferece uma dinâmica de exploração de conteúdos e atividades, incentivando a prática de programação.
+
+**Exportação de projetos**
+
+O Laboratório permite trabalhar com projetos que podem ser transferidos para ambientes externos, conforme os formatos de exportação disponíveis na versão utilizada.
+
+O objetivo é aproximar o estudante da experiência de desenvolver uma aplicação, testar seu funcionamento e compreender a conexão entre os arquivos.
+
+### 👨‍💼 Carreira
+
+Área voltada à preparação profissional de estudantes e desenvolvedores.
+
+A proposta contempla conteúdos relacionados a:
+
+- LinkedIn.
+- Currículo profissional.
+- Entrevistas.
+- Processos seletivos.
+- Desenvolvimento de carreira.
+
+**Observação:** parte dos recursos dessa área permanece em preparação.
+
+---
+
+## 🛠️ Tecnologias Utilizadas
+
+| Área | Tecnologias |
+|---|---|
+| **Frontend** | HTML5, CSS3 e JavaScript |
+| **Editor de código** | CodeMirror 6 |
+| **Análise de sintaxe** | Parsers Lezer |
+| **Armazenamento** | Armazenamento local do navegador |
+| **Interface** | CSS responsivo |
+| **Ícones** | Devicon e Font Awesome |
+| **Versionamento** | Git e GitHub |
+| **Publicação** | GitHub Pages e GitHub Actions |
+| **Testes** | Node.js Test Runner e testes automatizados |
+
+O TaskFlow foi desenvolvido com foco em JavaScript, sem necessidade de um framework de frontend ou backend próprio para executar a plataforma.
+
+Alguns recursos externos, como bibliotecas do editor e ícones, dependem de conexão com a internet.
+
+---
+
+## 🏗️ Arquitetura do Projeto
+
+O TaskFlow utiliza uma organização modular, separando interface, funcionalidades, serviços, conteúdos educacionais e documentação.
 
 ```text
-index.html              Home, TaskFlow, Biblioteca, Agenda e Pomodoro
-pages/                  Studio, Carreira e documentação por linguagem
-css/                    Estilos globais, componentes e páginas
-js/core/                Inicialização e navegação
-js/modules/             Studio e Pomodoro
-js/biblioteca/          Central, documentação e anotações
-js/services/            Projetos do Studio e anotações
-data/biblioteca/        Conteúdos por linguagem
-assets/                 Imagens e recursos visuais
-tests/                  Testes por responsabilidade
-docs/                   Arquitetura e documentação técnica
-.github/workflows/      Publicação no GitHub Pages
+TaskFlow-DevClub/
+│
+├── index.html
+│
+├── pages/
+│   ├── studio.html
+│   └── demais páginas
+│
+├── css/
+│   ├── global/
+│   ├── components/
+│   └── pages/
+│
+├── js/
+│   ├── core/
+│   ├── modules/
+│   ├── services/
+│   ├── utils/
+│   └── biblioteca/
+│
+├── data/
+│   └── biblioteca/
+│
+├── assets/
+│   └── images/
+│
+├── docs/
+│   └── arquitetura.md
+│
+├── tests/
+│
+├── .github/
+│   └── workflows/
+│
+└── README.md
 ```
 
-Consulte [a arquitetura](docs/arquitetura.md) para responsabilidades e fluxo de dados.
+### Responsabilidade dos diretórios
 
-## Testes
+| Diretório | Responsabilidade |
+|---|---|
+| `pages/` | Páginas e interfaces específicas. |
+| `css/` | Estilização global, componentes e páginas. |
+| `js/core/` | Inicialização e navegação da aplicação. |
+| `js/modules/` | Funcionalidades independentes da plataforma. |
+| `js/services/` | Serviços e gerenciamento de dados. |
+| `js/utils/` | Funções auxiliares. |
+| `js/biblioteca/` | Recursos da Biblioteca Técnica. |
+| `data/biblioteca/` | Conteúdos educacionais. |
+| `assets/` | Imagens e recursos visuais. |
+| `docs/` | Arquitetura e documentação técnica. |
+| `tests/` | Testes automatizados. |
+| `.github/workflows/` | Automação de publicação. |
 
-Com Node.js 24 ou superior, sem instalação de dependências:
+Para mais detalhes, consulte a [documentação de arquitetura](./docs/arquitetura.md).
 
-```powershell
+---
+
+## 🔄 Fluxo de Funcionamento
+
+O TaskFlow reúne diferentes recursos em uma interface de navegação integrada.
+
+```text
+Usuário
+   │
+   ▼
+Interface TaskFlow
+   │
+   ├── Home
+   │
+   ├── Pomodoro
+   │
+   ├── Agenda
+   │
+   ├── Biblioteca Técnica
+   │
+   ├── Laboratório
+   │      │
+   │      ▼
+   │   Criação do projeto
+   │      │
+   │      ▼
+   │   Arquivos e pastas
+   │      │
+   │      ▼
+   │   Editor de código
+   │      │
+   │      ▼
+   │   Pré-visualização
+   │      │
+   │      ▼
+   │   Testes e correções
+   │      │
+   │      ▼
+   │   Salvamento local
+   │      │
+   │      ▼
+   │   Exportação / Backup
+   │
+   └── Carreira
+```
+
+### Funcionamento do Laboratório
+
+O Laboratório utiliza um sistema de arquivos virtuais para organizar os projetos desenvolvidos pelo usuário.
+
+O editor permite trabalhar com arquivos HTML, CSS e JavaScript, enquanto a pré-visualização apresenta o resultado da aplicação em um ambiente isolado.
+
+O sistema também oferece recursos de navegação, diagnósticos e persistência local.
+
+Essa estrutura permite praticar a conexão entre arquivos e compreender o comportamento de uma aplicação web.
+
+---
+
+## 🧠 Metodologia de Desenvolvimento
+
+O TaskFlow foi desenvolvido utilizando uma metodologia estruturada de planejamento, implementação, testes e documentação.
+
+O objetivo foi compreender cada etapa do desenvolvimento e organizar a evolução do projeto.
+
+### Planejamento
+
+**Problema → Objetivo → MVP → Roadmap → Arquitetura**
+
+Antes de iniciar a implementação, foram definidos o problema que o projeto deveria resolver, seus objetivos e a organização inicial da aplicação.
+
+### Desenvolvimento
+
+**Planejar → Implementar → Testar → Code Review → Refatorar → Commitar → Documentar**
+
+Cada funcionalidade foi dividida em blocos menores, com responsabilidades específicas.
+
+Essa abordagem permitiu implementar, testar e revisar cada etapa antes de avançar para novas funcionalidades.
+
+### Metodologia de leitura de código JavaScript
+
+Durante o desenvolvimento, utilizei seis categorias para compreender a responsabilidade dos trechos de código.
+
+| Categoria | Responsabilidade |
+|---|---|
+| **Observação** | Compreender o comportamento esperado. |
+| **Seleção** | Identificar elementos e dados necessários. |
+| **Escuta** | Reconhecer eventos e interações. |
+| **Processamento** | Executar a lógica da aplicação. |
+| **Condição** | Validar regras e determinar o fluxo. |
+| **Atualização** | Modificar dados, estados ou elementos da interface. |
+
+Essa metodologia contribui para compreender não apenas **o que o código faz**, mas também **por que ele existe e qual responsabilidade exerce na aplicação**.
+
+---
+
+## 📚 Documentação
+
+A documentação faz parte do processo de desenvolvimento do TaskFlow.
+
+As etapas são registradas considerando três pontos principais:
+
+- **Objetivo:** o que foi planejado e implementado.
+- **Desafios:** dificuldades encontradas durante o desenvolvimento.
+- **Conclusão:** resultados e aprendizados da etapa.
+
+Os documentos técnicos são organizados na pasta `docs/`.
+
+O Git e o GitHub são utilizados para acompanhar a evolução do projeto por meio de commits relacionados às responsabilidades implementadas.
+
+**Documentação principal:**
+
+[Arquitetura do TaskFlow](./docs/arquitetura.md)
+
+---
+
+## 🚀 Como Executar o Projeto
+
+### Pré-requisitos
+
+- Navegador atualizado.
+- Visual Studio Code ou outro editor.
+- Servidor HTTP local, como Live Server.
+
+### 1. Clone o repositório
+
+```bash
+git clone https://github.com/pabliciosousa49-lang/TaskFlow-DevClub.git
+```
+
+### 2. Acesse a pasta
+
+```bash
+cd TaskFlow-DevClub
+```
+
+### 3. Abra no VS Code
+
+```bash
+code .
+```
+
+### 4. Execute a aplicação
+
+Utilize a extensão **Live Server** para iniciar a aplicação pelo arquivo `index.html`.
+
+Como alternativa, caso tenha Python instalado, execute na raiz do projeto:
+
+```bash
+python -m http.server 8000
+```
+
+Depois, acesse:
+
+http://localhost:8000
+
+**Importante:** utilize um servidor HTTP local. Abrir o arquivo diretamente pelo protocolo `file://` não é o fluxo recomendado para o funcionamento dos módulos e recursos da plataforma.
+
+---
+
+## 🌐 Live Demo
+
+Acesse a versão publicada do TaskFlow:
+
+### [Acessar TaskFlow — GitHub Pages](https://pabliciosousa49-lang.github.io/TaskFlow-DevClub/)
+
+---
+
+## 🧪 Como Utilizar o Laboratório
+
+O Laboratório permite desenvolver aplicações web diretamente pelo navegador.
+
+Um exemplo de utilização é a criação de uma aplicação simples de login com navegação para um dashboard.
+
+### 1. Crie um projeto
+
+Acesse o Laboratório e crie um novo projeto.
+
+### 2. Organize os arquivos
+
+```text
+Projeto-Login/
+│
+├── index.html
+├── dash.html
+├── style.css
+└── script.js
+```
+
+### 3. Conecte os arquivos
+
+No `index.html`, utilize as referências:
+
+```html
+<link rel="stylesheet" href="./style.css">
+<script src="./script.js" defer></script>
+```
+
+### 4. Desenvolva a aplicação
+
+Crie uma interface de login utilizando HTML e CSS.
+
+Implemente a interação do botão de entrada utilizando JavaScript.
+
+### 5. Teste a navegação
+
+No ambiente do Laboratório, utilize os recursos de navegação virtual disponibilizados pelo TaskFlow, quando necessário.
+
+Exemplo:
+
+```javascript
+TaskFlow.navegar("./dash.html");
+```
+
+Esse recurso permite navegar entre arquivos HTML do projeto dentro da pré-visualização do Laboratório.
+
+### 6. Teste e corrija
+
+Utilize a pré-visualização e os diagnósticos para acompanhar o comportamento da aplicação.
+
+### 7. Salve e exporte
+
+Salve o projeto e utilize as opções de exportação ou backup disponíveis na versão atual.
+
+Ao trabalhar com uma exportação ZIP, os arquivos podem ser extraídos e abertos em um editor externo, como o VS Code.
+
+No navegador convencional, a navegação poderá utilizar caminhos relativos ou outros mecanismos nativos apropriados.
+
+---
+
+## 📸 Preview do TaskFlow
+
+Esta seção é destinada às capturas reais das funcionalidades da plataforma.
+
+### Home
+
+<!--
+<img src="./assets/images/readme/home.png" alt="Home do TaskFlow" width="100%">
+-->
+
+### Biblioteca Técnica
+
+<!--
+<img src="./assets/images/readme/biblioteca.png" alt="Biblioteca Técnica" width="100%">
+-->
+
+### Laboratório
+
+<!--
+<img src="./assets/images/readme/laboratorio.png" alt="Laboratório TaskFlow Studio" width="100%">
+-->
+
+### Agenda
+
+<!--
+<img src="./assets/images/readme/agenda.png" alt="Agenda do TaskFlow" width="100%">
+-->
+
+### Carreira
+
+<!--
+<img src="./assets/images/readme/carreira.png" alt="Área de Carreira" width="100%">
+-->
+
+As imagens poderão ser adicionadas ao diretório `assets/images/readme/` e ativadas conforme os arquivos estiverem disponíveis.
+
+---
+
+## 🧪 Testes e Validação
+
+O TaskFlow possui testes automatizados para validar comportamentos e responsabilidades específicas da aplicação.
+
+Entre os recursos testados estão funcionalidades relacionadas ao Laboratório, à resolução de caminhos e à pré-visualização.
+
+### Executar os testes
+
+Com Node.js 24 ou superior, execute na raiz do projeto:
+
+```bash
 node --experimental-vm-modules --test tests/*/*.test.mjs
 ```
 
-A suíte usa armazenamento em memória, DOM simulado e parsers locais de teste. Não acessa projetos reais. Detalhes em [tests/studio/README.md](tests/studio/README.md).
+Os testes utilizam ambientes simulados e recursos locais de teste.
 
-## Aceitação manual antes da publicação
+A validação manual em navegador continua importante para verificar:
 
-1. Abra o site servido por HTTP em uma sessão de teste; navegue por Home, Biblioteca, documentação HTML/CSS e Carreira. Verifique console e recursos.
-2. No Studio, crie os três arquivos do exemplo acima. Use CSS visível e um botão com evento em `app.js`; confirme estilo e clique na prévia.
-3. Alterne arquivos, salve, saia, retorne e recarregue; confira o conteúdo dos três.
-4. Baixe o JSON, restaure e execute a cópia. Confira que o original continua intacto.
-5. Em um perfil descartável, teste duas abas alterando o mesmo projeto; baixe a recuperação e confira que contém o texto pendente.
-6. Em 375 px e com zoom, verifique menu, painéis do Studio, Agenda e Pomodoro. Confira foco e navegação por teclado.
-7. Após a publicação pelo responsável, repita o fluxo essencial na URL publicada e confira erros no console.
+- Navegação entre páginas.
+- Funcionamento do editor.
+- Pré-visualização.
+- Persistência de projetos.
+- Exportação e recuperação.
+- Responsividade.
+- Funcionamento na versão publicada.
 
-Esta rodada não concluiu esses passos no navegador: o navegador disponível não alcançou o servidor local. A consulta HTTP externa confirmou o site público, que ainda não contém as correções locais; execução, persistência real, downloads e mobile continuam exigindo homologação manual.
+---
+
+## ⚠️ Limitações e Futuras Implementações
+
+O TaskFlow é um MVP em evolução.
+
+Algumas limitações e características atuais incluem:
+
+- Armazenamento de projetos no navegador.
+- Ausência de sincronização em nuvem.
+- Ausência de autenticação de usuários na plataforma principal.
+- Restrições de segurança na pré-visualização do Laboratório.
+- Dependência de recursos externos para determinadas bibliotecas.
+- Funcionalidades da área de Carreira ainda em preparação.
+- Recursos de Comunidade e Gestor de IA sem integração funcional completa.
+
+O objetivo é evoluir a plataforma de maneira incremental, preservando sua proposta educacional.
+
+---
+
+## 🎯 Objetivo Profissional
+
+O TaskFlow faz parte do meu processo de desenvolvimento como programador, permitindo aplicar conhecimentos de **Frontend, JavaScript, arquitetura de software, organização de código, testes e documentação técnica**.
+
+Durante sua construção, trabalhei com problemas relacionados à navegação entre arquivos, persistência de dados, pré-visualização de aplicações, modularização e experiência do usuário.
+
+O projeto também representa minha metodologia de aprendizagem: utilizar a inteligência artificial como ferramenta de apoio ao desenvolvimento, mantendo o foco na compreensão do código, nas decisões técnicas e na resolução dos problemas encontrados.
+
+Mais do que concluir um MVP, a proposta foi transformar uma necessidade identificada durante meus estudos em uma aplicação funcional, documentada e em constante evolução.
+
+---
+
+## 👨‍💻 Desenvolvedor
+
+**José Pablicio Sousa Viana**
+
+Desenvolvimento Front-End | Desenvolvimento de Software
+
+Acadêmico de Análise e Desenvolvimento de Sistemas, com foco em desenvolvimento Full-Stack.
+
+<p align="center">
+  <a href="https://www.linkedin.com/in/pablicio-sousa-6554462a0/">
+    LinkedIn
+  </a>
+  &nbsp; | &nbsp;
+  <a href="https://github.com/pabliciosousa49-lang">
+    GitHub
+  </a>
+</p>
+
+---
+
+<p align="center">
+  <strong>TaskFlow — Estude. Organize. Desenvolva.</strong>
+</p>
