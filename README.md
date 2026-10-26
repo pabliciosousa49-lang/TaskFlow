@@ -15,21 +15,15 @@ Desenvolvido com **HTML5, CSS3 e JavaScript**, o projeto representa um MVP criad
 
 ## 🖼️ Apresentação do Projeto
 
-<!--
-Adicione a imagem oficial em:
-assets/images/readme/taskflow-apresentacao.png
-
-Depois de adicionar o arquivo, remova esta abertura de comentário e o fechamento abaixo.
 
 <p align="center">
   <img
-    src="./assets/images/readme/taskflow-apresentacao.png"
+    src="./assets/images/front.png"
+    src="./assets/images/front2.png"
     alt="Apresentação oficial do TaskFlow"
     width="100%"
   />
 </p>
-
--->
 
 ---
 

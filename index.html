@@ -12,6 +12,7 @@
 
   <!-- Font Awesome — Ícones - disponibilizar ícones para conteúdos de carreira -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <link rel="stylesheet" href="./css/biblioteca/tour.css">
   <link rel="stylesheet" href="./css/global/style.css">
   <link rel="stylesheet" href="./css/components/pomodoro.css">
   <link rel="stylesheet" href="./css/pages/home.css">
@@ -107,13 +108,23 @@
             <div class="home-apresentacao-texto">
               <p class="home-identificador">GUIA RÁPIDO</p>
               <h1 id="home-titulo">Bem-vindo ao <span>TaskFlow!</span></h1>
-              <p class="home-descricao">Seu ambiente completo para estudar, organizar, praticar e desenvolver sua carreira. Veja abaixo como usar o TaskFlow e aproveite ao máximo cada recurso.</p>
+              <p class="home-descricao">Seu ambiente completo para estudar, organizar, praticar e desenvolver sua
+                carreira. Veja abaixo como usar o TaskFlow e aproveite ao máximo cada recurso.</p>
+
               <div class="home-tour-acoes">
-                <button class="home-tour" type="button" disabled aria-describedby="home-tour-pendente"><i class="fa-solid fa-circle-play" aria-hidden="true"></i> Assista ao tour rápido <span aria-hidden="true">→</span></button>
-                <span class="home-tour-duracao"><i class="fa-regular fa-clock" aria-hidden="true"></i> Apenas 2 minutos</span>
+                <button id="abrir-tour" class="home-tour" type="button" aria-haspopup="dialog"
+                  aria-controls="modal-tour">
+                  <i class="fa-solid fa-circle-play" aria-hidden="true"></i>
+                  Assista ao tour rápido
+                  <span aria-hidden="true">→</span>
+                </button>
+
+                <span class="home-tour-duracao">
+                  <i class="fa-regular fa-clock" aria-hidden="true"></i>
+                  Apenas 2 minutos
+                </span>
               </div>
-              <p id="home-tour-pendente">Tour em preparação.</p>
-            </div>
+
           </header>
           <section class="home-guia" aria-labelledby="home-guia-titulo">
             <header class="home-guia-cabecalho">
@@ -122,7 +133,8 @@
             </header>
             <div class="home-guia-cards">
               <div id="home-explorar" class="home-guia-card" data-passo="1">
-                <div class="home-card-ilustracao"><img src="./assets/images/home-explore-voxel.png" width="353" height="242" alt="" loading="lazy"></div>
+                <div class="home-card-ilustracao"><img src="./assets/images/home-explore-voxel.png" width="353"
+                    height="242" alt="" loading="lazy"></div>
                 <div class="home-card-conteudo">
                   <h3>Explore as áreas</h3>
                   <p>Acesse a Biblioteca Técnica, Laboratório, Agenda, Área de Carreira e Gestor de IA.</p>
@@ -130,7 +142,8 @@
                 </div>
               </div>
               <div class="home-guia-card" data-passo="2">
-                <div class="home-card-ilustracao"><img src="./assets/images/home-pratique-voxel.png" width="333" height="244" alt="" loading="lazy"></div>
+                <div class="home-card-ilustracao"><img src="./assets/images/home-pratique-voxel.png" width="333"
+                    height="244" alt="" loading="lazy"></div>
                 <div class="home-card-conteudo">
                   <h3>Estude e pratique</h3>
                   <p>Utilize conteúdos, projetos e exercícios para evoluir com consistência.</p>
@@ -138,7 +151,8 @@
                 </div>
               </div>
               <div id="home-agenda" class="home-guia-card" data-passo="3">
-                <div class="home-card-ilustracao"><img src="./assets/images/home-agenda-voxel.png" width="338" height="239" alt="" loading="lazy"></div>
+                <div class="home-card-ilustracao"><img src="./assets/images/home-agenda-voxel.png" width="338"
+                    height="239" alt="" loading="lazy"></div>
                 <div class="home-card-conteudo">
                   <h3>Organize sua jornada</h3>
                   <p>Use a Agenda para planejar seus estudos, definir metas e acompanhar seu progresso.</p>
@@ -146,17 +160,20 @@
                 </div>
               </div>
               <div id="home-carreira" class="home-guia-card" data-passo="4">
-                <div class="home-card-ilustracao"><img src="./assets/images/home-carreira-voxel.png" width="368" height="244" alt="" loading="lazy"></div>
+                <div class="home-card-ilustracao"><img src="./assets/images/home-carreira-voxel.png" width="368"
+                    height="244" alt="" loading="lazy"></div>
                 <div class="home-card-conteudo">
                   <h3>Prepare seu futuro</h3>
-                  <p>Desenvolva suas habilidades na Área de Carreira e conte com o Gestor de IA para tomar decisões mais eficazes.</p>
+                  <p>Desenvolva suas habilidades na Área de Carreira e conte com o Gestor de IA para tomar decisões mais
+                    eficazes.</p>
                   <span class="home-card-seta" aria-hidden="true">→</span>
                 </div>
               </div>
             </div>
           </section>
           <footer class="home-dica">
-            <p><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span><strong>Dica:</strong> Use os recursos no seu ritmo e volte a este guia sempre que precisar.</span></p>
+            <p><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span><strong>Dica:</strong> Use os recursos no
+                seu ritmo e volte a este guia sempre que precisar.</span></p>
             <span class="home-dica-mensagem">Vamos juntos nessa jornada! <span aria-hidden="true">→</span></span>
           </footer>
         </div>
@@ -167,7 +184,8 @@
         <div class="taskflow-recepcao">
           <!-- Produtividade — acesso independente da navegação lateral. -->
           <div class="pomodoro-acesso-area">
-            <button id="abrir-pomodoro" class="pomodoro-etiqueta" type="button" aria-haspopup="dialog" aria-controls="pomodoro-painel">
+            <button id="abrir-pomodoro" class="pomodoro-etiqueta" type="button" aria-haspopup="dialog"
+              aria-controls="pomodoro-painel">
               <i class="fa-solid fa-stopwatch" aria-hidden="true"></i> Relógio &amp; <strong>Pomodoro</strong>
             </button>
           </div>
@@ -180,7 +198,8 @@
                   alt="TaskFlow — Seu próximo passo começa aqui. Um ponto de encontro para seus estudos, suas ideias e seu futuro. Explore os assuntos que fazem parte da sua jornada como desenvolvedor.">
               </h1>
               <div class="taskflow-acoes">
-                <a class="taskflow-explorar" href="#taskflow-areas">Explore as áreas <span aria-hidden="true">↓</span></a>
+                <a class="taskflow-explorar" href="#taskflow-areas">Explore as áreas <span
+                    aria-hidden="true">↓</span></a>
               </div>
             </div>
           </header>
@@ -194,19 +213,24 @@
               <p>Quatro áreas para conhecer.<br>Novas experiências por tópico virão nas próximas etapas.</p>
             </div>
             <nav class="taskflow-atalhos" aria-label="Recursos do TaskFlow">
-              <a class="taskflow-atalho" data-acesso="biblioteca" aria-label="Biblioteca Técnica" id="acessar-biblioteca" href="#view-biblioteca">
+              <a class="taskflow-atalho" data-acesso="biblioteca" aria-label="Biblioteca Técnica"
+                id="acessar-biblioteca" href="#view-biblioteca">
                 <img src="./assets/images/acesso-biblioteca-voxel.png" width="286" height="720" alt="" loading="lazy">
               </a>
-              <a class="taskflow-atalho" data-acesso="laboratorio" aria-label="Laboratório" id="abrir-laboratorio" href="./pages/studio.html">
+              <a class="taskflow-atalho" data-acesso="laboratorio" aria-label="Laboratório" id="abrir-laboratorio"
+                href="./pages/studio.html">
                 <img src="./assets/images/acesso-laboratorio-voxel.png" width="285" height="717" alt="" loading="lazy">
               </a>
-              <button class="taskflow-atalho" data-acesso="agenda" aria-label="Agenda" id="abrir-agenda" type="button" aria-haspopup="dialog">
+              <button class="taskflow-atalho" data-acesso="agenda" aria-label="Agenda" id="abrir-agenda" type="button"
+                aria-haspopup="dialog">
                 <img src="./assets/images/acesso-agenda-voxel.png" width="279" height="716" alt="" loading="lazy">
               </button>
-              <a class="taskflow-atalho" data-acesso="carreira" aria-label="Área de Carreira" id="acessar-carreira" href="./pages/carreira.html">
+              <a class="taskflow-atalho" data-acesso="carreira" aria-label="Área de Carreira" id="acessar-carreira"
+                href="./pages/carreira.html">
                 <img src="./assets/images/acesso-carreira-voxel.png" width="285" height="712" alt="" loading="lazy">
               </a>
-              <button class="taskflow-atalho" data-acesso="ia" aria-label="Gestor de IA — indisponível" type="button" disabled>
+              <button class="taskflow-atalho" data-acesso="ia" aria-label="Gestor de IA — indisponível" type="button"
+                disabled>
                 <img src="./assets/images/acesso-ia-voxel.png" width="281" height="673" alt="" loading="lazy">
                 <span class="taskflow-atalho-status">Indisponível</span>
               </button>
@@ -216,17 +240,27 @@
           <!-- Próximos eventos — Estrutura - apresenta até três compromissos futuros -->
           <aside class="proximos-eventos" aria-label="Próximos eventos">
             <button id="alternar-eventos" class="agenda-botao" type="button" aria-expanded="false"
-              aria-controls="painel-eventos"><i class="fa-regular fa-calendar-check" aria-hidden="true"></i> Próximos eventos <span class="eventos-indicador" aria-hidden="true">⌃</span></button>
-            <div id="painel-eventos" class="eventos-conteudo" role="dialog" aria-modal="false" aria-labelledby="eventos-titulo" aria-describedby="eventos-subtitulo" hidden>
+              aria-controls="painel-eventos"><i class="fa-regular fa-calendar-check" aria-hidden="true"></i> Próximos
+              eventos <span class="eventos-indicador" aria-hidden="true">⌃</span></button>
+            <div id="painel-eventos" class="eventos-conteudo" role="dialog" aria-modal="false"
+              aria-labelledby="eventos-titulo" aria-describedby="eventos-subtitulo" hidden>
               <header class="eventos-cabecalho">
-                <span class="eventos-calendario-icone" aria-hidden="true"><i class="fa-regular fa-calendar-days"></i></span>
-                <div><h2 id="eventos-titulo">Próximos <span>eventos</span></h2><p id="eventos-subtitulo">Seus próximos compromissos registrados na agenda.</p></div>
-                <button id="fechar-eventos" class="agenda-botao" type="button" aria-label="Fechar próximos eventos">×</button>
+                <span class="eventos-calendario-icone" aria-hidden="true"><i
+                    class="fa-regular fa-calendar-days"></i></span>
+                <div>
+                  <h2 id="eventos-titulo">Próximos <span>eventos</span></h2>
+                  <p id="eventos-subtitulo">Seus próximos compromissos registrados na agenda.</p>
+                </div>
+                <button id="fechar-eventos" class="agenda-botao" type="button"
+                  aria-label="Fechar próximos eventos">×</button>
               </header>
               <ul id="lista-eventos" class="agenda-lista"></ul>
               <footer class="eventos-rodape">
-                <button id="evento-abrir-unico" class="agenda-botao" type="button" data-acao="abrir" aria-haspopup="dialog" hidden><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> Abrir na Agenda</button>
-                <button id="agenda-completa" class="agenda-botao" type="button" aria-haspopup="dialog"><i class="fa-regular fa-calendar-days" aria-hidden="true"></i> Abrir agenda completa</button>
+                <button id="evento-abrir-unico" class="agenda-botao" type="button" data-acao="abrir"
+                  aria-haspopup="dialog" hidden><i class="fa-solid fa-arrow-up-right-from-square"
+                    aria-hidden="true"></i> Abrir na Agenda</button>
+                <button id="agenda-completa" class="agenda-botao" type="button" aria-haspopup="dialog"><i
+                    class="fa-regular fa-calendar-days" aria-hidden="true"></i> Abrir agenda completa</button>
               </footer>
             </div>
           </aside>
@@ -241,176 +275,205 @@
               <h1 id="titulo-biblioteca" tabindex="-1">Biblioteca <span>Técnica</span></h1>
               <p>Documentação e conteúdos para você aprender e evoluir</p>
             </div>
-            <button id="biblioteca-voltar" class="taskflow-explorar" type="button" data-taskflow-voltar>← Voltar</button>
+            <button id="biblioteca-voltar" class="taskflow-explorar" type="button" data-taskflow-voltar>←
+              Voltar</button>
           </header>
-            <div id="taskflow-categorias" class="taskflow-mapa">
-              <!-- Front-end — Estrutura - agrupa os tópicos desta área -->
-              <article class="area-tecnologia" aria-labelledby="titulo-frontend">
-                <header class="area-cabecalho">
-                  <span class="area-numero" aria-hidden="true">01</span>
-                  <div>
-                    <h3 id="titulo-frontend">Front-end</h3>
-                    <p>Dê forma às suas ideias na web.</p>
-                  </div>
-                  <i class="fa-solid fa-window-maximize area-ilustracao" aria-hidden="true"></i>
-                </header>
-                <div class="area-topicos">
-                  <a class="topico-taskflow topico-frontend" href="./pages/biblioteca/html.html"
-                    data-categoria="frontend" data-topico="html">
-                    <i aria-hidden="true" class="devicon-html5-plain colored topico-icone"></i>
-                    <span class="topico-nome">HTML</span>
-                  </a>
-                  <a class="topico-taskflow topico-frontend" href="./pages/biblioteca/css.html" data-categoria="frontend"
-                    data-topico="css">
-                    <i aria-hidden="true" class="devicon-css3-plain colored topico-icone"></i>
-                    <span class="topico-nome">CSS</span>
-                  </a>
-                  <a class="topico-taskflow topico-frontend" href="./pages/biblioteca/javascript.html" data-categoria="frontend" data-topico="javascript">
-                    <i aria-hidden="true" class="devicon-javascript-plain colored topico-icone"></i>
-                    <span class="topico-nome">JavaScript</span>
-                  </a>
-                  <a class="topico-taskflow topico-frontend" href="./pages/biblioteca/typescript.html" data-categoria="frontend" data-topico="typescript">
-                    <i aria-hidden="true" class="devicon-typescript-plain colored topico-icone"></i>
-                    <span class="topico-nome">TypeScript</span>
-                  </a>
-                  <a class="topico-taskflow topico-frontend" href="./pages/biblioteca/react.html" data-categoria="frontend" data-topico="react">
-                    <i aria-hidden="true" class="devicon-react-plain colored topico-icone"></i>
-                    <span class="topico-nome">React</span>
-                  </a>
-                  <button class="topico-taskflow topico-frontend" type="button" data-categoria="frontend"
-                    data-topico="vite">
-                    <i aria-hidden="true" class="devicon-vitejs-plain colored topico-icone"></i>
-                    <span class="topico-nome">Vite</span>
-                  </button>
+          <div id="taskflow-categorias" class="taskflow-mapa">
+            <!-- Front-end — Estrutura - agrupa os tópicos desta área -->
+            <article class="area-tecnologia" aria-labelledby="titulo-frontend">
+              <header class="area-cabecalho">
+                <span class="area-numero" aria-hidden="true">01</span>
+                <div>
+                  <h3 id="titulo-frontend">Front-end</h3>
+                  <p>Dê forma às suas ideias na web.</p>
                 </div>
-                <button class="biblioteca-categoria-atalho" type="button" aria-label="Explorar esta categoria">→</button>
-              </article>
-              <!-- Back-end — Estrutura - agrupa os tópicos desta área -->
-              <article class="area-tecnologia" aria-labelledby="titulo-backend">
-                <header class="area-cabecalho">
-                  <span class="area-numero" aria-hidden="true">02</span>
-                  <div>
-                    <h3 id="titulo-backend">Back-end</h3>
-                    <p>Conheça o que faz tudo acontecer.</p>
-                  </div>
-                  <i class="fa-solid fa-server area-ilustracao" aria-hidden="true"></i>
-                </header>
-                <div class="area-topicos">
-                  <button class="topico-taskflow topico-backend" type="button" data-categoria="backend"
-                    data-topico="node">
-                    <i aria-hidden="true" class="devicon-nodejs-plain colored topico-icone"></i>
-                    <span class="topico-nome">Node.js</span>
-                  </button>
-                  <button class="topico-taskflow topico-backend" type="button" data-categoria="backend"
-                    data-topico="express">
-                    <i aria-hidden="true" class="devicon-express-plain colored topico-icone"></i>
-                    <span class="topico-nome">Express</span>
-                  </button>
-                  <button class="topico-taskflow topico-backend" type="button" data-categoria="backend"
-                    data-topico="fastify">
-                    <i aria-hidden="true" class="devicon-fastify-plain colored topico-icone"></i>
-                    <span class="topico-nome">Fastify</span>
-                  </button>
-                  <button class="topico-taskflow topico-backend" type="button" data-categoria="backend"
-                    data-topico="prisma">
-                    <i aria-hidden="true" class="devicon-prisma-plain colored topico-icone"></i>
-                    <span class="topico-nome">Prisma</span>
-                  </button>
-                  <button class="topico-taskflow topico-backend" type="button" data-categoria="backend"
-                    data-topico="postgres">
-                    <i aria-hidden="true" class="devicon-postgresql-plain colored topico-icone"></i>
-                    <span class="topico-nome">PostgreSQL</span>
-                  </button>
-                  <button class="topico-taskflow topico-backend" type="button" data-categoria="backend"
-                    data-topico="mongodb">
-                    <i aria-hidden="true" class="devicon-mongodb-plain colored topico-icone"></i>
-                    <span class="topico-nome">MongoDB</span>
-                  </button>
-                  <button class="topico-taskflow topico-backend" type="button" data-categoria="backend"
-                    data-topico="docker">
-                    <i aria-hidden="true" class="devicon-docker-plain colored topico-icone"></i>
-                    <span class="topico-nome">Docker</span>
-                  </button>
+                <i class="fa-solid fa-window-maximize area-ilustracao" aria-hidden="true"></i>
+              </header>
+              <div class="area-topicos">
+                <a class="topico-taskflow topico-frontend" href="./pages/biblioteca/html.html" data-categoria="frontend"
+                  data-topico="html">
+                  <i aria-hidden="true" class="devicon-html5-plain colored topico-icone"></i>
+                  <span class="topico-nome">HTML</span>
+                </a>
+                <a class="topico-taskflow topico-frontend" href="./pages/biblioteca/css.html" data-categoria="frontend"
+                  data-topico="css">
+                  <i aria-hidden="true" class="devicon-css3-plain colored topico-icone"></i>
+                  <span class="topico-nome">CSS</span>
+                </a>
+                <a class="topico-taskflow topico-frontend" href="./pages/biblioteca/javascript.html"
+                  data-categoria="frontend" data-topico="javascript">
+                  <i aria-hidden="true" class="devicon-javascript-plain colored topico-icone"></i>
+                  <span class="topico-nome">JavaScript</span>
+                </a>
+                <a class="topico-taskflow topico-frontend" href="./pages/biblioteca/typescript.html"
+                  data-categoria="frontend" data-topico="typescript">
+                  <i aria-hidden="true" class="devicon-typescript-plain colored topico-icone"></i>
+                  <span class="topico-nome">TypeScript</span>
+                </a>
+                <a class="topico-taskflow topico-frontend" href="./pages/biblioteca/react.html"
+                  data-categoria="frontend" data-topico="react">
+                  <i aria-hidden="true" class="devicon-react-plain colored topico-icone"></i>
+                  <span class="topico-nome">React</span>
+                </a>
+                <button class="topico-taskflow topico-frontend" type="button" data-categoria="frontend"
+                  data-topico="vite">
+                  <i aria-hidden="true" class="devicon-vitejs-plain colored topico-icone"></i>
+                  <span class="topico-nome">Vite</span>
+                </button>
+              </div>
+              <button class="biblioteca-categoria-atalho" type="button" aria-label="Explorar esta categoria">→</button>
+            </article>
+            <!-- Back-end — Estrutura - agrupa os tópicos desta área -->
+            <article class="area-tecnologia" aria-labelledby="titulo-backend">
+              <header class="area-cabecalho">
+                <span class="area-numero" aria-hidden="true">02</span>
+                <div>
+                  <h3 id="titulo-backend">Back-end</h3>
+                  <p>Conheça o que faz tudo acontecer.</p>
                 </div>
-                <button class="biblioteca-categoria-atalho" type="button" aria-label="Explorar esta categoria">→</button>
-              </article>
-              <!-- Mobile — Estrutura - agrupa os tópicos desta área -->
-              <article class="area-tecnologia" aria-labelledby="titulo-mobile">
-                <header class="area-cabecalho">
-                  <span class="area-numero" aria-hidden="true">03</span>
-                  <div>
-                    <h3 id="titulo-mobile">Mobile</h3>
-                    <p>Leve suas ideias para outras telas.</p>
-                  </div>
-                  <i class="fa-solid fa-mobile-screen-button area-ilustracao" aria-hidden="true"></i>
-                </header>
-                <div class="area-topicos">
-                  <button class="topico-taskflow topico-mobile" type="button" data-categoria="mobile"
-                    data-topico="react-native">
-                    <i aria-hidden="true" class="devicon-react-plain colored topico-icone"></i>
-                    <span class="topico-nome">React Native</span>
-                  </button>
-                  <button class="topico-taskflow topico-mobile" type="button" data-categoria="mobile"
-                    data-topico="expo">
-                    <i aria-hidden="true" class="devicon-expo-plain colored topico-icone"></i>
-                    <span class="topico-nome">Expo</span>
-                  </button>
-                  <button class="topico-taskflow topico-mobile" type="button" data-categoria="mobile"
-                    data-topico="android">
-                    <i aria-hidden="true" class="devicon-android-plain colored topico-icone"></i>
-                    <span class="topico-nome">Android</span>
-                  </button>
-                  <button class="topico-taskflow topico-mobile" type="button" data-categoria="mobile" data-topico="ios">
-                    <i aria-hidden="true" class="devicon-ios-plain colored topico-icone"></i>
-                    <span class="topico-nome">iOS</span>
-                  </button>
+                <i class="fa-solid fa-server area-ilustracao" aria-hidden="true"></i>
+              </header>
+              <div class="area-topicos">
+                <button class="topico-taskflow topico-backend" type="button" data-categoria="backend"
+                  data-topico="node">
+                  <i aria-hidden="true" class="devicon-nodejs-plain colored topico-icone"></i>
+                  <span class="topico-nome">Node.js</span>
+                </button>
+                <button class="topico-taskflow topico-backend" type="button" data-categoria="backend"
+                  data-topico="express">
+                  <i aria-hidden="true" class="devicon-express-plain colored topico-icone"></i>
+                  <span class="topico-nome">Express</span>
+                </button>
+                <button class="topico-taskflow topico-backend" type="button" data-categoria="backend"
+                  data-topico="fastify">
+                  <i aria-hidden="true" class="devicon-fastify-plain colored topico-icone"></i>
+                  <span class="topico-nome">Fastify</span>
+                </button>
+                <button class="topico-taskflow topico-backend" type="button" data-categoria="backend"
+                  data-topico="prisma">
+                  <i aria-hidden="true" class="devicon-prisma-plain colored topico-icone"></i>
+                  <span class="topico-nome">Prisma</span>
+                </button>
+                <button class="topico-taskflow topico-backend" type="button" data-categoria="backend"
+                  data-topico="postgres">
+                  <i aria-hidden="true" class="devicon-postgresql-plain colored topico-icone"></i>
+                  <span class="topico-nome">PostgreSQL</span>
+                </button>
+                <button class="topico-taskflow topico-backend" type="button" data-categoria="backend"
+                  data-topico="mongodb">
+                  <i aria-hidden="true" class="devicon-mongodb-plain colored topico-icone"></i>
+                  <span class="topico-nome">MongoDB</span>
+                </button>
+                <button class="topico-taskflow topico-backend" type="button" data-categoria="backend"
+                  data-topico="docker">
+                  <i aria-hidden="true" class="devicon-docker-plain colored topico-icone"></i>
+                  <span class="topico-nome">Docker</span>
+                </button>
+              </div>
+              <button class="biblioteca-categoria-atalho" type="button" aria-label="Explorar esta categoria">→</button>
+            </article>
+            <!-- Mobile — Estrutura - agrupa os tópicos desta área -->
+            <article class="area-tecnologia" aria-labelledby="titulo-mobile">
+              <header class="area-cabecalho">
+                <span class="area-numero" aria-hidden="true">03</span>
+                <div>
+                  <h3 id="titulo-mobile">Mobile</h3>
+                  <p>Leve suas ideias para outras telas.</p>
                 </div>
-                <button class="biblioteca-categoria-atalho" type="button" aria-label="Explorar esta categoria">→</button>
-              </article>
-              <!-- Carreira — Estrutura - agrupa os tópicos desta área -->
+                <i class="fa-solid fa-mobile-screen-button area-ilustracao" aria-hidden="true"></i>
+              </header>
+              <div class="area-topicos">
+                <button class="topico-taskflow topico-mobile" type="button" data-categoria="mobile"
+                  data-topico="react-native">
+                  <i aria-hidden="true" class="devicon-react-plain colored topico-icone"></i>
+                  <span class="topico-nome">React Native</span>
+                </button>
+                <button class="topico-taskflow topico-mobile" type="button" data-categoria="mobile" data-topico="expo">
+                  <i aria-hidden="true" class="devicon-expo-plain colored topico-icone"></i>
+                  <span class="topico-nome">Expo</span>
+                </button>
+                <button class="topico-taskflow topico-mobile" type="button" data-categoria="mobile"
+                  data-topico="android">
+                  <i aria-hidden="true" class="devicon-android-plain colored topico-icone"></i>
+                  <span class="topico-nome">Android</span>
+                </button>
+                <button class="topico-taskflow topico-mobile" type="button" data-categoria="mobile" data-topico="ios">
+                  <i aria-hidden="true" class="devicon-ios-plain colored topico-icone"></i>
+                  <span class="topico-nome">iOS</span>
+                </button>
+              </div>
+              <button class="biblioteca-categoria-atalho" type="button" aria-label="Explorar esta categoria">→</button>
+            </article>
+            <!-- Carreira — Estrutura - agrupa os tópicos desta área -->
 
-            </div>
+          </div>
           <p id="biblioteca-integracao-status" role="status" aria-live="polite"></p>
-          <section id="biblioteca-central" class="biblioteca-layout" data-biblioteca-central="" data-tecnologia="html" aria-label="Consulta da Biblioteca Técnica">
-            <button id="biblioteca-alternar-menu" class="biblioteca-menu-botao" type="button" aria-controls="biblioteca-menu" aria-expanded="false" disabled>Mostrar Guia de Estudos</button>
+          <section id="biblioteca-central" class="biblioteca-layout" data-biblioteca-central="" data-tecnologia="html"
+            aria-label="Consulta da Biblioteca Técnica">
+            <button id="biblioteca-alternar-menu" class="biblioteca-menu-botao" type="button"
+              aria-controls="biblioteca-menu" aria-expanded="false" disabled>Mostrar Guia de Estudos</button>
             <aside id="biblioteca-menu" class="biblioteca-menu" aria-labelledby="biblioteca-menu-titulo">
-              <h2 id="biblioteca-menu-titulo"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Guia de Estudos</h2>
+              <h2 id="biblioteca-menu-titulo"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Guia de Estudos
+              </h2>
               <section id="biblioteca-pesquisa" class="biblioteca-pesquisa" aria-label="Pesquisa de conteúdos">
                 <form id="biblioteca-pesquisa-formulario" role="search" aria-label="Pesquisar na Biblioteca">
                   <label for="biblioteca-pesquisa-campo">Pesquisar conteúdo</label>
-                  <input id="biblioteca-pesquisa-campo" type="search" autocomplete="off" placeholder="Pesquisar conteúdo..." aria-describedby="biblioteca-pesquisa-status" disabled>
+                  <input id="biblioteca-pesquisa-campo" type="search" autocomplete="off"
+                    placeholder="Pesquisar conteúdo..." aria-describedby="biblioteca-pesquisa-status" disabled>
                   <button id="biblioteca-pesquisa-limpar" type="button" hidden>Limpar pesquisa</button>
                 </form>
                 <p id="biblioteca-pesquisa-status" role="status" aria-live="polite"></p>
                 <ul id="biblioteca-pesquisa-resultados" aria-label="Resultados da pesquisa" hidden></ul>
               </section>
-              <nav id="biblioteca-niveis" aria-label="Linguagens, níveis, módulos e tópicos"><p>Carregando conteúdos…</p></nav>
+              <nav id="biblioteca-niveis" aria-label="Linguagens, níveis, módulos e tópicos">
+                <p>Carregando conteúdos…</p>
+              </nav>
             </aside>
-            <article id="biblioteca-leitura" class="biblioteca-leitura" tabindex="-1" aria-labelledby="biblioteca-vazio-titulo">
+            <article id="biblioteca-leitura" class="biblioteca-leitura" tabindex="-1"
+              aria-labelledby="biblioteca-vazio-titulo">
               <header id="biblioteca-central-cabecalho" class="biblioteca-leitura-cabecalho" hidden>
                 <p id="biblioteca-central-breadcrumb">Biblioteca Técnica</p>
-                <div class="biblioteca-central-titulo"><img id="biblioteca-central-icone" src="./assets/images/biblioteca-html.svg" width="30" height="30" alt="" aria-hidden="true"><h2 id="biblioteca-titulo">Documentação</h2></div>
+                <div class="biblioteca-central-titulo"><img id="biblioteca-central-icone"
+                    src="./assets/images/biblioteca-html.svg" width="30" height="30" alt="" aria-hidden="true">
+                  <h2 id="biblioteca-titulo">Documentação</h2>
+                </div>
                 <span id="biblioteca-nivel" class="biblioteca-nivel">Todos os níveis</span>
                 <button id="biblioteca-ocultar-conteudo" type="button">Ocultar conteúdo</button>
                 <a id="biblioteca-central-original" href="./pages/biblioteca/html.html">Abrir documentação original</a>
               </header>
-              <div id="biblioteca-estado-vazio" role="status"><h2 id="biblioteca-vazio-titulo">Selecione uma linguagem</h2><p id="biblioteca-vazio-descricao">Escolha uma linguagem no Guia de Estudos para consultar sua documentação.</p></div>
-              <nav class="biblioteca-conteudos-navegacao" aria-label="Navegação entre assuntos" hidden><button type="button" disabled>← Assunto anterior</button><button type="button" disabled>Próximo assunto →</button></nav>
+              <div id="biblioteca-estado-vazio" role="status">
+                <h2 id="biblioteca-vazio-titulo">Selecione uma linguagem</h2>
+                <p id="biblioteca-vazio-descricao">Escolha uma linguagem no Guia de Estudos para consultar sua
+                  documentação.</p>
+              </div>
+              <nav class="biblioteca-conteudos-navegacao" aria-label="Navegação entre assuntos" hidden><button
+                  type="button" disabled>← Assunto anterior</button><button type="button" disabled>Próximo assunto
+                  →</button></nav>
             </article>
           </section>
-          <button id="biblioteca-abrir-anotacoes" class="biblioteca-anotacoes-flutuante" type="button" aria-haspopup="dialog" aria-controls="biblioteca-anotacoes"><i class="fa-regular fa-note-sticky" aria-hidden="true"></i><span>Anotações</span></button>
+          <button id="biblioteca-abrir-anotacoes" class="biblioteca-anotacoes-flutuante" type="button"
+            aria-haspopup="dialog" aria-controls="biblioteca-anotacoes"><i class="fa-regular fa-note-sticky"
+              aria-hidden="true"></i><span>Anotações</span></button>
           <dialog id="biblioteca-anotacoes" class="biblioteca-anotacoes" aria-labelledby="anotacoes-titulo">
-            <header><h2 id="anotacoes-titulo">Minhas anotações</h2><button id="anotacoes-fechar" type="button" aria-label="Fechar anotações">×</button></header>
+            <header>
+              <h2 id="anotacoes-titulo">Minhas anotações</h2><button id="anotacoes-fechar" type="button"
+                aria-label="Fechar anotações">×</button>
+            </header>
             <button id="anotacoes-nova" type="button" disabled>+ Nova anotação</button>
-            <div class="anotacoes-filtros"><label for="anotacoes-filtro">Linguagem</label><select id="anotacoes-filtro"><option value="">Todas</option></select><label for="anotacoes-pesquisa">Pesquisar anotações</label><input id="anotacoes-pesquisa" type="search" placeholder="Pesquisar anotações..."></div>
+            <div class="anotacoes-filtros"><label for="anotacoes-filtro">Linguagem</label><select id="anotacoes-filtro">
+                <option value="">Todas</option>
+              </select><label for="anotacoes-pesquisa">Pesquisar anotações</label><input id="anotacoes-pesquisa"
+                type="search" placeholder="Pesquisar anotações..."></div>
             <p id="anotacoes-status" role="status" aria-live="polite"></p>
             <form id="anotacoes-formulario" hidden>
               <h3 id="anotacoes-formulario-titulo">Nova anotação</h3>
               <label for="anotacoes-nome">Título</label><input id="anotacoes-nome" required maxlength="120">
               <label for="anotacoes-linguagem">Linguagem</label><select id="anotacoes-linguagem" required></select>
               <label for="anotacoes-topico">Tópico</label><select id="anotacoes-topico" required></select>
-              <label for="anotacoes-texto">Anotação</label><textarea id="anotacoes-texto" rows="6" required maxlength="10000"></textarea>
-              <div><button type="submit">Salvar anotação</button><button id="anotacoes-cancelar" type="button">Cancelar</button></div>
+              <label for="anotacoes-texto">Anotação</label><textarea id="anotacoes-texto" rows="6" required
+                maxlength="10000"></textarea>
+              <div><button type="submit">Salvar anotação</button><button id="anotacoes-cancelar"
+                  type="button">Cancelar</button></div>
             </form>
             <ul id="anotacoes-lista" aria-label="Anotações salvas"></ul>
           </dialog>
@@ -429,7 +492,8 @@
     </div>
     <header class="agenda-banner">
       <h2 id="titulo-agenda"><img src="./assets/images/agenda-banner-voxel.png" width="1942" height="809"
-        alt="Minha Agenda — Organize seus estudos. Planeje suas metas, acompanhe seus compromissos e mantenha sua evolução em dia."></h2>
+          alt="Minha Agenda — Organize seus estudos. Planeje suas metas, acompanhe seus compromissos e mantenha sua evolução em dia.">
+      </h2>
     </header>
     <p id="agenda-aviso" class="agenda-aviso" role="status" aria-live="polite"></p>
     <div class="agenda-layout">
@@ -441,7 +505,8 @@
         </div>
         <div class="agenda-ano-controle">
           <label for="agenda-ano">Ir para o ano</label>
-          <input id="agenda-ano" type="number" min="1" max="9999" step="1" inputmode="numeric" aria-label="Ano do calendário">
+          <input id="agenda-ano" type="number" min="1" max="9999" step="1" inputmode="numeric"
+            aria-label="Ano do calendário">
         </div>
         <div class="agenda-semana" aria-hidden="true">
           <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
@@ -454,7 +519,8 @@
           <span><i class="agenda-legenda-feriado" aria-hidden="true"></i>Feriado nacional</span>
           <span><i class="agenda-legenda-fim-semana" aria-hidden="true"></i>Fim de semana</span>
         </div>
-        <p class="agenda-escopo-feriados">Feriados nacionais do Brasil. Feriados locais e pontos facultativos não estão incluídos.</p>
+        <p class="agenda-escopo-feriados">Feriados nacionais do Brasil. Feriados locais e pontos facultativos não estão
+          incluídos.</p>
         <ul id="agenda-feriados" class="agenda-feriados" aria-label="Feriados nacionais do mês"></ul>
         <h3 id="agenda-data-selecionada"></h3>
       </section>
@@ -486,8 +552,8 @@
           <label for="compromisso-hora">Hora (obrigatória)</label>
           <input id="compromisso-hora" name="hora" type="time" required>
           <div class="agenda-acoes"><button id="salvar-compromisso" class="agenda-botao agenda-primario"
-              type="submit"><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Salvar</button><button id="cancelar-compromisso" class="agenda-botao"
-              type="button">Cancelar</button></div>
+              type="submit"><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Salvar</button><button
+              id="cancelar-compromisso" class="agenda-botao" type="button">Cancelar</button></div>
         </div>
         <div class="agenda-formulario-arte" aria-hidden="true">
           <img src="./assets/images/agenda-formulario-voxel.png" width="1448" height="1086" alt="" loading="lazy">
@@ -498,25 +564,37 @@
   <dialog id="pomodoro-painel" class="pomodoro-painel" aria-labelledby="pomodoro-titulo">
     <header class="pomodoro-cabecalho">
       <h2 id="pomodoro-titulo"><i class="fa-solid fa-stopwatch" aria-hidden="true"></i> Relógio e Pomodoro</h2>
-      <button id="pomodoro-minimizar" class="pomodoro-botao" type="button" aria-label="Minimizar Pomodoro" aria-controls="pomodoro-minimizado">−</button>
-      <button id="pomodoro-fechar" class="pomodoro-botao" type="button" aria-label="Fechar Relógio e Pomodoro">×</button>
+      <button id="pomodoro-minimizar" class="pomodoro-botao" type="button" aria-label="Minimizar Pomodoro"
+        aria-controls="pomodoro-minimizado">−</button>
+      <button id="pomodoro-fechar" class="pomodoro-botao" type="button"
+        aria-label="Fechar Relógio e Pomodoro">×</button>
     </header>
     <div class="pomodoro-conteudo">
       <div class="pomodoro-abas" role="tablist" aria-label="Produtividade">
-        <button id="pomodoro-aba-foco" role="tab" aria-selected="true" aria-controls="pomodoro-tab-foco" type="button">Pomodoro</button>
-        <button id="pomodoro-aba-relogio" role="tab" aria-selected="false" aria-controls="pomodoro-tab-relogio" tabindex="-1" type="button">Relógio</button>
-        <button id="pomodoro-aba-estatisticas" role="tab" aria-selected="false" aria-controls="pomodoro-tab-estatisticas" tabindex="-1" type="button">Estatísticas</button>
+        <button id="pomodoro-aba-foco" role="tab" aria-selected="true" aria-controls="pomodoro-tab-foco"
+          type="button">Pomodoro</button>
+        <button id="pomodoro-aba-relogio" role="tab" aria-selected="false" aria-controls="pomodoro-tab-relogio"
+          tabindex="-1" type="button">Relógio</button>
+        <button id="pomodoro-aba-estatisticas" role="tab" aria-selected="false"
+          aria-controls="pomodoro-tab-estatisticas" tabindex="-1" type="button">Estatísticas</button>
       </div>
       <section id="pomodoro-tab-foco" role="tabpanel" tabindex="0" aria-labelledby="pomodoro-aba-foco">
         <div class="pomodoro-palco">
           <div class="pomodoro-cronometro">
-            <div id="pomodoro-temporizador" class="pomodoro-circulo" role="timer" aria-live="off" aria-label="Foco: 25:00">
+            <div id="pomodoro-temporizador" class="pomodoro-circulo" role="timer" aria-live="off"
+              aria-label="Foco: 25:00">
               <svg viewBox="0 0 200 200" aria-hidden="true" focusable="false">
-                <defs><linearGradient id="pomodoro-gradiente" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ffd84d"/><stop offset="100%" stop-color="#ff8a00"/></linearGradient></defs>
-                <circle class="pomodoro-trilho" cx="100" cy="100" r="90"/>
-                <circle id="pomodoro-progresso" cx="100" cy="100" r="90"/>
+                <defs>
+                  <linearGradient id="pomodoro-gradiente" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#ffd84d" />
+                    <stop offset="100%" stop-color="#ff8a00" />
+                  </linearGradient>
+                </defs>
+                <circle class="pomodoro-trilho" cx="100" cy="100" r="90" />
+                <circle id="pomodoro-progresso" cx="100" cy="100" r="90" />
               </svg>
-              <div class="pomodoro-tempo-central"><span id="pomodoro-modalidade">Foco</span><strong id="pomodoro-tempo">25:00</strong><span id="pomodoro-estado">Pronto para começar</span></div>
+              <div class="pomodoro-tempo-central"><span id="pomodoro-modalidade">Foco</span><strong
+                  id="pomodoro-tempo">25:00</strong><span id="pomodoro-estado">Pronto para começar</span></div>
             </div>
           </div>
           <div class="pomodoro-mentor">
@@ -527,22 +605,28 @@
           <button class="pomodoro-botao" type="button" data-modo="foco" aria-pressed="true">Foco</button>
           <button class="pomodoro-botao" type="button" data-modo="curta" aria-pressed="false">Pausa curta</button>
           <button class="pomodoro-botao" type="button" data-modo="longa" aria-pressed="false">Pausa longa</button>
-          <button class="pomodoro-botao" type="button" data-modo="personalizado" aria-pressed="false" aria-expanded="false" aria-controls="pomodoro-personalizado">Personalizado</button>
+          <button class="pomodoro-botao" type="button" data-modo="personalizado" aria-pressed="false"
+            aria-expanded="false" aria-controls="pomodoro-personalizado">Personalizado</button>
         </div>
         <form id="pomodoro-personalizado" class="pomodoro-personalizado" hidden>
           <div class="pomodoro-configuracao-cabecalho">
             <span>Personalização</span>
-            <button id="pomodoro-recolher-campos" class="pomodoro-botao" type="button" aria-label="Minimizar campos de personalização" aria-controls="pomodoro-personalizado"><span aria-hidden="true">−</span> Recolher</button>
+            <button id="pomodoro-recolher-campos" class="pomodoro-botao" type="button"
+              aria-label="Minimizar campos de personalização" aria-controls="pomodoro-personalizado"><span
+                aria-hidden="true">−</span> Recolher</button>
           </div>
           <div class="pomodoro-duracao">
             <label for="pomodoro-estudo">Tempo de estudo (horas:minutos)</label>
-            <input id="pomodoro-estudo" type="text" inputmode="numeric" placeholder="01:00" value="00:25" maxlength="5" pattern="[0-9]{2}:[0-9]{2}" aria-describedby="pomodoro-duracao-ajuda" required>
+            <input id="pomodoro-estudo" type="text" inputmode="numeric" placeholder="01:00" value="00:25" maxlength="5"
+              pattern="[0-9]{2}:[0-9]{2}" aria-describedby="pomodoro-duracao-ajuda" required>
           </div>
           <div class="pomodoro-duracao">
             <label for="pomodoro-pausa">Tempo de pausa (horas:minutos)</label>
-            <input id="pomodoro-pausa" type="text" inputmode="numeric" placeholder="00:10" value="00:05" maxlength="5" pattern="[0-9]{2}:[0-9]{2}" aria-describedby="pomodoro-duracao-ajuda" required>
+            <input id="pomodoro-pausa" type="text" inputmode="numeric" placeholder="00:10" value="00:05" maxlength="5"
+              pattern="[0-9]{2}:[0-9]{2}" aria-describedby="pomodoro-duracao-ajuda" required>
           </div>
-          <p id="pomodoro-duracao-ajuda">Exemplo: 01:30 para uma hora e meia de estudo e 00:10 para dez minutos de pausa. Cada etapa começa ao clicar em Iniciar.</p>
+          <p id="pomodoro-duracao-ajuda">Exemplo: 01:30 para uma hora e meia de estudo e 00:10 para dez minutos de
+            pausa. Cada etapa começa ao clicar em Iniciar.</p>
           <button class="pomodoro-botao" type="submit">Aplicar tempos</button>
         </form>
         <div class="pomodoro-acoes">
@@ -551,26 +635,40 @@
           <button id="pomodoro-parar" class="pomodoro-botao" type="button">Parar</button>
         </div>
         <div class="pomodoro-resumo">
-          <div id="pomodoro-ciclos" class="pomodoro-ciclos" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+          <div id="pomodoro-ciclos" class="pomodoro-ciclos" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+          </div>
           <p id="pomodoro-sessoes">0 sessões de foco concluídas hoje</p>
         </div>
       </section>
-      <section id="pomodoro-tab-relogio" class="pomodoro-relogio-area" role="tabpanel" tabindex="0" aria-labelledby="pomodoro-aba-relogio" hidden>
+      <section id="pomodoro-tab-relogio" class="pomodoro-relogio-area" role="tabpanel" tabindex="0"
+        aria-labelledby="pomodoro-aba-relogio" hidden>
         <span class="pomodoro-sobretitulo">SEU TEMPO, SEU RITMO</span>
         <time id="pomodoro-relogio" aria-label="Horário local"></time>
         <p id="pomodoro-data"></p>
         <small>Horário local do seu navegador.</small>
       </section>
-      <section id="pomodoro-tab-estatisticas" role="tabpanel" tabindex="0" aria-labelledby="pomodoro-aba-estatisticas" hidden>
+      <section id="pomodoro-tab-estatisticas" role="tabpanel" tabindex="0" aria-labelledby="pomodoro-aba-estatisticas"
+        hidden>
         <h3 class="pomodoro-estatisticas-titulo">Sua evolução de hoje</h3>
         <dl class="pomodoro-estatisticas">
-          <div><dt>Ciclos de foco</dt><dd id="pomodoro-focos">0</dd></div>
-          <div><dt>Minutos de foco</dt><dd id="pomodoro-minutos-total">0</dd></div>
-          <div><dt>Pausas concluídas</dt><dd id="pomodoro-pausas">0</dd></div>
+          <div>
+            <dt>Ciclos de foco</dt>
+            <dd id="pomodoro-focos">0</dd>
+          </div>
+          <div>
+            <dt>Minutos de foco</dt>
+            <dd id="pomodoro-minutos-total">0</dd>
+          </div>
+          <div>
+            <dt>Pausas concluídas</dt>
+            <dd id="pomodoro-pausas">0</dd>
+          </div>
         </dl>
         <label id="pomodoro-meta-texto" for="pomodoro-meta">0 de 4 ciclos da meta diária</label>
         <progress id="pomodoro-meta" max="4" value="0"></progress>
-        <p class="pomodoro-estatisticas-nota">Somente sessões concluídas são contabilizadas. O modo personalizado conta como foco.</p>
+        <p class="pomodoro-estatisticas-nota">Somente sessões concluídas são contabilizadas. O modo personalizado conta
+          como foco.</p>
       </section>
       <p id="pomodoro-aviso" class="pomodoro-aviso" role="status" aria-live="polite"></p>
       <p id="pomodoro-armazenamento" class="pomodoro-armazenamento" role="status"></p>
@@ -581,8 +679,26 @@
   <aside id="pomodoro-minimizado" class="pomodoro-minimizado" aria-label="Tempo do Pomodoro" hidden>
     <div><strong id="pomodoro-minimizado-modo">Foco</strong><span id="pomodoro-minimizado-status">Pronto</span></div>
     <time id="pomodoro-minimizado-tempo" role="timer" aria-live="off">25:00</time>
-    <button id="pomodoro-restaurar" type="button" aria-label="Restaurar painel completo do Pomodoro" title="Abrir Pomodoro, Relógio e Estatísticas">Abrir</button>
+    <button id="pomodoro-restaurar" type="button" aria-label="Restaurar painel completo do Pomodoro"
+      title="Abrir Pomodoro, Relógio e Estatísticas">Abrir</button>
   </aside>
+
+
+  <!-- Tour — Estrutura - exibir apresentação em vídeo -->
+  <dialog id="modal-tour" class="modal-tour" aria-label="Tour de apresentação do TaskFlow">
+    <div class="modal-tour-conteudo">
+      <div class="modal-tour-cabecalho">
+        <h2>Conheça o TaskFlow</h2>
+        <button id="fechar-tour" type="button" aria-label="Fechar vídeo">×</button>
+      </div>
+
+      <video id="video-tour" controls playsinline preload="metadata">
+        <source src="./assets/images/1025.mp4" type="video/mp4">
+        Seu navegador não suporta reprodução de vídeo.
+      </video>
+    </div>
+  </dialog>
+  <script src="./js/modules/studio/tour.js"></script>
   <script src="./js/core/navegacao.js"></script>
   <script src="./js/core/app.js"></script>
   <script type="module" src="./js/modules/pomodoro/pomodoro.js"></script>
