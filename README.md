@@ -17,14 +17,8 @@ Desenvolvido com **HTML5, CSS3 e JavaScript**, o projeto representa um MVP criad
 
 
 <p align="center">
-  <img
-    src="./assets/images/front.png"
-    src="./assets/images/front2.png"
-    alt="Apresentação oficial do TaskFlow"
-    width="100%"
-  />
+    <img src="./assets/images/1025(1).mp4" alt="frontend" width="100%">
 </p>
-
 ---
 
 ## 💡 Problemática e Objetivo
@@ -241,7 +235,6 @@ TaskFlow-DevClub/
 | `tests/` | Testes automatizados. |
 | `.github/workflows/` | Automação de publicação. |
 
-Para mais detalhes, consulte a [documentação de arquitetura](./docs/arquitetura.md).
 
 ---
 
