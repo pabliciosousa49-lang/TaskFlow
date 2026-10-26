@@ -16,7 +16,7 @@ Desenvolvido com **HTML5, CSS3 e JavaScript**, o projeto representa um MVP criad
 ## 🌐 Live Demo
 
 Acesse a versão publicada do TaskFlow:
-### [Acessar TaskFlow — GitHub Pages](https://pabliciosousa49-lang.github.io/TaskFlow-DevClub/)
+### [Acessar TaskFlow — GitHub Pages](https://pabliciosousa49-lang.github.io/TaskFlow/)
 
 ---
 
