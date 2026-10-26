@@ -13,6 +13,13 @@ Desenvolvido com **HTML5, CSS3 e JavaScript**, o projeto representa um MVP criad
 
 ---
 
+## 🌐 Live Demo
+
+Acesse a versão publicada do TaskFlow:
+### [Acessar TaskFlow — GitHub Pages](https://pabliciosousa49-lang.github.io/TaskFlow-DevClub/)
+
+---
+
 ## 🖼️ Apresentação do Projeto
 
 
@@ -57,6 +64,10 @@ A página principal apresenta a plataforma e facilita o acesso às suas funciona
 - Acesso às ferramentas de estudo e desenvolvimento.
 - Interface responsiva com identidade visual própria.
 
+<p align="center">
+    <img src="./assets/images/front2.png" alt="frontend" width="100%">
+</p>
+
 ### ⏱️ Pomodoro
 
 Ferramenta de gerenciamento de tempo voltada à organização das sessões de estudo.
@@ -71,6 +82,11 @@ Ferramenta de gerenciamento de tempo voltada à organização das sessões de es
 - Visualização minimizada.
 - Estatísticas de utilização.
 
+<p align="center">
+    <img src="./assets/images/pomo1 (1).png" alt="pomo" width="100%">
+    <img src="./assets/images/pomo1 (2).png" alt="pomoPo" width="100%">
+</p>
+
 ### 📅 Agenda
 
 Ambiente para organizar compromissos e acompanhar atividades.
@@ -83,6 +99,10 @@ Ambiente para organizar compromissos e acompanhar atividades.
 - Filtros de organização.
 - Acompanhamento de próximos eventos.
 - Gerenciamento dos compromissos registrados.
+
+<p align="center">
+    <img src="./assets/images/agenda.png" alt="agenda" width="100%">
+</p>
 
 ### 📚 Biblioteca Técnica
 
@@ -101,6 +121,10 @@ Os materiais são organizados por linguagem e tópicos, permitindo que o estudan
 - Anotações locais.
 
 A Biblioteca Técnica funciona como um material de apoio para estudo e consulta.
+
+<p align="center">
+    <img src="./assets/images/bibliotecac.png" alt="biblio" width="100%">
+</p>
 
 ### 💻 Laboratório — TaskFlow Studio
 
@@ -141,6 +165,13 @@ O Laboratório permite trabalhar com projetos que podem ser transferidos para am
 
 O objetivo é aproximar o estudante da experiência de desenvolver uma aplicação, testar seu funcionamento e compreender a conexão entre os arquivos.
 
+<p align="center">
+    <img src="./assets/images/lab (1).png" alt="labora" width="100%">
+    <img src="./assets/images/lab (2).png" alt="laboratorio" width="100%">
+    <img src="./assets/images/roleta.png" alt="roleta" width="100%">
+    <img src="./assets/images/roletaDocument.png" alt="roleta" width="100%">
+</p>
+
 ### 👨‍💼 Carreira
 
 Área voltada à preparação profissional de estudantes e desenvolvedores.
@@ -154,6 +185,11 @@ A proposta contempla conteúdos relacionados a:
 - Desenvolvimento de carreira.
 
 **Observação:** parte dos recursos dessa área permanece em preparação.
+
+<p align="center">
+    <img src="./assets/images/carreira.png" alt="carreira" width="100%">
+</p>
+
 
 ---
 
@@ -286,11 +322,9 @@ Interface TaskFlow
 ### Funcionamento do Laboratório
 
 O Laboratório utiliza um sistema de arquivos virtuais para organizar os projetos desenvolvidos pelo usuário.
-
 O editor permite trabalhar com arquivos HTML, CSS e JavaScript, enquanto a pré-visualização apresenta o resultado da aplicação em um ambiente isolado.
 
 O sistema também oferece recursos de navegação, diagnósticos e persistência local.
-
 Essa estrutura permite praticar a conexão entre arquivos e compreender o comportamento de uma aplicação web.
 
 ---
@@ -298,7 +332,6 @@ Essa estrutura permite praticar a conexão entre arquivos e compreender o compor
 ## 🧠 Metodologia de Desenvolvimento
 
 O TaskFlow foi desenvolvido utilizando uma metodologia estruturada de planejamento, implementação, testes e documentação.
-
 O objetivo foi compreender cada etapa do desenvolvimento e organizar a evolução do projeto.
 
 ### Planejamento
@@ -335,27 +368,17 @@ Essa metodologia contribui para compreender não apenas **o que o código faz**,
 ## 📚 Documentação
 
 A documentação faz parte do processo de desenvolvimento do TaskFlow.
-
 As etapas são registradas considerando três pontos principais:
 
 - **Objetivo:** o que foi planejado e implementado.
 - **Desafios:** dificuldades encontradas durante o desenvolvimento.
 - **Conclusão:** resultados e aprendizados da etapa.
 
-Os documentos técnicos são organizados na pasta `docs/`.
-
 O Git e o GitHub são utilizados para acompanhar a evolução do projeto por meio de commits relacionados às responsabilidades implementadas.
-
-**Documentação principal:**
-
-[Arquitetura do TaskFlow](./docs/arquitetura.md)
-
----
 
 ## 🚀 Como Executar o Projeto
 
 ### Pré-requisitos
-
 - Navegador atualizado.
 - Visual Studio Code ou outro editor.
 - Servidor HTTP local, como Live Server.
@@ -393,14 +416,6 @@ Depois, acesse:
 http://localhost:8000
 
 **Importante:** utilize um servidor HTTP local. Abrir o arquivo diretamente pelo protocolo `file://` não é o fluxo recomendado para o funcionamento dos módulos e recursos da plataforma.
-
----
-
-## 🌐 Live Demo
-
-Acesse a versão publicada do TaskFlow:
-
-### [Acessar TaskFlow — GitHub Pages](https://pabliciosousa49-lang.github.io/TaskFlow-DevClub/)
 
 ---
 
@@ -466,60 +481,19 @@ No navegador convencional, a navegação poderá utilizar caminhos relativos ou 
 
 ---
 
-## 📸 Preview do TaskFlow
-
-Esta seção é destinada às capturas reais das funcionalidades da plataforma.
-
-### Home
-
-<!--
-<img src="./assets/images/readme/home.png" alt="Home do TaskFlow" width="100%">
--->
-
-### Biblioteca Técnica
-
-<!--
-<img src="./assets/images/readme/biblioteca.png" alt="Biblioteca Técnica" width="100%">
--->
-
-### Laboratório
-
-<!--
-<img src="./assets/images/readme/laboratorio.png" alt="Laboratório TaskFlow Studio" width="100%">
--->
-
-### Agenda
-
-<!--
-<img src="./assets/images/readme/agenda.png" alt="Agenda do TaskFlow" width="100%">
--->
-
-### Carreira
-
-<!--
-<img src="./assets/images/readme/carreira.png" alt="Área de Carreira" width="100%">
--->
-
-As imagens poderão ser adicionadas ao diretório `assets/images/readme/` e ativadas conforme os arquivos estiverem disponíveis.
-
----
-
 ## 🧪 Testes e Validação
 
 O TaskFlow possui testes automatizados para validar comportamentos e responsabilidades específicas da aplicação.
-
 Entre os recursos testados estão funcionalidades relacionadas ao Laboratório, à resolução de caminhos e à pré-visualização.
 
 ### Executar os testes
 
 Com Node.js 24 ou superior, execute na raiz do projeto:
-
 ```bash
 node --experimental-vm-modules --test tests/*/*.test.mjs
 ```
 
 Os testes utilizam ambientes simulados e recursos locais de teste.
-
 A validação manual em navegador continua importante para verificar:
 
 - Navegação entre páginas.
@@ -535,7 +509,6 @@ A validação manual em navegador continua importante para verificar:
 ## ⚠️ Limitações e Futuras Implementações
 
 O TaskFlow é um MVP em evolução.
-
 Algumas limitações e características atuais incluem:
 
 - Armazenamento de projetos no navegador.
@@ -567,7 +540,6 @@ Mais do que concluir um MVP, a proposta foi transformar uma necessidade identifi
 **José Pablicio Sousa Viana**
 
 Desenvolvimento Front-End | Desenvolvimento de Software
-
 Acadêmico de Análise e Desenvolvimento de Sistemas, com foco em desenvolvimento Full-Stack.
 
 <p align="center">
