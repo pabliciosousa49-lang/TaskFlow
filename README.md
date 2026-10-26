@@ -17,7 +17,7 @@ Desenvolvido com **HTML5, CSS3 e JavaScript**, o projeto representa um MVP criad
 
 
 <p align="center">
-    <img src="./assets/images/1025(1).mp4" alt="frontend" width="100%">
+    <img src="./assets/images/1025(2).mp4" alt="frontend" width="100%">
 </p>
 ---
 
